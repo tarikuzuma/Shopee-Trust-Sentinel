@@ -1,6 +1,6 @@
-# Shopee Trust Sentinel — Full Build Brief for Claude Code (v3)
+# Shopee Trust Sentinel — Full Build Brief for Claude Code (v4)
 
-TRAILBLAZE Shopee AI Hackathon 2026, Fraud Detection track. ~1 day. v2 added Rung 0, a deterministic pre-filter that runs before any paid model call. v3 splits the four-agent layer in two: Authenticity now runs alone, first — if it's dispositive, the other three checks + Defender are never called.
+TRAILBLAZE Shopee AI Hackathon 2026, Fraud Detection track. ~1 day. v2 added Rung 0, a deterministic pre-filter that runs before any paid model call. v3 splits the four-agent layer in two: Authenticity now runs alone, first — if it's dispositive, the other three checks + Defender are never called. **v4 adds Rung 2 — an expected-loss (pricing) layer that runs AFTER credibility scoring and decides auto-approve vs escalate by minimizing expected PESO loss, not classification accuracy.** The new dataset carries a Price column, so every case now has a claim value; escalation is treated as a cost (~₱19), only paid when the fraud loss it prevents exceeds it. Full spec: docs/ECONOMICS.md. The four checks are implemented as ONE combined VLM call (sentinel/agents/rung1b.py) with a burden-of-proof calibrated prompt — see docs/RUNG1B_REPORT.md.
 
 ## The problem, in one line
 
@@ -19,7 +19,7 @@ Given a return case (stated reason + image/video evidence), decide valid or inva
 - Training data is invalid-only; test data is unlabeled mixed valid/invalid. Architecture and reasoning are graded alongside accuracy.
 - Judges are cross-panel, mostly non-technical. Clarity beats cleverness.
 
-## Architecture — Rung 0 + Rung 1a (new) + Rung 1b
+## Architecture — Rung 0 + Rung 1a + Rung 1b + Rung 2 (new, economics)
 
 Rung 0 is a deterministic Python layer: `cv2` + `Pillow` + `imagehash`, zero tokens, zero API calls. It runs first and does two unrelated jobs that must not be filed under one name:
 
@@ -61,19 +61,49 @@ Return case (reason + video + photo)
       ↓  each returns { score 0-1, reason_string, applicable: bool }
 Scoring combiner → credibility 0–100 (higher = more trustworthy)   [unchanged]
       ↓
-Synthesis agent (LLM) → plain-language brief + verdict
+Decision router (asymmetric thresholds) → preliminary bucket:
+   credibility > ~75  → approve bucket
+   credibility < ~35  → reject  (auto-reject configurable, default ON)
+   35–75 (uncertain)  → escalate bucket
       ↓
-Decision router (asymmetric thresholds):
-   credibility > ~75  → AUTO-APPROVE (valid, behind the scenes)
-   credibility < ~35  → AUTO-REJECT  (invalid, behind the scenes)
-   35–75 (uncertain)  → ESCALATE to human swipe queue
+┌──────────────── Rung 2 — expected-loss / pricing layer (v4) ────────────────┐
+│  Runs AFTER scoring. Refines approve-vs-escalate by MINIMIZING EXPECTED PESO │
+│  LOSS. Escalation is a cost (~₱19); only worth it when prevented fraud loss  │
+│  exceeds it, so the threshold is VALUE-SENSITIVE.                            │
+│    expected_loss_auto_approve = p_invalid × claim_value × net_loss_fraction  │
+│    escalate when expected_loss_escalate < expected_loss_auto_approve         │
+│  p_invalid comes from CONFIGURABLE per-bucket base rates (approve≈0.05,      │
+│  escalate≈0.30) — NOT raw credibility (not calibrated). Missing price or     │
+│  uncalibrated p → ESCALATE (never a silent approve).                         │
+│    low-value uncertain claim  → AUTO-APPROVE (cheaper to eat rare fraud)     │
+│    high-value claim           → needs stronger evidence, else ESCALATE       │
+└─────────────────────────────────────────────────────────────────────────────┘
       ↓
-Everything logged to SQLite → confusion matrix + labeled seed
+Synthesis agent (LLM) → plain-language brief + verdict   [not yet built]
+      ↓
+Everything logged to SQLite (incl. claim value + economic threshold/reason)
+      → confusion matrix + labeled seed
 ```
 
 **Authenticity's own internal jobs** (it's a single VLM call, not a multi-step agent — consistent with "Rung 1, deliberately flat"): full-frame AI-generation detection, local splice/edit detection, physical/compositional plausibility (damage physics, lighting/shadow consistency, garbled text/logos), recapture/screenshot detection. It does NOT own frozen/looped-frame detection — that stays with Tamper (a loop is deception, not an authenticity-of-content question). When a case has multiple evidence files, Authenticity aggregates **worst-case-wins** (minimum credibility across files) — one faked photo among several honest ones is still fraud.
 
 **Considered and deliberately rejected for Authenticity (with evidence, not just theory):** classic hand-crafted forensics (Error Level Analysis, frequency/DCT artifact detection) as a zero-token replacement or supplement. Tested empirically against the 4 real "Edited using AI" training cases — ELA residuals were *lower* on the real fakes than on a non-AI-edited case, and zero of the four carried an EXIF editing-software fingerprint. Matches published research: hand-crafted forensic detectors are documented as brittle against diffusion-model output and confounded by ordinary compression/format differences — exactly the false-positive trap this project's whole design exists to avoid. Also rejected: pretrained deep detectors (CNNDetection/UnivFD/DIRE-style) — real research, but too much dependency/generalization risk for a 1-day build. Both are named on the roadmap, not built.
+
+## Rung 2 — expected-loss / pricing layer (v4, new)
+
+The evidence layers (Rung 0/1a/1b) answer "how trustworthy is this proof." Rung 2 answers a different question: "is acting on that judgment worth the money?" It optimizes expected PESO loss, not accuracy, and only ever moves a case between AUTO-APPROVE and ESCALATE — it never rejects (auto-reject stays the evidence layer's job, behind a config flag).
+
+Why it exists: escalation to a human is a real cost (fully-loaded ~₱19/case, derived from Sea's public filings — see docs/ECONOMICS.md). Paying it only makes sense when the expected fraud loss it prevents is larger than the cost. For a low-value claim the expected loss is tiny, so auto-approving and eating the rare fraud is provably cheaper than reviewing. This makes the auto-approve threshold VALUE-SENSITIVE: cheap claims auto-approve readily; expensive claims require stronger evidence before auto-approval and escalate otherwise. The "Bear" scenario (₱50 exposure, ₱40 review) even produces a NEGATIVE net benefit — the system correctly says "don't review this, it destroys value." Kept in the deck as an honest result.
+
+The calibration guard (the single most important rule here): the model's credibility score is NOT a calibrated probability, and the case spec forbids treating confidence as one. So p_invalid is NOT derived from the raw score. Instead the model's decision bucket maps to a CONFIGURABLE, conservative invalid base rate (bucket_p_invalid, default approve≈0.05 / escalate≈0.30 — SHOPEE-INPUT-REQUIRED placeholders, calibrate from the swipe queue). Any case with a missing price or an out-of-range probability routes to a human.
+
+Locked decisions: (1) p_invalid from per-bucket base rates, never raw credibility; (2) auto-reject configurable, default ON (Shopee guidance is to disable it until the cost of wrongly rejecting a valid claim is known). The formula, the three scenarios (bull/normal/bear), the assumption register with [FACT]/[DERIVED]/[ILLUSTRATIVE]/[SHOPEE INPUT REQUIRED] tags, and the robustness stress tests all live in docs/ECONOMICS.md (engine: sentinel/economics.py; wiring: sentinel/pipeline.py `_apply_economics` / `_auto_reject_gate`). scoring.py is untouched — Rung 2 is a pure post-scoring refinement.
+
+Data validation worth citing: the parsed dataset order values (Test Data median ₱563 / mean ₱841) EXACTLY match the fact sheet's independently-derived figures — the economics are validated against real data, not invented.
+
+## The four checks are ONE combined call (implementation note)
+
+The diagram shows Completeness / Tamper / Relevance / Defender as four boxes, and they ARE four independent signals with their own questions, verdicts, and applicable rules. But they are produced by a SINGLE Gemini call (sentinel/agents/rung1b.py) that returns all four as structured JSON — ~4x cheaper/faster than four separate calls, and the model reasons over the whole case story in one context. The prompt is burden-of-proof calibrated: a check may only score above ~0.7 if it can name affirmative visible evidence; "nothing looks wrong" caps at ~0.5 and routes to escalate (this cut false-approves 5→3 on the training set — see docs/RUNG1B_REPORT.md). Known soft spot: on video, the model can be fooled by pre-opened parcels that look like clean unboxings (a model-capability ceiling, not a missing check).
 
 ## Scoring direction (unchanged, still locked)
 
@@ -126,10 +156,11 @@ One technical detail that breaks silently if missed: the blur metric (variance o
 2. **Rung 0** — quality gate, duplicate hash, EXIF read. No external dependency, so it can be built and unit-tested in isolation before the agents exist. Gives a second demoable spine: "here's a case getting rejected/escalated before it ever costs a token."
 3. Scoring combiner + decision router with hand-fed fake numbers.
 4. **Rung 1a — Authenticity, built and wired FIRST, alone** (v3 change). Takes the EXIF prior as input, aggregates worst-case across multiple evidence files, and short-circuits the case to `reject` when it alone meets the veto bar — the remaining three checks are not called for that case.
-5. Rung 1b — the remaining three checks + Defender (Relevance and Tamper next — cheapest; Tamper also takes the frozen-frame motion score as input).
-6. Synthesis agent (LLM brief — depends on all signals existing, or on Rung 1a alone if it short-circuited).
-7. Confusion-matrix script (queries the DB; Rung 0- and Rung-1a-short-circuited cases must appear in it too).
-8. Swipe app (parallelizable by the second partner).
+5. Rung 1b — the remaining three checks + Defender, as ONE combined call (DONE).
+6. **Rung 2 — expected-loss / pricing layer (DONE, v4).** Parses the Price column, computes claim value per order, refines approve-vs-escalate by expected peso loss, persists the economic audit. See docs/ECONOMICS.md.
+7. Synthesis agent (LLM brief — depends on all signals existing, or on Rung 1a alone if it short-circuited). [not yet built]
+8. Confusion-matrix script (queries the DB; Rung 0-, Rung-1a-, and Rung-2 cases must appear in it too; graded deliverable). [not yet built]
+9. Swipe app (parallelizable by the second partner). [not yet built]
 
 ## What to name but not build (unchanged, still roadmap)
 
@@ -145,6 +176,8 @@ The AI investigates and decides autonomously for confident cases, but the design
 (d) keep the Defender pulling honest claims up,
 (e) **never let a capture-quality problem auto-reject** — Rung 0's quality gate only escalates,
 (f) **never let a deterministic fraud signal wait on a VLM call** — Rung 0's duplicate check rejects directly, and the frozen-frame signal reaches Tamper as a first-class input rather than being silently absorbed into the quality gate, and
-(g) **never let the Authenticity-first short-circuit lower the bar for auto-reject** — Rung 1a uses the exact same veto threshold (score ≤0.15 @ confidence ≥0.85) that was already the bar for a single check to override the Defender when all five ran in parallel. Running it first changes *cost and latency*, not the *standard of evidence* required to reject.
+(g) **never let the Authenticity-first short-circuit lower the bar for auto-reject** — Rung 1a uses the exact same veto threshold (score ≤0.15 @ confidence ≥0.85) that was already the bar for a single check to override the Defender when all five ran in parallel. Running it first changes *cost and latency*, not the *standard of evidence* required to reject, and
+
+(h) **never let the pricing layer treat model confidence as a calibrated probability** — Rung 2's p_invalid comes from configurable per-bucket base rates, never the raw credibility score; a missing price or uncalibrated probability routes to a human, never to a silent auto-approval. The economic layer only moves cases between approve and escalate — it never rejects.
 
 The differentiator stays the same: "is the proof authentic" (the AI's job) is separated from "whose fault is the damage" (a human's job, out of scope). Rung 0 adds a second differentiator: an obvious, deterministic fraud check (duplicate proof) is caught before spending a single token, and an obvious non-fraud problem (bad camera) never gets treated as fraud. v3 extends this one layer up: the single hardest, most expensive check runs first and can settle obvious fraud alone, so the other three checks' tokens are only spent on cases that actually need their opinion.
