@@ -64,6 +64,18 @@ def _case_brief(rec: CaseRecord) -> str:
     elif rec.reason_code == "corrupted_file":
         parts.append("Proof file would not decode — bounced to the buyer for a "
                      "re-upload. No claim decision was made.")
+    # What the model actually saw, named against what was ordered. Leads the brief
+    # on a mismatch because it is the most checkable fact a reviewer can act on.
+    rel = rec.signals.get("relevance")
+    if rel is not None and rel.item_seen and rel.item_match is not None:
+        ordered = "; ".join((i.title or "").strip() for i in rec.items if (i.title or "").strip())
+        if rel.item_match <= 0.30:
+            parts.append(f"Item mismatch: ordered “{ordered or 'unknown'}” "
+                         f"but the evidence appears to show {rel.item_seen} "
+                         f"(match {rel.item_match:.2f}).")
+        else:
+            parts.append(f"Evidence appears to show {rel.item_seen} "
+                         f"(match to ordered item {rel.item_match:.2f}).")
     if flags:
         n, s = flags[0]
         parts.append(f"Weakest signal: {n} ({s.score:.2f}) — {s.reason_string}")

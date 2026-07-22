@@ -53,10 +53,33 @@ class _TamperVerdict(_SubVerdict):
                                                 "evidence")
 
 
+class _RelevanceVerdict(_SubVerdict):
+    """Relevance, plus an explicit read on WHAT is actually depicted.
+
+    `item_seen` is reported separately from `credibility` on purpose: it is the
+    observation, not the judgement. Surfacing it lets the case brief say "the
+    ordered item was a power bank; the video shows fabric" instead of an opaque
+    0.30, and it gives a reviewer something checkable against the listing.
+    """
+    item_seen: str = Field(description="what the main object in the evidence "
+                                       "appears to be, in a few plain words "
+                                       "(e.g. 'grey fabric / clothing', 'a "
+                                       "cardboard box on a floor'). Describe "
+                                       "only what is visible; if nothing "
+                                       "identifiable is shown, say so.")
+    item_match: float = Field(description="0.0-1.0: does the object visible in "
+                                          "the evidence match the ORDERED "
+                                          "product named above? 1.0 = clearly "
+                                          "the same product, 0.0 = clearly a "
+                                          "different/unrelated object. Use 0.5 "
+                                          "if the media is too unclear to tell "
+                                          "— never guess.")
+
+
 class _Rung1bResponse(BaseModel):
     completeness: _SubVerdict
     tamper: _TamperVerdict
-    relevance: _SubVerdict
+    relevance: _RelevanceVerdict
     defender: _SubVerdict
 
 
@@ -88,12 +111,23 @@ frames, no natural motion) is deception -> credibility DOWN hard
 or shipping wrap is actually visible in the evidence. If false, explain briefly \
 what the evidence shows instead.
 
-CHECK 3 — RELEVANCE: "Does the evidence depict what the stated reason claims?"
-  - Reason says "{reason}" and the evidence shows exactly that problem on the \
-actual item -> credibility UP
-  - Evidence shows a floor, an empty box, a wrong/unrelated product, or an \
-unrelated scene that proves nothing about the stated reason -> credibility DOWN \
-(this is a hard fraud signal)
+CHECK 3 — RELEVANCE: "Does the evidence depict the ORDERED ITEM, and the problem \
+claimed about it?" This check has TWO parts; answer both.
+  (a) `item_seen` + `item_match`: FIRST say what object the evidence actually \
+shows, then compare it to the ordered product named above. Judge the OBJECT, not \
+the photography — a blurry or partial shot of the right product is still a match. \
+If you genuinely cannot tell what the object is, give item_match 0.5 rather than \
+guessing in either direction.
+  (b) `credibility`: reason says "{reason}" and the evidence shows exactly that \
+problem ON THE ORDERED ITEM -> credibility UP. Evidence showing a floor, an empty \
+box, an unrelated scene, or a DIFFERENT product than the one ordered -> \
+credibility DOWN (this is a hard fraud signal).
+  - A confident item mismatch is among the strongest signals available to you: \
+damage to something the buyer did not order says nothing about this order.
+  - But do NOT punish a mismatch you are unsure of. Listings are often generic, \
+bundled, or multi-pack, and an accessory or a single part of the product may be \
+all that is in frame. Score item_match low only when you can say what you see AND \
+that it is plainly not the ordered thing.
 
 CHECK 4 — DEFENDER: you are the not-guilty advocate. Actively hunt for SPECIFIC, \
 NAMEABLE evidence that this claim is LEGITIMATE:
@@ -127,10 +161,26 @@ production values."""
 
 
 def _items_line(rec: CaseRecord) -> str:
+    """The ordered product(s), BY NAME.
+
+    This used to emit only opaque IDs ("item 49855346760 (shop 1639973292)"),
+    which meant the relevance check was asked "does the evidence depict what is
+    claimed?" without ever being told what was bought. It could only compare the
+    media against the return-reason string, so a video of an unrelated object
+    scored on vibes. Titles were in the order data the whole time — 73 of 74
+    items in test_eval have one — they simply were never put in front of the
+    model. Naming the product is what makes CHECK 3's item-match question
+    answerable at all.
+    """
     if not rec.items:
         return ""
-    parts = [f"item {it.item_id} (shop {it.shop_id})" for it in rec.items[:4]]
-    return f"Order context: {len(rec.items)} purchased item(s): {'; '.join(parts)}.\n"
+    parts = []
+    for it in rec.items[:4]:
+        title = (it.title or "").strip()
+        parts.append(f'"{title}"' if title else f"item {it.item_id} (name unavailable)")
+    more = f" (+{len(rec.items) - 4} more)" if len(rec.items) > 4 else ""
+    return (f"The buyer ordered {len(rec.items)} item(s): "
+            f"{'; '.join(parts)}{more}.\n")
 
 
 def _authenticity_line(rec: CaseRecord) -> str:
@@ -205,11 +255,24 @@ def run(rec: CaseRecord, client: Optional[VLMClient] = None) -> dict[str, Signal
             confidence=0.0)
 
     # Relevance — never not-applicable (rubric absolute).
+    #
+    # The item read is surfaced in the reason string rather than silently folded
+    # into the number: a reviewer (and the case brief) can then see "ordered a
+    # power bank, evidence shows grey fabric" and check it against the listing,
+    # instead of being handed an unexplained 0.30. The mismatch also travels to
+    # the scoring layer as its own field, so it can gate a decision on its own.
     r = v.relevance
+    item_seen = (r.item_seen or "").strip()
+    item_match = _clamp(r.item_match)
+    reason = r.reasoning.strip()
+    if item_seen:
+        reason = (f"{reason} Evidence appears to show: {item_seen} "
+                  f"(match to ordered item: {item_match:.2f}).")
     out["relevance"] = SignalOutput(
         signal_name="relevance", score=_clamp(r.credibility),
-        verdict=r.verdict.strip(), reason_string=r.reasoning.strip(),
-        confidence=_clamp(r.confidence), applicable=True)
+        verdict=r.verdict.strip(), reason_string=reason,
+        confidence=_clamp(r.confidence), applicable=True,
+        item_seen=item_seen or None, item_match=item_match)
 
     # Defender — always applicable once the case is here.
     d = v.defender

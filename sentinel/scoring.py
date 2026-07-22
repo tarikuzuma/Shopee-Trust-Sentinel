@@ -18,6 +18,7 @@ Design invariants (do not break):
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Optional
 
 from .contract import (
     CaseRecord, DECISION_APPROVE, DECISION_REJECT, DECISION_ESCALATE,
@@ -90,6 +91,19 @@ CONSENSUS_REJECT_MIN = 3
 # See route() for why this gate runs LAST and why it bounces rather than rejects.
 IRRELEVANT_PROOF_MAX = LOW_SIGNAL_SCORE
 
+# Item mismatch: the evidence depicts a DIFFERENT product than the one ordered.
+# Treated as its own red flag rather than left to move the relevance score alone,
+# because it is a categorically stronger claim than "this proof is unconvincing" —
+# damage to something the buyer did not order says nothing about the order, no
+# matter how well filmed it is.
+#
+# Requires CONFIDENCE, not just a low match. The model is explicitly told to
+# answer 0.5 when it cannot identify the object, and listings are frequently
+# generic, bundled, or multi-pack, so an unsure mismatch is worthless and a
+# confident one is decisive. Both bars must be cleared.
+ITEM_MISMATCH_MAX = 0.30       # item_match <= this ...
+ITEM_MISMATCH_CONFIDENCE = 0.70  # ... at relevance confidence >= this
+
 
 @dataclass
 class ScoreBreakdown:
@@ -104,6 +118,8 @@ class ScoreBreakdown:
     hard_reject: bool               # True => dispositive fraud, auto-reject
     low_signals: list[str]          # applicable fraud checks scoring as red flags
     irrelevant_proof: bool          # relevance at/below the red-flag floor
+    item_mismatch: bool             # evidence confidently shows a DIFFERENT product
+    item_seen: Optional[str]        # what the evidence appears to depict
 
 
 def combine(rec: CaseRecord) -> ScoreBreakdown:
@@ -143,6 +159,15 @@ def combine(rec: CaseRecord) -> ScoreBreakdown:
     irrelevant_proof = (rel is not None and rel.applicable
                         and rel.score <= IRRELEVANT_PROOF_MAX)
 
+    # Item mismatch: a CONFIDENT read that the evidence shows a different product.
+    item_mismatch = (
+        rel is not None and rel.applicable
+        and rel.item_match is not None
+        and rel.item_match <= ITEM_MISMATCH_MAX
+        and rel.confidence >= ITEM_MISMATCH_CONFIDENCE
+    )
+    item_seen = rel.item_seen if rel is not None else None
+
     no_info = weight_total == 0.0
     base = 0.5 if no_info else weighted_sum / weight_total
     hard_reject = bool(vetoed_by)
@@ -169,6 +194,8 @@ def combine(rec: CaseRecord) -> ScoreBreakdown:
         hard_reject=hard_reject,
         low_signals=low_signals,
         irrelevant_proof=irrelevant_proof,
+        item_mismatch=item_mismatch,
+        item_seen=item_seen,
     )
 
 
@@ -203,7 +230,11 @@ def route(breakdown: ScoreBreakdown) -> str:
     # Checked BEFORE the score gates precisely because the score is the thing
     # that fails here — one unrelated high check can lift the mean above the
     # reject line while three checks agree the proof is staged.
-    if len(breakdown.low_signals) >= CONSENSUS_REJECT_MIN:
+    # A confident item mismatch counts as an additional converging red flag: the
+    # proof being of the wrong product is independent evidence from whatever the
+    # other checks found, so it should be able to complete a consensus.
+    effective_flags = len(breakdown.low_signals) + (1 if breakdown.item_mismatch else 0)
+    if effective_flags >= CONSENSUS_REJECT_MIN:
         return DECISION_REJECT
 
     score = breakdown.credibility_0_100

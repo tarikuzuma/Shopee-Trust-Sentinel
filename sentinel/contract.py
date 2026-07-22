@@ -122,6 +122,12 @@ class SignalOutput:
     confidence: float = 0.0           # how sure THIS check is of its own score, 0..1
     applicable: bool = True           # False => contributes NEUTRAL, never suspicion
 
+    # Relevance only. Kept as their own fields rather than buried in the score so
+    # the router can act on an item mismatch directly and the brief can name what
+    # was actually seen. None on every other check.
+    item_seen: Optional[str] = None   # what the evidence appears to depict
+    item_match: Optional[float] = None  # 0..1 match to the ORDERED product
+
     def effective_score(self) -> float:
         """Score the combiner should use: real score if applicable, else neutral."""
         return self.score if self.applicable else NEUTRAL_SCORE
