@@ -35,6 +35,7 @@ are a large fraction of real traffic, and a mis-set floor rejects valid ones.
 """
 from __future__ import annotations
 
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
@@ -205,6 +206,14 @@ def _read_exif_editor(path: Path) -> Optional[str]:
 
 
 def _eval_image(path: Path) -> dict:
+    """Timed wrapper around image evaluation — stamps eval_ms onto the metrics."""
+    t0 = time.perf_counter()
+    m = _eval_image_impl(path)
+    m["eval_ms"] = round((time.perf_counter() - t0) * 1000.0, 1)
+    return m
+
+
+def _eval_image_impl(path: Path) -> dict:
     """Decode + QC + pHash one image. Returns a metrics dict with 'status'."""
     import cv2
 
@@ -234,6 +243,14 @@ def _eval_image(path: Path) -> dict:
 
 
 def _eval_video(path: Path) -> dict:
+    """Timed wrapper around video evaluation — stamps eval_ms onto the metrics."""
+    t0 = time.perf_counter()
+    m = _eval_video_impl(path)
+    m["eval_ms"] = round((time.perf_counter() - t0) * 1000.0, 1)
+    return m
+
+
+def _eval_video_impl(path: Path) -> dict:
     """Decode + sample frames + QC + pHash one video (median over sampled frames)."""
     import cv2
 
