@@ -3,6 +3,11 @@ data/*.db
 data/*.db-journal
 media/
 
+# secrets — never commit API keys
+.env
+.env.*
+*.key
+
 # python
 __pycache__/
 *.pyc
