@@ -44,6 +44,12 @@ DEFENDER_LIFT_MAX = 0.20
 VETO_SCORE = 0.15        # credibility <= this ...
 VETO_CONFIDENCE = 0.85   # ... at confidence >= this  => dispositive fraud
 
+# A "low signal" (red flag) is an applicable fraud check scoring below this.
+# Convergence guard: with no veto, auto-reject requires >= 2 low signals. A
+# single soft red flag can only escalate, never sink a case on its own.
+LOW_SIGNAL_SCORE = 0.40
+CONVERGENCE_MIN = 2
+
 
 @dataclass
 class ScoreBreakdown:
@@ -56,6 +62,7 @@ class ScoreBreakdown:
     no_information: bool            # True => nothing to judge on -> escalate
     vetoed_by: list[str]            # fraud checks that triggered the strong-fraud veto
     hard_reject: bool               # True => dispositive fraud, auto-reject
+    low_signals: list[str]          # applicable fraud checks scoring as red flags
 
 
 def combine(rec: CaseRecord) -> ScoreBreakdown:
@@ -63,6 +70,7 @@ def combine(rec: CaseRecord) -> ScoreBreakdown:
     applicable: list[str] = []
     excluded: list[str] = []
     vetoed_by: list[str] = []
+    low_signals: list[str] = []
     weighted_sum = 0.0
     weight_total = 0.0
 
@@ -80,6 +88,9 @@ def combine(rec: CaseRecord) -> ScoreBreakdown:
         # Strong-fraud veto: this one check is confident enough to be dispositive.
         if sig.score <= VETO_SCORE and sig.confidence >= VETO_CONFIDENCE:
             vetoed_by.append(name)
+        # Red flag for the convergence guard.
+        if sig.score < LOW_SIGNAL_SCORE:
+            low_signals.append(name)
 
     no_info = weight_total == 0.0
     base = 0.5 if no_info else weighted_sum / weight_total
@@ -105,6 +116,7 @@ def combine(rec: CaseRecord) -> ScoreBreakdown:
         no_information=no_info,
         vetoed_by=vetoed_by,
         hard_reject=hard_reject,
+        low_signals=low_signals,
     )
 
 
@@ -113,6 +125,10 @@ def route(breakdown: ScoreBreakdown) -> str:
 
     Cost asymmetry: when in doubt, escalate — never auto-approve. No information
     always escalates, regardless of the (neutral) score.
+
+    Anti-over-rejection guard (rubric): auto-reject requires EITHER the strong-
+    fraud veto OR multiple converging low signals. A single soft red flag can
+    only escalate — it must not sink a case on its own.
     """
     if breakdown.hard_reject:
         return DECISION_REJECT
@@ -122,7 +138,10 @@ def route(breakdown: ScoreBreakdown) -> str:
     if score >= APPROVE_AT:
         return DECISION_APPROVE
     if score < REJECT_AT:
-        return DECISION_REJECT
+        # Convergence required: without a veto, a lone red flag escalates.
+        if len(breakdown.low_signals) >= CONVERGENCE_MIN:
+            return DECISION_REJECT
+        return DECISION_ESCALATE
     return DECISION_ESCALATE
 
 

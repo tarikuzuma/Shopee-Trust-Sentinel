@@ -57,6 +57,21 @@ SCENARIOS = [
         "tamper": (0.0, 0.0, False), "relevance": (0.0, 0.0, False),
         "defender": (0.0, 0.0, False),
     }, "image"),
+
+    ("lone-soft-flag (1 red flag, no veto -> must escalate, NOT reject)",
+     "Suspicious Parcel", {
+        "relevance": (0.25, 0.6, True),      # single soft red flag, few checks apply
+        "authenticity": (0.0, 0.0, False), "completeness": (0.0, 0.0, False),
+        "tamper": (0.0, 0.0, False),
+        "defender": (0.5, 0.4, True),
+    }, "image"),
+
+    ("converging-flags (2+ red flags -> reject)", "Suspicious Parcel", {
+        "relevance": (0.25, 0.6, True), "tamper": (0.3, 0.6, True),
+        "authenticity": (0.35, 0.6, True),
+        "completeness": (0.0, 0.0, False),
+        "defender": (0.5, 0.4, True),
+    }, "video"),
 ]
 
 
@@ -94,6 +109,10 @@ def main():
     assert fraud.decision == "reject", "strong-fraud veto must auto-reject"
     noinfo = cases["no-information (all checks inapplicable -> escalate)"]
     assert noinfo.decision == "escalate", "no information must escalate"
+    lone = cases["lone-soft-flag (1 red flag, no veto -> must escalate, NOT reject)"]
+    assert lone.decision == "escalate", "a single soft red flag must not auto-reject"
+    conv = cases["converging-flags (2+ red flags -> reject)"]
+    assert conv.decision == "reject", "converging red flags must auto-reject"
     print("\nOK  all scoring invariants hold.")
 
 
