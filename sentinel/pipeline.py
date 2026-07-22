@@ -71,8 +71,8 @@ def _apply_economics(rec: CaseRecord, prelim: str, cfg: EconomicConfig,
     # thumbs-down photo got approved for ₱109.
     if prelim == DECISION_RESUBMIT:
         rec.economic = {"route": "resubmit", "claim_value_php": rec.claim_value_php,
-                        "reason": "no_product_evidence: the proof does not depict "
-                                  "the ordered item; bounced for a usable photo. "
+                        "reason": "irrelevant_proof: the proof does not depict what is "
+                                  "being claimed; bounced for usable proof. "
                                   "No claim decision was made, so there is no "
                                   "expected loss to price."}
         return

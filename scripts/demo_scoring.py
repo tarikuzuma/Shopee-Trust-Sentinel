@@ -66,6 +66,14 @@ SCENARIOS = [
         "defender": (0.5, 0.4, True),
     }, "image"),
 
+    ("lone-soft-flag-nonrelevance (1 red flag, relevant proof -> escalate)",
+     "Suspicious Parcel", {
+        "tamper": (0.25, 0.6, True),         # single soft red flag
+        "relevance": (0.85, 0.8, True),      # proof IS about the claim
+        "authenticity": (0.0, 0.0, False), "completeness": (0.0, 0.0, False),
+        "defender": (0.5, 0.4, True),
+    }, "image"),
+
     ("converging-flags (2+ red flags -> reject)", "Suspicious Parcel", {
         "relevance": (0.25, 0.6, True), "tamper": (0.3, 0.6, True),
         "authenticity": (0.35, 0.6, True),
@@ -117,8 +125,16 @@ def main():
     assert fraud.decision == "reject", "strong-fraud veto must auto-reject"
     noinfo = cases["no-information (all checks inapplicable -> escalate)"]
     assert noinfo.decision == "escalate", "no information must escalate"
+    # The invariant is that a lone soft flag never auto-REJECTS. This fixture's
+    # single flag is relevance 0.25, so the irrelevance gate now bounces it for
+    # usable proof rather than queueing it — still not a rejection.
     lone = cases["lone-soft-flag (1 red flag, no veto -> must escalate, NOT reject)"]
-    assert lone.decision == "escalate", "a single soft red flag must not auto-reject"
+    assert lone.decision != "reject", "a single soft red flag must not auto-reject"
+    assert lone.decision == "resubmit", "irrelevant proof should bounce, not queue"
+    # Same shape but with RELEVANT proof: must still escalate, proving the gate
+    # keys on relevance and has not swallowed the ordinary lone-flag path.
+    lone2 = cases["lone-soft-flag-nonrelevance (1 red flag, relevant proof -> escalate)"]
+    assert lone2.decision == "escalate", "a lone non-relevance flag must escalate"
     conv = cases["converging-flags (2+ red flags -> reject)"]
     assert conv.decision == "reject", "converging red flags must auto-reject"
     cflict = cases["conflict-guard (high mean but 1 red flag -> escalate, NOT approve)"]

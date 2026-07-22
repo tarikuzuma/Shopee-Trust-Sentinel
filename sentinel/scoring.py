@@ -76,23 +76,19 @@ CONVERGENCE_MIN = 2
 # test_eval automation 69% -> 71%.
 CONSENSUS_REJECT_MIN = 3
 
-# "No product evidence" bounce. When BOTH video-only checks are inapplicable
-# (photo submission) AND relevance is at or below the red-flag floor, nothing in
-# the submission depicts the ordered item — there is no evidence to judge, so the
-# case bounces for a usable photo instead of being decided.
+# Irrelevance gate. Relevance at or below the red-flag floor means the proof does
+# not depict what is being claimed — so a human reviewer has nothing to adjudicate
+# either, and the case bounces for usable proof instead of occupying the queue.
 #
-# This is deliberately NOT "photo-only -> bounce". Measured on the labeled set,
-# the unnarrowed rule bounces 100% of the known-valid cases and 40% of all
-# traffic, because a PHOTO cannot show an unboxing or a seal — two N/A checks are
-# the signature of a photo submission, not of fraud. Adding the relevance
-# condition drops that to 11% and leaves the two clean valid photo cases
-# (relevance 0.9) untouched.
+# Keyed on relevance ALONE. An earlier version also required both video-only
+# checks to be N/A ("photo-only"), which was wrong twice over: it missed cases
+# with a video that simply shows the wrong thing, and the "photo-only" half was
+# itself a trap — measured, "2 checks N/A -> bounce" hits 100% of the known-valid
+# cases and 40% of all traffic, because a PHOTO cannot show an unboxing or a seal.
+# Two N/A checks are the signature of a photo submission, not of fraud.
 #
-# It bounces rather than rejects for the same reason Rung 0 does: a photo of the
-# wrong thing is far more often a confused buyer than a fraudster, and a bounce
-# costs a reviewer nothing while denying nothing.
-NO_EVIDENCE_RELEVANCE_MAX = LOW_SIGNAL_SCORE
-_VIDEO_ONLY_CHECKS = ("completeness", "tamper")
+# See route() for why this gate runs LAST and why it bounces rather than rejects.
+IRRELEVANT_PROOF_MAX = LOW_SIGNAL_SCORE
 
 
 @dataclass
@@ -107,7 +103,7 @@ class ScoreBreakdown:
     vetoed_by: list[str]            # fraud checks that triggered the strong-fraud veto
     hard_reject: bool               # True => dispositive fraud, auto-reject
     low_signals: list[str]          # applicable fraud checks scoring as red flags
-    no_product_evidence: bool       # photo-only AND relevance at/below the floor
+    irrelevant_proof: bool          # relevance at/below the red-flag floor
 
 
 def combine(rec: CaseRecord) -> ScoreBreakdown:
@@ -139,14 +135,13 @@ def combine(rec: CaseRecord) -> ScoreBreakdown:
         if sig.score <= LOW_SIGNAL_SCORE:
             low_signals.append(name)
 
-    # No product evidence: a photo submission (both video-only checks N/A) whose
-    # relevance says the ordered item is not depicted. Nothing to judge.
+    # Irrelevant proof: the submission does not depict what is being claimed.
+    # Relevance alone decides this — it is the one check that always applies, and
+    # conditioning on the video-only checks was wrong: it made the gate miss any
+    # case that HAS an unboxing video which simply shows the wrong thing.
     rel = rec.signals.get("relevance")
-    no_product_evidence = (
-        all(name in excluded for name in _VIDEO_ONLY_CHECKS)
-        and rel is not None and rel.applicable
-        and rel.score <= NO_EVIDENCE_RELEVANCE_MAX
-    )
+    irrelevant_proof = (rel is not None and rel.applicable
+                        and rel.score <= IRRELEVANT_PROOF_MAX)
 
     no_info = weight_total == 0.0
     base = 0.5 if no_info else weighted_sum / weight_total
@@ -173,7 +168,7 @@ def combine(rec: CaseRecord) -> ScoreBreakdown:
         vetoed_by=vetoed_by,
         hard_reject=hard_reject,
         low_signals=low_signals,
-        no_product_evidence=no_product_evidence,
+        irrelevant_proof=irrelevant_proof,
     )
 
 
@@ -204,29 +199,45 @@ def route(breakdown: ScoreBreakdown) -> str:
         return DECISION_REJECT
     if breakdown.no_information:
         return DECISION_ESCALATE
-    # No product evidence -> bounce for a usable photo. Checked before the score
-    # gates: the score is meaningless when the proof isn't about the claim, and
-    # economics would otherwise auto-approve it as a cheap unflagged claim.
-    if breakdown.no_product_evidence:
-        return DECISION_RESUBMIT
     # Consensus reject: near-unanimous red flags are dispositive on their own.
     # Checked BEFORE the score gates precisely because the score is the thing
     # that fails here — one unrelated high check can lift the mean above the
     # reject line while three checks agree the proof is staged.
     if len(breakdown.low_signals) >= CONSENSUS_REJECT_MIN:
         return DECISION_REJECT
+
     score = breakdown.credibility_0_100
     if score >= APPROVE_AT:
         # Conflict guard: a lone red-flag fraud check blocks auto-approval.
-        if breakdown.low_signals:
-            return DECISION_ESCALATE
-        return DECISION_APPROVE
-    if score < REJECT_AT:
+        decision = DECISION_ESCALATE if breakdown.low_signals else DECISION_APPROVE
+    elif score < REJECT_AT:
         # Convergence required: without a veto, a lone red flag escalates.
-        if len(breakdown.low_signals) >= CONVERGENCE_MIN:
-            return DECISION_REJECT
-        return DECISION_ESCALATE
-    return DECISION_ESCALATE
+        decision = (DECISION_REJECT if len(breakdown.low_signals) >= CONVERGENCE_MIN
+                    else DECISION_ESCALATE)
+    else:
+        decision = DECISION_ESCALATE
+
+    # Irrelevance gate — applied LAST, and only to a case already headed for the
+    # queue. If the proof doesn't depict the claim, a reviewer has nothing to
+    # adjudicate either: they are being handed a photo of a thumbs-down gesture
+    # and asked to rule on a refund. Bounce it for usable proof instead.
+    #
+    # Ordering is the whole design here. Every reject and approve path above is
+    # evaluated FIRST and left untouched, so the gate can only ever convert an
+    # ESCALATE into a RESUBMIT. Placed any earlier it preempts real fraud: a
+    # known AI-edited case (train_eval 237776404294061, relevance 0.20) rejects
+    # on the score path, and an earlier gate downgraded it to a mere bounce.
+    #
+    # It bounces rather than rejects because low relevance does NOT mean fraud.
+    # VALID_moldy_food is a genuine claim scoring relevance 0.20: the buyer
+    # photographed real mould but selected "Spilled Contents" from the dropdown,
+    # so the proof mismatches the STATED REASON while the product and defect are
+    # plainly visible. Auto-rejecting on relevance turns that honest buyer into a
+    # false positive — measured: 1 FP across the 3 known-valid cases, vs 0 when
+    # bouncing. Same operational saving either way; only the buyer pays.
+    if decision == DECISION_ESCALATE and breakdown.irrelevant_proof:
+        return DECISION_RESUBMIT
+    return decision
 
 
 def score_case(rec: CaseRecord) -> ScoreBreakdown:
