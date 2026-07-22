@@ -129,6 +129,13 @@ def route(breakdown: ScoreBreakdown) -> str:
     Anti-over-rejection guard (rubric): auto-reject requires EITHER the strong-
     fraud veto OR multiple converging low signals. A single soft red flag can
     only escalate — it must not sink a case on its own.
+
+    Conflict guard (cost asymmetry): a high MEAN credibility can still hide one
+    fraud check screaming red — e.g. a video that looks like a clean unboxing but
+    whose tamper/relevance check flags it. We must never AUTO-APPROVE while any
+    applicable fraud check is a red flag (< LOW_SIGNAL_SCORE). "Signals conflict
+    -> escalate to a human" made mechanical. It only blocks auto-approval; it
+    never rejects on its own (that still needs the veto or convergence).
     """
     if breakdown.hard_reject:
         return DECISION_REJECT
@@ -136,6 +143,9 @@ def route(breakdown: ScoreBreakdown) -> str:
         return DECISION_ESCALATE
     score = breakdown.credibility_0_100
     if score >= APPROVE_AT:
+        # Conflict guard: a lone red-flag fraud check blocks auto-approval.
+        if breakdown.low_signals:
+            return DECISION_ESCALATE
         return DECISION_APPROVE
     if score < REJECT_AT:
         # Convergence required: without a veto, a lone red flag escalates.

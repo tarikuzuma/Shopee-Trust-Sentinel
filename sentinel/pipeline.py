@@ -44,16 +44,31 @@ def _auto_reject_gate(rec: CaseRecord, cfg: EconomicConfig) -> None:
                                   "human review per config"}
 
 
-def _apply_economics(rec: CaseRecord, prelim: str, cfg: EconomicConfig) -> None:
+def _apply_economics(rec: CaseRecord, prelim: str, cfg: EconomicConfig,
+                     has_red_flag: bool = False) -> None:
     """Pricing layer for a SCORED case: refine the route by expected peso loss.
 
     Only ever moves a case between auto-approve and escalate (never rejects —
     that's the evidence layer's job, gated above). Because credibility is not a
     calibrated probability, p_invalid comes from configurable per-bucket base
     rates, not the raw score. Missing price / uncalibrated input -> human review.
+
+    Layer-interaction rule: the economic "cheap claim -> auto-approve" downgrade
+    applies ONLY to thin/UNFLAGGED uncertainty. If a fraud check raised a red flag
+    (has_red_flag), the model's judgment is in conflict and the per-bucket base
+    rate no longer describes this case — so it goes to a human regardless of claim
+    value. A flagged case is never auto-paid just because it is cheap.
     """
     if prelim == DECISION_REJECT:
         _auto_reject_gate(rec, cfg)
+        return
+
+    if prelim == DECISION_ESCALATE and has_red_flag:
+        rec.economic = {"route": "escalate", "claim_value_php": rec.claim_value_php,
+                        "reason": "flagged_conflict: a fraud check raised a red flag "
+                                  "(<0.40); routed to human review regardless of "
+                                  "claim value — the base rate does not describe a "
+                                  "conflicted case"}
         return
 
     bucket = "approve" if prelim == DECISION_APPROVE else "escalate"
@@ -123,8 +138,8 @@ def process_case(rec: CaseRecord, client: Optional[VLMClient] = None,
     t = _mark("rung1b", t)
 
     # --- score (evidence layer) then refine by expected loss (pricing layer) -
-    scoring.score_case(rec)
-    _apply_economics(rec, rec.decision, econ)
+    breakdown = scoring.score_case(rec)
+    _apply_economics(rec, rec.decision, econ, has_red_flag=bool(breakdown.low_signals))
     if rec.reason_code is None:
         rec.reason_code = REASON_PASSED_PREVALIDATION
     rec.runtime_ms = int((time.perf_counter() - t0) * 1000)
