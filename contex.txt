@@ -1,4 +1,4 @@
-# Shopee Trust Sentinel — Full Build Brief for Claude Code (v4)
+# Shopee Trust Sentinel — Full Build Brief for Claude Code (v5)
 
 TRAILBLAZE Shopee AI Hackathon 2026, Fraud Detection track. ~1 day. v2 added Rung 0, a deterministic pre-filter that runs before any paid model call. v3 splits the four-agent layer in two: Authenticity now runs alone, first — if it's dispositive, the other three checks + Defender are never called. **v4 adds Rung 2 — an expected-loss (pricing) layer that runs AFTER credibility scoring and decides auto-approve vs escalate by minimizing expected PESO loss, not classification accuracy.** The new dataset carries a Price column, so every case now has a claim value; escalation is treated as a cost (~₱19), only paid when the fraud loss it prevents exceeds it. Full spec: docs/ECONOMICS.md. The four checks are implemented as ONE combined VLM call (sentinel/agents/rung1b.py) with a burden-of-proof calibrated prompt — see docs/RUNG1B_REPORT.md.
 
@@ -23,7 +23,7 @@ Given a return case (stated reason + image/video evidence), decide valid or inva
 
 Rung 0 is a deterministic Python layer: `cv2` + `Pillow` + `imagehash`, zero tokens, zero API calls. It runs first and does two unrelated jobs that must not be filed under one name:
 
-1. **Quality gating** — corrupt file, too blurry, too dark, too short. These are "can't be judged" outcomes. They route to **escalate** (`insufficient_evidence`), never reject. Auto-rejecting a blurry photo punishes an honest buyer with a cheap phone camera — the exact false positive the Defender exists to prevent, tripped one layer earlier. Low-end-device photos are a large slice of real traffic here, not an edge case.
+1. **Quality gating** — corrupt file, too blurry, too dark, too short. These are "can't be judged" outcomes. **v5 change: they route to `resubmit`, not escalate** (`insufficient_evidence` / `corrupted_file`). Still never reject — auto-rejecting a blurry photo punishes an honest buyer with a cheap phone camera, the exact false positive the Defender exists to prevent, tripped one layer earlier. Low-end-device photos are a large slice of real traffic here, not an edge case. But escalating was also wrong: Rung 0's verdict on a black frame is already *final*, so a reviewer looking at the same black rectangle learns nothing the pixel math didn't — and a queue full of black rectangles gets rubber-stamped into payouts by a reviewer clearing quota. A bounce costs no reviewer, denies nothing, and is the only action that can actually produce judgeable evidence. Measured: automation 57%→62%, human queue 25→22 on `test_eval`.
 2. **Duplicate detection** — perceptual hash (`imagehash.phash`) against every prior submitted proof. A reused image across unrelated claims is a genuine fraud signal, more reliable than anything the VLM agents produce, because it's deterministic. A match routes straight to **reject** (`duplicate_proof`), skipping the four agents entirely.
 
 Same layer, two exit routes. A third check — EXIF read — never gates at all: it extracts the `Software` tag (Photoshop/GIMP/Lightroom/etc.) for free and hands it forward as a prior into the Authenticity agent's prompt, instead of making an expensive VLM call re-derive from pixels something a metadata read already answered.
@@ -41,7 +41,7 @@ Anything Rung 0 hard-stops (escalate or reject) never reaches a VLM — that's w
 Return case (reason + video + photo)
       ↓
 ┌─────────────────────────── Rung 0 — deterministic, zero tokens ───────────────────────────┐
-│  integrity + quality (blur/dark/corrupt/too-short)   →  fail  →  ESCALATE insufficient_evidence
+│  integrity + quality (blur/dark/corrupt/too-short)   →  fail  →  RESUBMIT insufficient_evidence
 │  duplicate check (perceptual hash vs prior proofs)   →  fail  →  REJECT duplicate_proof
 │  EXIF read (editing-software tag)                    →  always passes through as a prior
 └──────────────────────────────────────────────────────────────────────────────────────────┘
@@ -62,9 +62,13 @@ Return case (reason + video + photo)
 Scoring combiner → credibility 0–100 (higher = more trustworthy)   [unchanged]
       ↓
 Decision router (asymmetric thresholds) → preliminary bucket:
+   veto (≤0.15 @ ≥0.85)          → REJECT   (dispositive, checked first)
+   ≥3 converging red flags        → REJECT   (v5: outranks the mean)
    credibility > ~75  → approve bucket
    credibility < ~35  → reject  (auto-reject configurable, default ON)
    35–75 (uncertain)  → escalate bucket
+   …then, on a would-be ESCALATE only:
+   relevance ≤ 0.40               → RESUBMIT (v5: proof isn't about the claim)
       ↓
 ┌──────────────── Rung 2 — expected-loss / pricing layer (v4) ────────────────┐
 │  Runs AFTER scoring. Refines approve-vs-escalate by MINIMIZING EXPECTED PESO │
@@ -105,6 +109,42 @@ Data validation worth citing: the parsed dataset order values (Test Data median 
 
 The diagram shows Completeness / Tamper / Relevance / Defender as four boxes, and they ARE four independent signals with their own questions, verdicts, and applicable rules. But they are produced by a SINGLE Gemini call (sentinel/agents/rung1b.py) that returns all four as structured JSON — ~4x cheaper/faster than four separate calls, and the model reasons over the whole case story in one context. The prompt is burden-of-proof calibrated: a check may only score above ~0.7 if it can name affirmative visible evidence; "nothing looks wrong" caps at ~0.5 and routes to escalate (this cut false-approves 5→3 on the training set — see docs/RUNG1B_REPORT.md). Known soft spot: on video, the model can be fooled by pre-opened parcels that look like clean unboxings (a model-capability ceiling, not a missing check).
 
+## The title layer (v5, new) — Relevance must know WHAT WAS ORDERED
+
+The single highest-leverage fix in v5, and it cost almost nothing because the data was already in hand.
+
+Relevance asks "does the evidence depict what is claimed?" — but until v5 the prompt described the order as opaque identifiers:
+
+```
+Order context: 1 purchased item(s): item 49855346760 (shop 1639973292).
+```
+
+The model was therefore judging relevance **blindfolded**: it could compare the media against the return-reason string ("Change of Mind", "Damaged Others") and nothing else. It had no way to notice that a video of grey fabric has nothing to do with an order of shampoo sachets, because it was never told shampoo was ordered. Every low-relevance score before v5 was scored on vibes.
+
+The product titles were in the order data the whole time — **73 of 74 items in `test_eval`, 11 of 11 in `train_eval`** — loaded, stored in `signals_json`, and rendered in the UI. They were simply never put in front of the model. `_items_line` now names them.
+
+Relevance (CHECK 3) is now a two-part question:
+
+- **(a) `item_seen` + `item_match`** — first say what object the evidence actually shows, *then* compare it to the ordered product. Judge the OBJECT, not the photography: a blurry or partial shot of the right product is still a match, and `item_match` must be 0.5 when the object genuinely cannot be identified rather than guessed either way.
+- **(b) `credibility`** — as before, does the evidence show the claimed *problem*, now qualified as "on the ORDERED ITEM".
+
+Two design points worth keeping:
+
+- **The observation is stored separately from the judgement.** `item_seen` is a plain-language string ("indistinct dark texture and motion"), not folded into the score. The case brief can then say *"ordered 'Empress Shampoo 21ml x 5+1 sachet', evidence appears to show indistinct dark texture"* — a fact a reviewer can check against the listing in seconds — instead of an unexplained `relevance 0.30`.
+- **A mismatch must be CONFIDENT to count.** `item_match ≤ 0.30` AND relevance confidence `≥ 0.70` (scoring.ITEM_MISMATCH_MAX / _CONFIDENCE). Real listings are generic, bundled, and multi-pack, and an accessory or a single part may be all that is in frame, so an unsure mismatch is worthless while a confident one is decisive. It then counts as an extra converging red flag and can complete a consensus reject on its own.
+
+The confidence bar earned itself immediately: on the first re-run the model returned `item_match 0.50` on an unreadable video — correctly refusing to invent a mismatch it could not see — while the case still flipped `approve 50.0 → reject 40.0` on convergence. That is the intended behavior: the title layer sharpens the *judgement*, it does not manufacture certainty.
+
+## Router changes (v5) — three routes added above the score
+
+The credibility mean is a weighted average of checks that answer DIFFERENT questions, which makes it rescuable by an irrelevant high score. Three gates now sit above it:
+
+1. **Consensus reject** (`CONSENSUS_REJECT_MIN = 3`) — three converging red flags reject regardless of the mean. Found via a staged-fraud case: completeness 0.20, tamper 0.20, relevance 0.30 all agreed the video showed a pre-opened box (mean 0.23 → reject), but Authenticity honestly scored 0.95 (the fraudster used a real camera on a real pre-opened parcel — an authenticity PASS is *guaranteed by construction* on staging fraud) and dragged the mean to 0.43 → escalate. Averaging assumes the checks are interchangeable votes on one question; they are not, so three agreeing outweighs a fourth disagreeing about something else.
+2. **Irrelevance gate** — a case headed for the queue whose relevance is at/below the red-flag floor becomes `resubmit`. If the proof doesn't depict the claim, a human has nothing to adjudicate either. Applied **last**, and only to would-be escalates, so every reject and approve path is preserved: an earlier placement demoted a known AI-edited fraud case to a mere bounce. It bounces rather than rejects because `VALID_moldy_food` — a genuine claim — scores relevance 0.20 purely from a dropdown mismatch (photographed real mould, selected "Spilled Contents"). Measured: relevance→reject costs 1 FP across the 3 known-valid cases; relevance→resubmit costs 0, with identical queue savings.
+3. **Inclusive red-flag boundary** — `score <= LOW_SIGNAL_SCORE`, not `<`. An exclusive test let `relevance 0.40` read as clean, which auto-approved a photo of a thumbs-down gesture for ₱109.
+
+Also: economics never touches a `resubmit`. A bounce pays nothing and denies nothing, so there is no exposure to weigh against review cost — without that guard the pricing layer treats it as an escalate-bucket case and can auto-approve it as "too cheap to review".
+
 ## Scoring direction (unchanged, still locked)
 
 Every signal outputs credibility (high = trustworthy), never risk. Rung 0's two gates are the one exception to "everything feeds the combiner" — they act before the combiner exists for that case, by design, because they're deterministic enough to skip the deliberation step entirely.
@@ -139,9 +179,11 @@ Existing shape (`case_id`, `session_id`, `return_reason`, `evidence_refs`, `vide
 
 When a Rung 0 gate fires, `case["decision"]` and `case["gate_reason"]` are set immediately and the Rung 1a/1b stages are skipped entirely — but the case still gets a full row in `cases`, so it still counts in the confusion matrix. Same rule one layer up: when Rung 1a (Authenticity) alone meets the veto bar, `decision=reject` and `reason_code=authenticity_dispositive_fraud` are set immediately and Rung 1b (Completeness/Tamper/Relevance/Defender) never runs for that case — again, still a full row, still counted.
 
+**v5 — `SignalOutput` gains two Relevance-only fields:** `item_seen` (string, what the evidence appears to depict) and `item_match` (0–1 against the ORDERED product). `None` on every other check. They are stored rather than collapsed into `score` so the router can act on a mismatch directly and the brief can name what was seen. `CaseRecord.reason_code` also gains `price_unavailable` — an ops data gap (the order export's Price cell is blank), tagged distinctly so "our feed is incomplete" is countable separately from "the evidence is inconclusive". It is deliberately NOT a resubmit: price comes from the order record, so bouncing the buyer would return the same submission and the same gap, forever.
+
 ## Threshold discipline (the same rule extended)
 
-Every Rung 0 threshold — resolution floor, blur/Laplacian floor, brightness range, video duration floor, duplicate-hash hamming distance — is a placeholder until tuned against the labeled dataset. Same rule as the 35/75 credibility split. Guess these and the system rejects or escalates a large share of honest low-end-device photos.
+Every Rung 0 threshold — resolution floor, blur/Laplacian floor, brightness range, video duration floor, duplicate-hash hamming distance — plus v5's `ITEM_MISMATCH_MAX` / `ITEM_MISMATCH_CONFIDENCE` and the `CONSENSUS_REJECT_MIN = 3` convergence bar, is a placeholder until tuned against the labeled dataset. Same rule as the 35/75 credibility split. Guess these and the system rejects or escalates a large share of honest low-end-device photos.
 
 One technical detail that breaks silently if missed: the blur metric (variance of Laplacian) scales with image resolution. Resize to a fixed reference width before thresholding, or the same cutoff means something different for a 400px phone photo than a 4K one. For video, sample ~10 frames and take the median blur/brightness — one motion-blurred frame in an otherwise clear video should not fail the whole clip.
 
