@@ -72,6 +72,14 @@ SCENARIOS = [
         "completeness": (0.0, 0.0, False),
         "defender": (0.5, 0.4, True),
     }, "video"),
+
+    ("conflict-guard (high mean but 1 red flag -> escalate, NOT approve)",
+     "Suspicious Parcel", {
+        "authenticity": (0.95, 0.9, True), "completeness": (0.9, 0.85, True),
+        "tamper": (0.25, 0.6, True),         # lone red flag hidden under a high mean
+        "relevance": (0.9, 0.85, True),
+        "defender": (0.85, 0.8, True),
+    }, "video"),
 ]
 
 
@@ -113,6 +121,8 @@ def main():
     assert lone.decision == "escalate", "a single soft red flag must not auto-reject"
     conv = cases["converging-flags (2+ red flags -> reject)"]
     assert conv.decision == "reject", "converging red flags must auto-reject"
+    cflict = cases["conflict-guard (high mean but 1 red flag -> escalate, NOT approve)"]
+    assert cflict.decision == "escalate", "a lone red flag must block auto-approval"
     print("\nOK  all scoring invariants hold.")
 
 
