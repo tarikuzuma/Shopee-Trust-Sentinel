@@ -216,12 +216,18 @@ def _eval_image(path: Path) -> dict:
     h, w = gray.shape[:2]
     sharp = _normalized_laplacian_var(gray)
     brightness, clip_frac = _exposure_metrics(gray)
-    phash = phash_from_gray(gray)
+    std = float(gray.std())
+    # A perceptual hash of near-blank content is NOT a real fingerprint: every
+    # blank/degenerate frame hashes to ~the same value, so hashing them would
+    # manufacture false "reused proof" rejects between unrelated honest buyers.
+    # Only hash media that has actual visual content.
+    phash = phash_from_gray(gray) if std >= DEGENERATE_FRAME_STD_MAX else None
     quality_note = _quality_verdict(w, h, sharp, brightness, clip_frac)
     return {
         "kind": "image", "width": w, "height": h,
         "sharpness": round(sharp, 1), "brightness": round(brightness, 1),
-        "clip_fraction": round(clip_frac, 3), "phash": phash,
+        "clip_fraction": round(clip_frac, 3), "frame_std": round(std, 1),
+        "phash": phash,
         "status": "insufficient" if quality_note else "ok",
         "note": quality_note or "",
     }
@@ -278,7 +284,8 @@ def _eval_video(path: Path) -> dict:
         "kind": "video", "width": w, "height": h, "duration_s": round(duration, 2),
         "sharpness": round(sharp, 1), "brightness": round(brightness, 1),
         "clip_fraction": round(clip_frac, 3), "frame_std": round(frame_std, 1),
-        "phash": mid_phash,
+        # Suppress the hash for degenerate/blank video — see _eval_image note.
+        "phash": mid_phash if frame_std >= DEGENERATE_FRAME_STD_MAX else None,
     }
 
     # Degeneracy: essentially blank frames (lens cap, ceiling, all-black).
