@@ -151,6 +151,23 @@ def main() -> int:
     check("route", r.route, DECISION_ESCALATE)
     check("reason", r.reason_code, REASON_INSUFFICIENT_EVIDENCE)
 
+    # --- mixed evidence (one crisp + one blurry) -> PROCEEDS, not escalate -----
+    good = _write_img("mix_good.jpg", _clean_image())
+    soft = _write_img("mix_blur.jpg", cv2.GaussianBlur(_clean_image(), (31, 31), 0))
+    r = _run(conn, _case("C_mixed", [_img_ev("mix_good.jpg", good),
+                                     _img_ev("mix_blur.jpg", soft)]))
+    print("Mixed evidence (1 usable + 1 blurry):")
+    check("route (proceeds on the usable file)", r.route, None)
+
+    # --- all evidence weak (both blurry, fresh content) -> escalate ------------
+    w1 = _write_img("allweak1.jpg", cv2.GaussianBlur(_clean_image(), (31, 31), 0))
+    w2 = _write_img("allweak2.jpg", cv2.GaussianBlur(_clean_image(), (31, 31), 0))
+    r = _run(conn, _case("C_allweak", [_img_ev("allweak1.jpg", w1),
+                                       _img_ev("allweak2.jpg", w2)]))
+    print("All evidence weak (both blurry):")
+    check("route", r.route, DECISION_ESCALATE)
+    check("reason", r.reason_code, REASON_INSUFFICIENT_EVIDENCE)
+
     # --- absent media -> Rung 0 no-op (passes; downstream escalates) -----------
     r = _run(conn, _case("C_absent", [Evidence("missing.jpg", "image", None)]))
     print("Absent media (no pixels):")
