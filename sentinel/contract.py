@@ -78,6 +78,8 @@ class ItemListing:
     shop_id: str
     item_id: str
     listing_link: Optional[str] = None
+    price_php: Optional[float] = None   # listing price (range midpoint), PHP
+    title: Optional[str] = None
 
 
 @dataclass
@@ -113,6 +115,11 @@ class CaseRecord:
     video_frames: list[str] = field(default_factory=list)   # extracted frame paths
     submitted_at: Optional[str] = None
 
+    # Claim value = order value proxy (sum of item listing prices), PHP. None when
+    # no item carries a price — the economic layer routes such cases to a human.
+    # In production, replace with the actual requested refund amount.
+    claim_value_php: Optional[float] = None
+
     # Per-agent output slots, keyed by signal_name.
     signals: dict[str, SignalOutput] = field(default_factory=dict)
 
@@ -126,6 +133,11 @@ class CaseRecord:
     # Rung-0 (pre-validation) trace: per-evidence QC metrics + gate outcome. Kept
     # for the brief / swipe-app explanation and for tuning thresholds vs the dataset.
     prevalidation: Optional[dict] = None
+
+    # Expected-loss (pricing) layer trace: the EscalationDecision audit dict —
+    # claim value, net exposure, both expected losses, break-even threshold, route,
+    # and reason. Surfaced in the reviewer UI so a human sees WHY it was routed.
+    economic: Optional[dict] = None
 
     # Filled later.
     human_verdict: Optional[str] = None         # swipe app writes this back
@@ -164,6 +176,8 @@ class CaseRecord:
             "brief": self.brief,
             "reason_code": self.reason_code,
             "prevalidation": self.prevalidation,
+            "claim_value_php": self.claim_value_php,
+            "economic": self.economic,
         }
         return json.dumps(payload, ensure_ascii=False)
 
@@ -185,6 +199,8 @@ class CaseRecord:
             reason_code=blob.get("reason_code"),
             brief=blob.get("brief", ""),
             prevalidation=blob.get("prevalidation"),
+            claim_value_php=blob.get("claim_value_php"),
+            economic=blob.get("economic"),
             runtime_ms=row.get("runtime_ms"),
             human_verdict=row.get("human_verdict"),
             true_label=row.get("true_label"),

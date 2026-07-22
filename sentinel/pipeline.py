@@ -22,12 +22,47 @@ from typing import Optional
 
 from . import scoring, db
 from .contract import (
-    CaseRecord, DECISION_REJECT, REASON_AUTHENTICITY_DISPOSITIVE,
-    REASON_PASSED_PREVALIDATION,
+    CaseRecord, DECISION_APPROVE, DECISION_REJECT, DECISION_ESCALATE,
+    REASON_AUTHENTICITY_DISPOSITIVE, REASON_PASSED_PREVALIDATION,
 )
+from .economics import EconomicConfig, expected_loss_decision, ROUTE_AUTO_APPROVE
 from .prevalidation import prevalidate, apply as apply_rung0, _read_exif_editor
 from .vlm import VLMClient
 from .agents import authenticity, rung1b
+
+
+def _auto_reject_gate(rec: CaseRecord, cfg: EconomicConfig) -> None:
+    """If the case is a REJECT and auto-reject is disabled, downgrade to escalate.
+
+    Shopee guidance: keep auto-rejection off until the cost of wrongly rejecting a
+    valid claim is known. Applies to every reject path (Rung 0 duplicate,
+    Authenticity dispositive, convergence)."""
+    if rec.decision == DECISION_REJECT and not cfg.enable_auto_reject:
+        rec.decision = DECISION_ESCALATE
+        rec.economic = {"route": "escalate", "claim_value_php": rec.claim_value_php,
+                        "reason": "auto_reject_disabled: model reject downgraded to "
+                                  "human review per config"}
+
+
+def _apply_economics(rec: CaseRecord, prelim: str, cfg: EconomicConfig) -> None:
+    """Pricing layer for a SCORED case: refine the route by expected peso loss.
+
+    Only ever moves a case between auto-approve and escalate (never rejects —
+    that's the evidence layer's job, gated above). Because credibility is not a
+    calibrated probability, p_invalid comes from configurable per-bucket base
+    rates, not the raw score. Missing price / uncalibrated input -> human review.
+    """
+    if prelim == DECISION_REJECT:
+        _auto_reject_gate(rec, cfg)
+        return
+
+    bucket = "approve" if prelim == DECISION_APPROVE else "escalate"
+    p_invalid = cfg.bucket_p_invalid.get(bucket)
+    decision = expected_loss_decision(rec.claim_value_php, p_invalid, cfg)
+    rec.decision = (DECISION_APPROVE if decision.route == ROUTE_AUTO_APPROVE
+                    else DECISION_ESCALATE)
+    rec.economic = decision.to_dict()
+    rec.economic["bucket"] = bucket
 
 
 def _attach_exif_priors(rec: CaseRecord) -> None:
@@ -38,7 +73,8 @@ def _attach_exif_priors(rec: CaseRecord) -> None:
 
 
 def process_case(rec: CaseRecord, client: Optional[VLMClient] = None,
-                 conn=None, session_id: Optional[str] = None) -> CaseRecord:
+                 conn=None, session_id: Optional[str] = None,
+                 econ: Optional[EconomicConfig] = None) -> CaseRecord:
     """Run one case end-to-end, writing decision/reason/credibility onto it.
 
     Also records per-stage wall times on `rec.stage_ms` (ephemeral attribute,
@@ -46,6 +82,7 @@ def process_case(rec: CaseRecord, client: Optional[VLMClient] = None,
     """
     t0 = time.perf_counter()
     sid = session_id or rec.session_id
+    econ = econ or EconomicConfig.normal()
     stage_ms: dict[str, int] = {}
     rec.stage_ms = stage_ms
 
@@ -58,6 +95,9 @@ def process_case(rec: CaseRecord, client: Optional[VLMClient] = None,
     res = prevalidate(rec, conn=conn, session_id=sid)
     t = _mark("rung0", t0)
     if apply_rung0(rec, res):           # terminal (reject dup / escalate quality)
+        # Rung 0 escalates are "cannot be judged" — economics must NOT downgrade
+        # them to auto-approve. Only the auto-reject gate applies here.
+        _auto_reject_gate(rec, econ)
         rec.runtime_ms = int((time.perf_counter() - t0) * 1000)
         return rec
 
@@ -73,6 +113,7 @@ def process_case(rec: CaseRecord, client: Optional[VLMClient] = None,
         rec.credibility_score = breakdown.credibility_0_100
         rec.decision = DECISION_REJECT
         rec.reason_code = REASON_AUTHENTICITY_DISPOSITIVE
+        _auto_reject_gate(rec, econ)
         rec.runtime_ms = int((time.perf_counter() - t0) * 1000)
         return rec
 
@@ -81,8 +122,9 @@ def process_case(rec: CaseRecord, client: Optional[VLMClient] = None,
         rec.set_signal(sig)
     t = _mark("rung1b", t)
 
-    # --- score + route on whatever signals exist -----------------------------
+    # --- score (evidence layer) then refine by expected loss (pricing layer) -
     scoring.score_case(rec)
+    _apply_economics(rec, rec.decision, econ)
     if rec.reason_code is None:
         rec.reason_code = REASON_PASSED_PREVALIDATION
     rec.runtime_ms = int((time.perf_counter() - t0) * 1000)
@@ -90,8 +132,9 @@ def process_case(rec: CaseRecord, client: Optional[VLMClient] = None,
 
 
 def process_and_store(rec: CaseRecord, client: VLMClient, conn,
-                      session_id: Optional[str] = None) -> CaseRecord:
+                      session_id: Optional[str] = None,
+                      econ: Optional[EconomicConfig] = None) -> CaseRecord:
     """process_case + persist the routed case to SQLite."""
-    process_case(rec, client=client, conn=conn, session_id=session_id)
+    process_case(rec, client=client, conn=conn, session_id=session_id, econ=econ)
     db.upsert_case(conn, rec)
     return rec

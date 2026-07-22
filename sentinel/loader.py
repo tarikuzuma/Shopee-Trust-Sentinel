@@ -29,7 +29,44 @@ COL = {
     "evidence": "Image/Video Link",
     "validity": "Valid / Invalid",
     "invalidity": "Reason for Invalidity",
+    "price": "Price",
+    "title": "Title",
 }
+
+
+def _parse_price(v) -> Optional[float]:
+    """Parse a listing price cell to PHP float, or None if absent/unparseable.
+
+    Handles: plain floats (1299.0); strings with the ₱ sign and thousands commas
+    ("₱1,000"); and displayed RANGES ("₱369 - ₱1,399") -> midpoint. A blank cell
+    returns None, which the economic layer treats as missing price -> route to a
+    human (never a silent auto-approve).
+    """
+    if v is None:
+        return None
+    if isinstance(v, (int, float)):
+        return float(v) if v >= 0 else None
+    s = str(v).replace("₱", "").replace(",", "").strip()
+    if not s:
+        return None
+    # Range: take the midpoint of the two ends.
+    if "-" in s:
+        parts = [p.strip() for p in s.split("-") if p.strip()]
+        nums = []
+        for p in parts:
+            try:
+                nums.append(float(p))
+            except ValueError:
+                continue
+        if len(nums) >= 2:
+            return (nums[0] + nums[-1]) / 2.0
+        if len(nums) == 1:
+            return nums[0]
+        return None
+    try:
+        return float(s)
+    except ValueError:
+        return None
 
 
 def _clean(v) -> Optional[str]:
@@ -67,6 +104,10 @@ def load_sheet(path: Path | str, sheet_name: str,
         idx = cmap.get(key)
         return _clean(row[idx]) if idx is not None and idx < len(row) else None
 
+    def raw(row, key):
+        idx = cmap.get(key)
+        return row[idx] if idx is not None and idx < len(row) else None
+
     cases: dict[str, CaseRecord] = {}
     current: Optional[CaseRecord] = None
 
@@ -93,7 +134,10 @@ def load_sheet(path: Path | str, sheet_name: str,
         if item_id:
             listing = cell(row, "listing")
             if not any(it.item_id == item_id for it in current.items):
-                current.items.append(ItemListing(shop_id or "", item_id, listing))
+                current.items.append(ItemListing(
+                    shop_id or "", item_id, listing,
+                    price_php=_parse_price(raw(row, "price")),
+                    title=cell(row, "title")))
 
         # evidence file (may repeat per order)
         ev = cell(row, "evidence")
@@ -110,6 +154,12 @@ def load_sheet(path: Path | str, sheet_name: str,
                 else (invalid_reason or "invalid")
             )
 
+    # Claim value = order-value proxy = sum of the order's item listing prices.
+    # None when no item carries a price (economic layer -> route to human).
+    for rec in cases.values():
+        priced = [it.price_php for it in rec.items if it.price_php is not None]
+        rec.claim_value_php = round(sum(priced), 2) if priced else None
+
     return list(cases.values())
 
 
@@ -122,7 +172,8 @@ if __name__ == "__main__":
     sheet = sys.argv[2] if len(sys.argv) > 2 else "Test Data"
     recs = load_sheet(xlsx, sheet, session_id="cli")
     print(f"Loaded {len(recs)} cases from '{sheet}'")
-    for r in recs[:12]:
-        print(f"  {r.case_id}  reason={r.return_reason!r:20}  "
-              f"items={len(r.items)} evidence={[e.filename for e in r.evidence]} "
-              f"label={r.true_label}")
+    missing = sum(1 for r in recs if r.claim_value_php is None)
+    print(f"({missing} of {len(recs)} cases have no parseable price)")
+    for r in recs[:15]:
+        print(f"  {r.case_id}  reason={r.return_reason!r:20}  items={len(r.items)} "
+              f"claim=₱{r.claim_value_php}  label={r.true_label}")
