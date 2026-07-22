@@ -41,6 +41,13 @@ REASON_CORRUPTED_FILE = "corrupted_file"          # won't decode -> escalate (op
 REASON_INSUFFICIENT_EVIDENCE = "insufficient_evidence"  # too blurry/dark/small/short -> escalate
 REASON_PASSED_PREVALIDATION = "passed_prevalidation"    # cleared Rung 0, went to the agents
 
+# Rung 1a — Authenticity runs solo, first. If it alone meets the strong-fraud veto
+# (see scoring.VETO_SCORE/VETO_CONFIDENCE), the case rejects immediately and the
+# remaining four checks (Rung 1b) are never called — saves 4 VLM calls on the
+# clearest fraud. Distinct from Rung 0's duplicate_proof so logs/swipe-app can
+# tell "the single hardest check was dispositive" apart from "hash-matched reuse".
+REASON_AUTHENTICITY_DISPOSITIVE = "authenticity_dispositive_fraud"
+
 
 @dataclass
 class Evidence:
