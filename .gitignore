@@ -1,0 +1,15 @@
+# runtime artifacts
+data/*.db
+data/*.db-journal
+media/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# os
+.DS_Store
+Thumbs.db
