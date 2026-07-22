@@ -1,6 +1,6 @@
-# Shopee Trust Sentinel — Full Build Brief for Claude Code (v2)
+# Shopee Trust Sentinel — Full Build Brief for Claude Code (v3)
 
-TRAILBLAZE Shopee AI Hackathon 2026, Fraud Detection track. ~1 day. v2 adds Rung 0, a deterministic pre-filter that runs before any paid model call.
+TRAILBLAZE Shopee AI Hackathon 2026, Fraud Detection track. ~1 day. v2 added Rung 0, a deterministic pre-filter that runs before any paid model call. v3 splits the four-agent layer in two: Authenticity now runs alone, first — if it's dispositive, the other three checks + Defender are never called.
 
 ## The problem, in one line
 
@@ -19,7 +19,7 @@ Given a return case (stated reason + image/video evidence), decide valid or inva
 - Training data is invalid-only; test data is unlabeled mixed valid/invalid. Architecture and reasoning are graded alongside accuracy.
 - Judges are cross-panel, mostly non-technical. Clarity beats cleverness.
 
-## Architecture — Rung 0 (new) + Rung 1
+## Architecture — Rung 0 + Rung 1a (new) + Rung 1b
 
 Rung 0 is a deterministic Python layer: `cv2` + `Pillow` + `imagehash`, zero tokens, zero API calls. It runs first and does two unrelated jobs that must not be filed under one name:
 
@@ -35,6 +35,8 @@ Two boundary calls, decided and locked:
 
 Anything Rung 0 hard-stops (escalate or reject) never reaches a VLM — that's where the API cost savings come from, on top of catching a fraud class (duplicate proof) the four-agent layer doesn't otherwise cover.
 
+**v3 change — Authenticity is no longer parallel with the other three checks.** It runs alone, first, as its own gate ("Rung 1a"). Reasoning: it's the hardest and highest-value check (the one the judge's own dev team couldn't crack), and empirically the most likely to be *dispositive* on its own — a clearly AI-generated/edited photo doesn't need Completeness/Tamper/Relevance/Defender's opinions to be rejected. So it runs by itself; only if it does NOT meet the strong-fraud veto bar (score ≤0.15 at confidence ≥0.85 — the exact same veto threshold the scoring layer already used when all checks ran in parallel) does the case proceed to the remaining three checks + Defender ("Rung 1b"), run in parallel as before. This is the same fail-fast philosophy as Rung 0, applied one layer up: run the single most decisive, most expensive check first, and skip paying for the rest when it already settles the case. The scoring combiner needed zero changes for this — `hard_reject` already overrides regardless of which other signals ran, and a signal that never ran already shows up as neutral/excluded.
+
 ```
 Return case (reason + video + photo)
       ↓
@@ -44,14 +46,20 @@ Return case (reason + video + photo)
 │  EXIF read (editing-software tag)                    →  always passes through as a prior
 └──────────────────────────────────────────────────────────────────────────────────────────┘
       ↓ (pass-through only, + EXIF prior attached)
-┌─────────────┬──────────────┬───────────┬────────────┐
-│ Authenticity│ Completeness │  Tamper   │ Relevance  │   + Defender
-│ AI-edited?  │ unboxing     │ pre-opened│ matches    │   (argues the
-│ (+EXIF prior│ shown?       │ / frozen  │ reason?    │   claim is legit)
-│  as context)│              │  frame?   │            │
-└─────────────┴──────────────┴───────────┴────────────┘
+┌────────────────────────── Rung 1a — Authenticity (solo, runs FIRST) ──────────────────────┐
+│  ONE VLM call: AI-generated / edited? (+EXIF prior as context; worst-case across evidence) │
+│  score ≤0.15 @ confidence ≥0.85 (dispositive)  →  REJECT authenticity_dispositive_fraud, STOP │
+│  otherwise                                     →  pass through to Rung 1b                 │
+└──────────────────────────────────────────────────────────────────────────────────────────┘
+      ↓ (only non-dispositive cases reach here — the other 3 calls skipped on obvious fraud)
+┌──────────────┬───────────┬────────────┐
+│ Completeness │  Tamper   │ Relevance  │   + Defender
+│ unboxing     │ pre-opened│ matches    │   (argues the
+│ shown?       │/ frozen   │ reason?    │   claim is legit)
+│              │  frame?   │            │
+└──────────────┴───────────┴────────────┘
       ↓  each returns { score 0-1, reason_string, applicable: bool }
-Scoring combiner → credibility 0–100 (higher = more trustworthy)
+Scoring combiner → credibility 0–100 (higher = more trustworthy)   [unchanged]
       ↓
 Synthesis agent (LLM) → plain-language brief + verdict
       ↓
@@ -62,6 +70,10 @@ Decision router (asymmetric thresholds):
       ↓
 Everything logged to SQLite → confusion matrix + labeled seed
 ```
+
+**Authenticity's own internal jobs** (it's a single VLM call, not a multi-step agent — consistent with "Rung 1, deliberately flat"): full-frame AI-generation detection, local splice/edit detection, physical/compositional plausibility (damage physics, lighting/shadow consistency, garbled text/logos), recapture/screenshot detection. It does NOT own frozen/looped-frame detection — that stays with Tamper (a loop is deception, not an authenticity-of-content question). When a case has multiple evidence files, Authenticity aggregates **worst-case-wins** (minimum credibility across files) — one faked photo among several honest ones is still fraud.
+
+**Considered and deliberately rejected for Authenticity (with evidence, not just theory):** classic hand-crafted forensics (Error Level Analysis, frequency/DCT artifact detection) as a zero-token replacement or supplement. Tested empirically against the 4 real "Edited using AI" training cases — ELA residuals were *lower* on the real fakes than on a non-AI-edited case, and zero of the four carried an EXIF editing-software fingerprint. Matches published research: hand-crafted forensic detectors are documented as brittle against diffusion-model output and confounded by ordinary compression/format differences — exactly the false-positive trap this project's whole design exists to avoid. Also rejected: pretrained deep detectors (CNNDetection/UnivFD/DIRE-style) — real research, but too much dependency/generalization risk for a 1-day build. Both are named on the roadmap, not built.
 
 ## Scoring direction (unchanged, still locked)
 
@@ -95,7 +107,7 @@ Existing shape (`case_id`, `session_id`, `return_reason`, `evidence_refs`, `vide
 - `rung0`: `{quality: {...}, duplicate: {...}, exif_prior: {...}}` — the three Rung 0 check outputs, same `{signal_name, applicable, verdict, reason_string, confidence}` shape as every other agent, for consistency and so the swipe app / confusion-matrix script can read it without a special case.
 - `authenticity_prior`: the EXIF extract handed forward, read once by the Authenticity agent's prompt builder.
 
-When a Rung 0 gate fires, `case["decision"]` and `case["gate_reason"]` are set immediately and the four-agent stage is skipped for that case — but the case still gets a full row in `cases`, so it still counts in the confusion matrix.
+When a Rung 0 gate fires, `case["decision"]` and `case["gate_reason"]` are set immediately and the Rung 1a/1b stages are skipped entirely — but the case still gets a full row in `cases`, so it still counts in the confusion matrix. Same rule one layer up: when Rung 1a (Authenticity) alone meets the veto bar, `decision=reject` and `reason_code=authenticity_dispositive_fraud` are set immediately and Rung 1b (Completeness/Tamper/Relevance/Defender) never runs for that case — again, still a full row, still counted.
 
 ## Threshold discipline (the same rule extended)
 
@@ -113,10 +125,11 @@ One technical detail that breaks silently if missed: the blur metric (variance o
 1. Data contract + SQLite schema, including `proof_hashes` — unblocks everyone.
 2. **Rung 0** — quality gate, duplicate hash, EXIF read. No external dependency, so it can be built and unit-tested in isolation before the agents exist. Gives a second demoable spine: "here's a case getting rejected/escalated before it ever costs a token."
 3. Scoring combiner + decision router with hand-fed fake numbers.
-4. The four checks + Defender (Relevance and Tamper first — cheapest; Authenticity is the hard VLM one, and now takes the EXIF prior as input; Tamper now also takes the frozen-frame motion score as input).
-5. Synthesis agent (LLM brief — depends on all signals existing).
-6. Confusion-matrix script (queries the DB; Rung 0 short-circuited cases must appear in it too).
-7. Swipe app (parallelizable by the second partner).
+4. **Rung 1a — Authenticity, built and wired FIRST, alone** (v3 change). Takes the EXIF prior as input, aggregates worst-case across multiple evidence files, and short-circuits the case to `reject` when it alone meets the veto bar — the remaining three checks are not called for that case.
+5. Rung 1b — the remaining three checks + Defender (Relevance and Tamper next — cheapest; Tamper also takes the frozen-frame motion score as input).
+6. Synthesis agent (LLM brief — depends on all signals existing, or on Rung 1a alone if it short-circuited).
+7. Confusion-matrix script (queries the DB; Rung 0- and Rung-1a-short-circuited cases must appear in it too).
+8. Swipe app (parallelizable by the second partner).
 
 ## What to name but not build (unchanged, still roadmap)
 
@@ -130,7 +143,8 @@ The AI investigates and decides autonomously for confident cases, but the design
 (b) never auto-approve under uncertainty,
 (c) treat missing signals as neutral, not suspicious,
 (d) keep the Defender pulling honest claims up,
-(e) **never let a capture-quality problem auto-reject** — Rung 0's quality gate only escalates, and
-(f) **never let a deterministic fraud signal wait on a VLM call** — Rung 0's duplicate check rejects directly, and the frozen-frame signal reaches Tamper as a first-class input rather than being silently absorbed into the quality gate.
+(e) **never let a capture-quality problem auto-reject** — Rung 0's quality gate only escalates,
+(f) **never let a deterministic fraud signal wait on a VLM call** — Rung 0's duplicate check rejects directly, and the frozen-frame signal reaches Tamper as a first-class input rather than being silently absorbed into the quality gate, and
+(g) **never let the Authenticity-first short-circuit lower the bar for auto-reject** — Rung 1a uses the exact same veto threshold (score ≤0.15 @ confidence ≥0.85) that was already the bar for a single check to override the Defender when all five ran in parallel. Running it first changes *cost and latency*, not the *standard of evidence* required to reject.
 
-The differentiator stays the same: "is the proof authentic" (the AI's job) is separated from "whose fault is the damage" (a human's job, out of scope). Rung 0 adds a second differentiator: an obvious, deterministic fraud check (duplicate proof) is caught before spending a single token, and an obvious non-fraud problem (bad camera) never gets treated as fraud.
+The differentiator stays the same: "is the proof authentic" (the AI's job) is separated from "whose fault is the damage" (a human's job, out of scope). Rung 0 adds a second differentiator: an obvious, deterministic fraud check (duplicate proof) is caught before spending a single token, and an obvious non-fraud problem (bad camera) never gets treated as fraud. v3 extends this one layer up: the single hardest, most expensive check runs first and can settle obvious fraud alone, so the other three checks' tokens are only spent on cases that actually need their opinion.
