@@ -23,6 +23,7 @@ from typing import Optional
 from . import scoring, db
 from .contract import (
     CaseRecord, DECISION_APPROVE, DECISION_REJECT, DECISION_ESCALATE,
+    DECISION_RESUBMIT,
     REASON_AUTHENTICITY_DISPOSITIVE, REASON_PASSED_PREVALIDATION,
 )
 from .economics import EconomicConfig, expected_loss_decision, ROUTE_AUTO_APPROVE
@@ -61,6 +62,19 @@ def _apply_economics(rec: CaseRecord, prelim: str, cfg: EconomicConfig,
     """
     if prelim == DECISION_REJECT:
         _auto_reject_gate(rec, cfg)
+        return
+
+    # A resubmit is not a claim decision, so there is no exposure to price: the
+    # proof doesn't depict the item, and expected-loss reasoning has nothing to
+    # weigh. Without this guard economics would treat it as an escalate-bucket
+    # case and could auto-approve it as "too cheap to review" — exactly how a
+    # thumbs-down photo got approved for ₱109.
+    if prelim == DECISION_RESUBMIT:
+        rec.economic = {"route": "resubmit", "claim_value_php": rec.claim_value_php,
+                        "reason": "no_product_evidence: the proof does not depict "
+                                  "the ordered item; bounced for a usable photo. "
+                                  "No claim decision was made, so there is no "
+                                  "expected loss to price."}
         return
 
     if prelim == DECISION_ESCALATE and has_red_flag:

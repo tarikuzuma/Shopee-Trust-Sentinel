@@ -21,6 +21,7 @@ from dataclasses import dataclass
 
 from .contract import (
     CaseRecord, DECISION_APPROVE, DECISION_REJECT, DECISION_ESCALATE,
+    DECISION_RESUBMIT,
 )
 
 # The four fraud checks (Defender is handled separately — it points opposite).
@@ -50,6 +51,49 @@ VETO_CONFIDENCE = 0.85   # ... at confidence >= this  => dispositive fraud
 LOW_SIGNAL_SCORE = 0.40
 CONVERGENCE_MIN = 2
 
+# Consensus reject: when this many INDEPENDENT fraud checks are red flags, the
+# case rejects on the convergence alone, regardless of the weighted mean.
+#
+# Why the mean needs overriding (measured on case 237722409265023): completeness
+# 0.20, tamper 0.20, relevance 0.30 all agreed the video shows a pre-opened box —
+# a mean of 0.23 over those three, which rejects. But authenticity scored 0.95 at
+# 28% of the weight and pulled the mean to 0.43, over the 35 reject line, so the
+# case escalated. Authenticity was not wrong: it answers "were these pixels
+# manipulated?", and for a STAGED fraud the honest answer is no — the fraudster
+# used a real camera on a genuinely pre-opened parcel. That is exactly the failure
+# mode: on staging fraud, an authenticity PASS is guaranteed by construction, and
+# averaging it in lets it rescue a case the other three checks convicted.
+#
+# Averaging assumes the checks are interchangeable votes on one question. They are
+# not — they answer different questions, so three of them agreeing is stronger
+# evidence than a fourth disagreeing about something else. Hence: count the
+# convergence, don't dilute it.
+#
+# Set to 3 (of 4) deliberately, not 2: CONVERGENCE_MIN=2 still governs the
+# score-based path, so two red flags plus a low mean rejects as before, while two
+# red flags with a high mean still escalates. Only near-unanimity bypasses the
+# score. Measured on the labeled set: 0 false positives, valid_eval unchanged,
+# test_eval automation 69% -> 71%.
+CONSENSUS_REJECT_MIN = 3
+
+# "No product evidence" bounce. When BOTH video-only checks are inapplicable
+# (photo submission) AND relevance is at or below the red-flag floor, nothing in
+# the submission depicts the ordered item — there is no evidence to judge, so the
+# case bounces for a usable photo instead of being decided.
+#
+# This is deliberately NOT "photo-only -> bounce". Measured on the labeled set,
+# the unnarrowed rule bounces 100% of the known-valid cases and 40% of all
+# traffic, because a PHOTO cannot show an unboxing or a seal — two N/A checks are
+# the signature of a photo submission, not of fraud. Adding the relevance
+# condition drops that to 11% and leaves the two clean valid photo cases
+# (relevance 0.9) untouched.
+#
+# It bounces rather than rejects for the same reason Rung 0 does: a photo of the
+# wrong thing is far more often a confused buyer than a fraudster, and a bounce
+# costs a reviewer nothing while denying nothing.
+NO_EVIDENCE_RELEVANCE_MAX = LOW_SIGNAL_SCORE
+_VIDEO_ONLY_CHECKS = ("completeness", "tamper")
+
 
 @dataclass
 class ScoreBreakdown:
@@ -63,6 +107,7 @@ class ScoreBreakdown:
     vetoed_by: list[str]            # fraud checks that triggered the strong-fraud veto
     hard_reject: bool               # True => dispositive fraud, auto-reject
     low_signals: list[str]          # applicable fraud checks scoring as red flags
+    no_product_evidence: bool       # photo-only AND relevance at/below the floor
 
 
 def combine(rec: CaseRecord) -> ScoreBreakdown:
@@ -88,9 +133,20 @@ def combine(rec: CaseRecord) -> ScoreBreakdown:
         # Strong-fraud veto: this one check is confident enough to be dispositive.
         if sig.score <= VETO_SCORE and sig.confidence >= VETO_CONFIDENCE:
             vetoed_by.append(name)
-        # Red flag for the convergence guard.
-        if sig.score < LOW_SIGNAL_SCORE:
+        # Red flag for the convergence guard. INCLUSIVE (<=): a check landing
+        # exactly ON the floor is a red flag. An exclusive test let relevance=0.40
+        # register as clean, which auto-approved a photo of a thumbs-down gesture.
+        if sig.score <= LOW_SIGNAL_SCORE:
             low_signals.append(name)
+
+    # No product evidence: a photo submission (both video-only checks N/A) whose
+    # relevance says the ordered item is not depicted. Nothing to judge.
+    rel = rec.signals.get("relevance")
+    no_product_evidence = (
+        all(name in excluded for name in _VIDEO_ONLY_CHECKS)
+        and rel is not None and rel.applicable
+        and rel.score <= NO_EVIDENCE_RELEVANCE_MAX
+    )
 
     no_info = weight_total == 0.0
     base = 0.5 if no_info else weighted_sum / weight_total
@@ -117,6 +173,7 @@ def combine(rec: CaseRecord) -> ScoreBreakdown:
         vetoed_by=vetoed_by,
         hard_reject=hard_reject,
         low_signals=low_signals,
+        no_product_evidence=no_product_evidence,
     )
 
 
@@ -130,6 +187,12 @@ def route(breakdown: ScoreBreakdown) -> str:
     fraud veto OR multiple converging low signals. A single soft red flag can
     only escalate — it must not sink a case on its own.
 
+    Consensus reject: >= CONSENSUS_REJECT_MIN red flags rejects on convergence
+    alone, bypassing the credibility score. The weighted mean can be rescued by
+    one unrelated high check (a staged-fraud video is genuinely unmanipulated, so
+    Authenticity honestly scores it ~0.95); counting agreeing checks is not
+    vulnerable to that, because the checks answer different questions.
+
     Conflict guard (cost asymmetry): a high MEAN credibility can still hide one
     fraud check screaming red — e.g. a video that looks like a clean unboxing but
     whose tamper/relevance check flags it. We must never AUTO-APPROVE while any
@@ -141,6 +204,17 @@ def route(breakdown: ScoreBreakdown) -> str:
         return DECISION_REJECT
     if breakdown.no_information:
         return DECISION_ESCALATE
+    # No product evidence -> bounce for a usable photo. Checked before the score
+    # gates: the score is meaningless when the proof isn't about the claim, and
+    # economics would otherwise auto-approve it as a cheap unflagged claim.
+    if breakdown.no_product_evidence:
+        return DECISION_RESUBMIT
+    # Consensus reject: near-unanimous red flags are dispositive on their own.
+    # Checked BEFORE the score gates precisely because the score is the thing
+    # that fails here — one unrelated high check can lift the mean above the
+    # reject line while three checks agree the proof is staged.
+    if len(breakdown.low_signals) >= CONSENSUS_REJECT_MIN:
+        return DECISION_REJECT
     score = breakdown.credibility_0_100
     if score >= APPROVE_AT:
         # Conflict guard: a lone red-flag fraud check blocks auto-approval.
