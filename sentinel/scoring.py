@@ -1,0 +1,134 @@
+"""
+Scoring combiner + decision router.
+
+Turns the five per-check SignalOutputs into a single credibility score (0-100)
+and an autonomous decision (approve / reject / escalate).
+
+Design invariants (do not break):
+  1. Every score is CREDIBILITY (high = trustworthy). Never mix in risk.
+  2. An inapplicable check is truly NEUTRAL: it is EXCLUDED from the average,
+     so a missing signal neither raises nor lowers credibility. (Averaging in a
+     0.5 would drag a strong case toward the middle — that would penalize honest
+     photo-only buyers, which we forbid.)
+  3. The Defender only ever LIFTS credibility (it argues the claim is legit).
+     Its lift is bounded, so it can protect an honest buyer but can NOT rescue a
+     case the fraud checks find clearly fraudulent.
+  4. No information (no applicable fraud checks) => ESCALATE, never auto-approve.
+"""
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+from .contract import (
+    CaseRecord, DECISION_APPROVE, DECISION_REJECT, DECISION_ESCALATE,
+)
+
+# The four fraud checks (Defender is handled separately — it points opposite).
+FRAUD_CHECKS = ("authenticity", "completeness", "tamper", "relevance")
+DEFENDER = "defender"
+
+# Decision thresholds on the 0-100 credibility scale (placeholders; tune vs eval).
+APPROVE_AT = 75.0   # >= this  -> auto-approve
+REJECT_AT = 35.0    # <  this  -> auto-reject
+# in between -> escalate to human
+
+# Max credibility (0-1 scale) the Defender may add on top of the fraud-check base.
+# 0.20 = up to 20 points. Enough to save a borderline honest case, not enough to
+# lift a clearly fraudulent one (base 0.10 + 0.20 = 0.30 -> still rejects).
+DEFENDER_LIFT_MAX = 0.20
+
+# Strong-fraud veto: a single fraud check that is this confident the proof is fake
+# is DISPOSITIVE -> auto-reject, and the Defender cannot lift it. This keeps the
+# auto-decision rate high on obvious fraud (e.g. clearly AI-edited proof) while
+# still letting the Defender protect genuinely borderline honest buyers.
+VETO_SCORE = 0.15        # credibility <= this ...
+VETO_CONFIDENCE = 0.85   # ... at confidence >= this  => dispositive fraud
+
+
+@dataclass
+class ScoreBreakdown:
+    """Explainable trace of how the credibility number was reached."""
+    base_0_1: float                 # weighted mean of applicable fraud checks
+    defender_lift_0_1: float        # bounded lift the Defender contributed
+    credibility_0_100: float
+    applicable_checks: list[str]
+    excluded_checks: list[str]      # inapplicable -> treated as neutral
+    no_information: bool            # True => nothing to judge on -> escalate
+    vetoed_by: list[str]            # fraud checks that triggered the strong-fraud veto
+    hard_reject: bool               # True => dispositive fraud, auto-reject
+
+
+def combine(rec: CaseRecord) -> ScoreBreakdown:
+    """Fold the case's signals into a 0-100 credibility score."""
+    applicable: list[str] = []
+    excluded: list[str] = []
+    vetoed_by: list[str] = []
+    weighted_sum = 0.0
+    weight_total = 0.0
+
+    for name in FRAUD_CHECKS:
+        sig = rec.signals.get(name)
+        if sig is None or not sig.applicable:
+            excluded.append(name)
+            continue
+        applicable.append(name)
+        # Weight by the check's own confidence; a floor keeps a zero-confidence
+        # but applicable check from vanishing entirely.
+        w = max(sig.confidence, 0.05)
+        weighted_sum += sig.score * w
+        weight_total += w
+        # Strong-fraud veto: this one check is confident enough to be dispositive.
+        if sig.score <= VETO_SCORE and sig.confidence >= VETO_CONFIDENCE:
+            vetoed_by.append(name)
+
+    no_info = weight_total == 0.0
+    base = 0.5 if no_info else weighted_sum / weight_total
+    hard_reject = bool(vetoed_by)
+
+    # Defender: bounded, one-directional lift. Suppressed entirely under a veto —
+    # dispositive fraud cannot be lifted, even by a strong legitimacy argument.
+    lift = 0.0
+    dfn = rec.signals.get(DEFENDER)
+    if dfn is not None and dfn.applicable and not no_info and not hard_reject:
+        # Only the part of the Defender's score ABOVE neutral counts, scaled by
+        # its confidence. score=1.0, conf=1.0 -> full lift; score<=0.5 -> none.
+        strength = max(0.0, dfn.score - 0.5) * 2.0
+        lift = DEFENDER_LIFT_MAX * strength * dfn.confidence
+
+    credibility_0_1 = min(1.0, max(0.0, base + lift))
+    return ScoreBreakdown(
+        base_0_1=base,
+        defender_lift_0_1=lift,
+        credibility_0_100=round(credibility_0_1 * 100.0, 1),
+        applicable_checks=applicable,
+        excluded_checks=excluded,
+        no_information=no_info,
+        vetoed_by=vetoed_by,
+        hard_reject=hard_reject,
+    )
+
+
+def route(breakdown: ScoreBreakdown) -> str:
+    """Map a credibility breakdown to an autonomous decision.
+
+    Cost asymmetry: when in doubt, escalate — never auto-approve. No information
+    always escalates, regardless of the (neutral) score.
+    """
+    if breakdown.hard_reject:
+        return DECISION_REJECT
+    if breakdown.no_information:
+        return DECISION_ESCALATE
+    score = breakdown.credibility_0_100
+    if score >= APPROVE_AT:
+        return DECISION_APPROVE
+    if score < REJECT_AT:
+        return DECISION_REJECT
+    return DECISION_ESCALATE
+
+
+def score_case(rec: CaseRecord) -> ScoreBreakdown:
+    """Combine + route + write the results back onto the CaseRecord."""
+    breakdown = combine(rec)
+    rec.credibility_score = breakdown.credibility_0_100
+    rec.decision = route(breakdown)
+    return breakdown
