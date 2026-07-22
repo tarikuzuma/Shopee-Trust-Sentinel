@@ -25,6 +25,7 @@ from .contract import (
     CaseRecord, DECISION_APPROVE, DECISION_REJECT, DECISION_ESCALATE,
     DECISION_RESUBMIT,
     REASON_AUTHENTICITY_DISPOSITIVE, REASON_PASSED_PREVALIDATION,
+    REASON_PRICE_UNAVAILABLE,
 )
 from .economics import EconomicConfig, expected_loss_decision, ROUTE_AUTO_APPROVE
 from .prevalidation import prevalidate, apply as apply_rung0, _read_exif_editor
@@ -84,6 +85,13 @@ def _apply_economics(rec: CaseRecord, prelim: str, cfg: EconomicConfig,
                                   "claim value — the base rate does not describe a "
                                   "conflicted case"}
         return
+
+    # Missing price is an ops data gap, not a buyer failure — tag it so it can be
+    # counted and fixed at the source rather than hiding inside the escalation
+    # queue. Deliberately NOT a resubmit: the price comes from the order record,
+    # so bouncing the buyer would return the same submission and the same gap.
+    if rec.claim_value_php is None:
+        rec.reason_code = REASON_PRICE_UNAVAILABLE
 
     bucket = "approve" if prelim == DECISION_APPROVE else "escalate"
     p_invalid = cfg.bucket_p_invalid.get(bucket)

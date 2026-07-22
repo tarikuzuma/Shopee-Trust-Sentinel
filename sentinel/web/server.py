@@ -57,6 +57,10 @@ def _case_brief(rec: CaseRecord) -> str:
     elif rec.reason_code == "insufficient_evidence":
         parts.append("Proof too blurry/dark/short to judge — bounced to the buyer "
                      "for a readable file. No claim decision was made.")
+    elif rec.reason_code == "price_unavailable":
+        parts.append("Order record has no price, so expected loss cannot be "
+                     "computed. Data gap on our side — the buyer cannot supply "
+                     "this; a reviewer can read it off the listing.")
     elif rec.reason_code == "corrupted_file":
         parts.append("Proof file would not decode — bounced to the buyer for a "
                      "re-upload. No claim decision was made.")

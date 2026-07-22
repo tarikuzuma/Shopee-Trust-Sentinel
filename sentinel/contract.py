@@ -60,6 +60,13 @@ REASON_CORRUPTED_FILE = "corrupted_file"          # won't decode -> resubmit (op
 REASON_INSUFFICIENT_EVIDENCE = "insufficient_evidence"  # too blurry/dark/small/short -> resubmit
 REASON_PASSED_PREVALIDATION = "passed_prevalidation"    # cleared Rung 0, went to the agents
 
+# The order record has no price, so expected-loss cannot be computed and the case
+# goes to a human. This is an OPS DATA GAP, not a judgment about the buyer: the
+# price lives in Shopee's order export, and the buyer has no way to supply it.
+# Tagged distinctly so the dashboard can separate "our data is incomplete" (fix
+# the feed) from "the evidence is inconclusive" (genuinely needs a reviewer).
+REASON_PRICE_UNAVAILABLE = "price_unavailable"
+
 # Rung 1a — Authenticity runs solo, first. If it alone meets the strong-fraud veto
 # (see scoring.VETO_SCORE/VETO_CONFIDENCE), the case rejects immediately and the
 # remaining four checks (Rung 1b) are never called — saves 4 VLM calls on the
