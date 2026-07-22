@@ -27,7 +27,7 @@ from .contract import (
 )
 from .prevalidation import prevalidate, apply as apply_rung0, _read_exif_editor
 from .vlm import VLMClient
-from .agents import authenticity
+from .agents import authenticity, rung1b
 
 
 def _attach_exif_priors(rec: CaseRecord) -> None:
@@ -39,12 +39,24 @@ def _attach_exif_priors(rec: CaseRecord) -> None:
 
 def process_case(rec: CaseRecord, client: Optional[VLMClient] = None,
                  conn=None, session_id: Optional[str] = None) -> CaseRecord:
-    """Run one case end-to-end, writing decision/reason/credibility onto it."""
+    """Run one case end-to-end, writing decision/reason/credibility onto it.
+
+    Also records per-stage wall times on `rec.stage_ms` (ephemeral attribute,
+    not persisted) so eval scripts can report where the time goes.
+    """
     t0 = time.perf_counter()
     sid = session_id or rec.session_id
+    stage_ms: dict[str, int] = {}
+    rec.stage_ms = stage_ms
+
+    def _mark(stage: str, since: float) -> float:
+        now = time.perf_counter()
+        stage_ms[stage] = int((now - since) * 1000)
+        return now
 
     # --- Rung 0: deterministic pre-validation --------------------------------
     res = prevalidate(rec, conn=conn, session_id=sid)
+    t = _mark("rung0", t0)
     if apply_rung0(rec, res):           # terminal (reject dup / escalate quality)
         rec.runtime_ms = int((time.perf_counter() - t0) * 1000)
         return rec
@@ -54,6 +66,7 @@ def process_case(rec: CaseRecord, client: Optional[VLMClient] = None,
     # --- Rung 1a: Authenticity, solo, first ----------------------------------
     client = client or VLMClient()
     rec.set_signal(authenticity.run(rec, client))
+    t = _mark("authenticity", t)
 
     breakdown = scoring.combine(rec)
     if breakdown.hard_reject:           # dispositive fraud -> reject, skip Rung 1b
@@ -63,11 +76,10 @@ def process_case(rec: CaseRecord, client: Optional[VLMClient] = None,
         rec.runtime_ms = int((time.perf_counter() - t0) * 1000)
         return rec
 
-    # --- Rung 1b: the remaining checks (slot in as built) --------------------
-    # rec.set_signal(completeness.run(rec, client))
-    # rec.set_signal(tamper.run(rec, client))
-    # rec.set_signal(relevance.run(rec, client))
-    # rec.set_signal(defender.run(rec, client))
+    # --- Rung 1b: Completeness / Tamper / Relevance / Defender (one call) ----
+    for sig in rung1b.run(rec, client).values():
+        rec.set_signal(sig)
+    t = _mark("rung1b", t)
 
     # --- score + route on whatever signals exist -----------------------------
     scoring.score_case(rec)

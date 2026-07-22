@@ -64,6 +64,12 @@ class VLMClient:
             raise VLMError("GEMINI_API_KEY not set (put it in .env or the env).")
         self.model = model or DEFAULT_MODEL
         self._client = genai.Client(api_key=key)
+        # Upload cache: the same video is used by both the Authenticity call and
+        # the Rung 1b call — re-uploading it would double time and quota for no
+        # benefit. Keyed by resolved path + mtime so a changed file re-uploads.
+        self._upload_cache: dict[str, object] = {}
+        # Usage metadata of the most recent analyze() call (for cost accounting).
+        self.last_usage = None
 
     # --- media handling ------------------------------------------------------
 
@@ -76,7 +82,11 @@ class VLMClient:
         return types.Part.from_bytes(data=path.read_bytes(), mime_type=mime)
 
     def _upload(self, path: Path):
-        """Upload via the Files API and block until the file is ACTIVE."""
+        """Upload via the Files API and block until the file is ACTIVE (cached)."""
+        cache_key = f"{path.resolve()}:{path.stat().st_mtime_ns}"
+        cached = self._upload_cache.get(cache_key)
+        if cached is not None:
+            return cached
         try:
             f = self._client.files.upload(file=str(path))
         except Exception as e:  # noqa: BLE001
@@ -89,6 +99,7 @@ class VLMClient:
             f = self._client.files.get(name=f.name)
         if getattr(f.state, "name", str(f.state)) == "FAILED":
             raise VLMError(f"server failed to process {path.name}")
+        self._upload_cache[cache_key] = f
         return f
 
     # --- the one call the checks use -----------------------------------------
@@ -117,6 +128,7 @@ class VLMClient:
         except Exception as e:  # noqa: BLE001
             raise VLMError(f"generate_content failed: {e}") from e
 
+        self.last_usage = getattr(resp, "usage_metadata", None)
         parsed = getattr(resp, "parsed", None)
         if parsed is None:
             raise VLMError("model returned no parseable structured output")
