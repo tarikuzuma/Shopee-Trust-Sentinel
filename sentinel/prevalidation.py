@@ -322,7 +322,8 @@ def prevalidate(rec: CaseRecord, conn=None, session_id: Optional[str] = None,
     sid = session_id or rec.session_id
     result = PreValResult()
 
-    worst_escalate: Optional[str] = None  # remember a quality/corruption fail if no dup found
+    escalate_reason: Optional[str] = None  # a quality/corruption fail, if no dup found
+    has_usable = False                     # at least one 'ok' evidence file present
 
     for ev in rec.evidence:
         if not ev.path:
@@ -338,9 +339,9 @@ def prevalidate(rec: CaseRecord, conn=None, session_id: Optional[str] = None,
         metrics["filename"] = ev.filename
         result.evidence_qc.append(metrics)
 
-        # Stage A — file integrity (hard stop, escalate).
+        # Stage A — file integrity (this FILE fails; case-level route decided below).
         if metrics["status"] == "corrupted":
-            worst_escalate = worst_escalate or REASON_CORRUPTED_FILE
+            escalate_reason = escalate_reason or REASON_CORRUPTED_FILE
             continue  # can't hash a file we couldn't decode
 
         phash = metrics.get("phash")
@@ -366,9 +367,12 @@ def prevalidate(rec: CaseRecord, conn=None, session_id: Optional[str] = None,
                 ev.exif_editor = editor
                 result.exif_priors[ev.filename] = editor
 
-        # Stages B-E — quality gates (hard stop, ESCALATE not reject).
+        # Stages B-E — quality gates. A weak FILE is noted, but does not by itself
+        # sink the case (see case-level roll-up below).
         if metrics["status"] == "insufficient":
-            worst_escalate = worst_escalate or REASON_INSUFFICIENT_EVIDENCE
+            escalate_reason = escalate_reason or REASON_INSUFFICIENT_EVIDENCE
+        else:  # status == "ok"
+            has_usable = True
 
     # No duplicate found. Record cleared hashes so later cases can match this one.
     if conn is not None and record:
@@ -376,9 +380,14 @@ def prevalidate(rec: CaseRecord, conn=None, session_id: Optional[str] = None,
             if m.get("status") in ("ok", "insufficient") and m.get("phash"):
                 db.record_phash(conn, sid, rec.case_id, m["filename"], m["phash"])
 
-    if worst_escalate is not None:
+    # Case-level roll-up: proceed if ANY evidence file is usable — the agents can
+    # judge on it, and a single weak/corrupt file must not force a human review
+    # (raises automation; still safe — quality != fraud, and a duplicate already
+    # returned above). Escalate only when something failed AND nothing is usable.
+    # All-absent falls through (route stays None) to downstream no_information.
+    if not has_usable and escalate_reason is not None:
         result.route = DECISION_ESCALATE
-        result.reason_code = worst_escalate
+        result.reason_code = escalate_reason
 
     return result
 
