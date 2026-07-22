@@ -31,7 +31,7 @@ from sentinel import media, db, pipeline
 from sentinel.contract import CaseRecord, Evidence
 from sentinel.vlm import VLMClient
 
-XLSX = r"C:\Users\gumba\Downloads\[OPS Hackathon Case] Order Details.xlsx"
+XLSX = r"C:\Users\gumba\Downloads\[OPS Hackathon Case] Order Details (1) (1).xlsx"
 METRICS_PATH = Path(__file__).resolve().parent.parent / "data" / "eval_metrics.json"
 SLEEP_BETWEEN_CASES = 8.0
 
@@ -135,6 +135,7 @@ def _run_cases(recs: list[CaseRecord], session: str, metrics: dict) -> None:
             "kinds": sorted({e.kind for e in rec.evidence if e.path}),
             "decision": rec.decision, "credibility": rec.credibility_score,
             "reason_code": rec.reason_code, "runtime_ms": rec.runtime_ms,
+            "claim_value_php": rec.claim_value_php, "economic": rec.economic,
             "stage_ms": getattr(rec, "stage_ms", {}),
             "calls": call_log,
             "signals": {n: {"score": s.score, "conf": s.confidence,
@@ -180,6 +181,12 @@ def cmd_test(metrics: dict) -> None:
     _run_cases(recs, "test_eval", metrics)
 
 
+def cmd_testfull(metrics: dict) -> None:
+    recs = load_sheet(XLSX, "Test Data", session_id="test_eval")
+    print(f"=== FULL TEST-DATA EVAL: {len(recs)} cases (unlabeled, resume-safe) ===")
+    _run_cases(recs, "test_eval", metrics)
+
+
 def cmd_report(metrics: dict) -> None:
     cases = metrics["cases"]
     for session in ("train_eval", "valid_eval", "test_eval"):
@@ -211,7 +218,7 @@ def main() -> int:
     cmd = sys.argv[1] if len(sys.argv) > 1 else "report"
     metrics = _load_metrics()
     {"train": cmd_train, "valid": cmd_valid, "test": cmd_test,
-     "report": cmd_report}[cmd](metrics)
+     "testfull": cmd_testfull, "report": cmd_report}[cmd](metrics)
     return 0
 
 
