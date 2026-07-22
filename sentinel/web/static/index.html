@@ -10,6 +10,8 @@
     --bg:#f5f5f5; --card:#fff; --ink:#222; --muted:#767676; --line:#eee;
     --green:#26a541; --green-bg:#eafaef; --red:#e02020; --red-bg:#fdecec;
     --amber:#f5a623; --amber-bg:#fef6e7;
+    /* resubmit: a neutral bounce, deliberately NOT red — it denies nothing */
+    --blue:#2673dd; --blue-bg:#eaf1fd;
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
@@ -36,7 +38,7 @@
   h1{font-size:20px;margin:0 0 2px} .sub{color:var(--muted);margin:0 0 20px}
 
   /* kpi cards */
-  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:18px}
   .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
   .kpi .label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.03em}
   .kpi .val{font-size:26px;font-weight:700;margin-top:6px}
@@ -53,12 +55,13 @@
   /* decision mix bar */
   .mixbar{display:flex;height:26px;border-radius:7px;overflow:hidden;margin-bottom:10px}
   .mixbar span{display:block}
-  .seg-approve{background:var(--green)} .seg-escalate{background:var(--amber)} .seg-reject{background:var(--red)}
+  .seg-approve{background:var(--green)} .seg-escalate{background:var(--amber)}
+  .seg-reject{background:var(--red)} .seg-resubmit{background:var(--blue)}
   .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px}
   .legend .dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle}
 
   /* confusion matrix */
-  .cm{display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:6px;font-size:13px}
+  .cm{display:grid;grid-template-columns:auto 1fr 1fr 1fr 1fr;gap:6px;font-size:13px}
   .cm .h{color:var(--muted);font-size:11px;text-transform:uppercase;padding:4px;text-align:center;align-self:end}
   .cm .rh{color:var(--muted);font-size:11px;text-transform:uppercase;align-self:center;padding-right:6px;text-align:right}
   .cm .cell{border-radius:8px;padding:12px 8px;text-align:center}
@@ -67,6 +70,7 @@
   .cm-good{background:var(--green-bg);color:#177a30}
   .cm-bad{background:var(--red-bg);color:#b31414}
   .cm-esc{background:var(--amber-bg);color:#8a5a06}
+  .cm-res{background:var(--blue-bg);color:#1b4f9c}
 
   /* table */
   table{width:100%;border-collapse:collapse}
@@ -78,6 +82,7 @@
   .b-approve{background:var(--green-bg);color:#177a30}
   .b-escalate{background:var(--amber-bg);color:#8a5a06}
   .b-reject{background:var(--red-bg);color:#b31414}
+  .b-resubmit{background:var(--blue-bg);color:#1b4f9c}
   .cred{font-weight:700} .mono{font-variant-numeric:tabular-nums}
   .filters{display:flex;gap:8px;margin-bottom:12px}
   .chip{padding:6px 12px;border:1px solid var(--line);border-radius:20px;cursor:pointer;background:#fff;font-size:13px}
@@ -104,6 +109,14 @@
     justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff}
   .drawer-hd .x{cursor:pointer;color:var(--muted);font-size:22px;line-height:1}
   .drawer-bd{padding:20px}
+  /* reviewer actions */
+  .rerun{margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
+  .rerun-row{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 12px;
+    font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+  .btn:hover{background:#fafafa}
+  .btn-ghost{font-weight:500;color:var(--muted)}
+  .rerun-note{color:var(--muted);font-size:12px;line-height:1.5;margin-top:10px}
   .sig{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
   .sig .sh{display:flex;justify-content:space-between;align-items:center;font-weight:600}
   .sig .bar{height:6px;border-radius:4px;background:#eee;margin:8px 0;overflow:hidden}
@@ -111,6 +124,20 @@
   .sig .sr{color:var(--muted);font-size:13px}
   .na{color:var(--muted);font-style:italic}
   .brief{background:var(--shopee-soft);border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px}
+  /* evidence media */
+  .media-wrap{margin-bottom:16px}
+  .media-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .media-hd h2{font-size:14px;margin:0}
+  .media-hd .cnt{color:var(--muted);font-size:12px}
+  .media-item{position:relative;border:1px solid var(--line);border-radius:10px;
+    overflow:hidden;margin-bottom:10px;background:#000}
+  .media-item img,.media-item video{display:block;width:100%;max-height:420px;
+    object-fit:contain;background:#000}
+  .media-cap{display:flex;justify-content:space-between;align-items:center;
+    padding:7px 10px;background:#fafafa;font-size:12px;color:var(--muted)}
+  .media-cap a{color:var(--shopee);font-weight:600}
+  .media-missing{padding:22px;text-align:center;color:var(--muted);background:#fafafa;font-size:13px}
+  .kind-pill{background:#eee;border-radius:20px;padding:1px 8px;font-size:11px;color:#555}
   .kv{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line);font-size:13px}
   .kv span:first-child{color:var(--muted)}
   .loading{color:var(--muted);padding:40px;text-align:center}
@@ -168,6 +195,7 @@
       <div class="chip" data-f="approve">Auto-approved</div>
       <div class="chip" data-f="escalate">Escalated</div>
       <div class="chip" data-f="reject">Auto-rejected</div>
+      <div class="chip" data-f="resubmit">Bounced</div>
     </div>
     <div class="card" style="padding:0">
       <table><thead><tr><th>Case</th><th>Return reason</th><th>Claim</th>
@@ -226,11 +254,13 @@ async function renderDashboard(){
   document.getElementById("mixbar").innerHTML =
     `<span class="seg-approve" style="width:${m.approve/tot*100}%"></span>
      <span class="seg-escalate" style="width:${m.escalate/tot*100}%"></span>
-     <span class="seg-reject" style="width:${m.reject/tot*100}%"></span>`;
+     <span class="seg-reject" style="width:${m.reject/tot*100}%"></span>
+     <span class="seg-resubmit" style="width:${m.resubmit/tot*100}%"></span>`;
   document.getElementById("mixlegend").innerHTML =
     `<span><i class="dot" style="background:var(--green)"></i>Auto-approve · ${m.approve}</span>
      <span><i class="dot" style="background:var(--amber)"></i>Escalate · ${m.escalate}</span>
-     <span><i class="dot" style="background:var(--red)"></i>Auto-reject · ${m.reject}</span>`;
+     <span><i class="dot" style="background:var(--red)"></i>Auto-reject · ${m.reject}</span>
+     <span><i class="dot" style="background:var(--blue)"></i>Bounced to buyer · ${m.resubmit}</span>`;
 
   const cm = s.confusion, card = document.getElementById("cmCard");
   if(!cm){ card.style.display="none"; }
@@ -238,15 +268,17 @@ async function renderDashboard(){
     card.style.display="";
     document.getElementById("cm").innerHTML = `
       <div class="cm">
-        <div class="h"></div><div class="h">pred reject</div><div class="h">pred approve</div><div class="h">escalated</div>
+        <div class="h"></div><div class="h">pred reject</div><div class="h">pred approve</div><div class="h">escalated</div><div class="h">bounced</div>
         <div class="rh">actual invalid</div>
           <div class="cell cm-good"><b>${cm.tp}</b><small>caught</small></div>
           <div class="cell cm-bad"><b>${cm.fn}</b><small>bad approval</small></div>
           <div class="cell cm-esc"><b>${cm.esc_inv}</b><small>to human</small></div>
+          <div class="cell cm-res"><b>${cm.res_inv}</b><small>unreadable</small></div>
         <div class="rh">actual valid</div>
           <div class="cell cm-bad"><b>${cm.fp}</b><small>bad reject</small></div>
           <div class="cell cm-good"><b>${cm.tn}</b><small>honest ok</small></div>
           <div class="cell cm-esc"><b>${cm.esc_val}</b><small>to human</small></div>
+          <div class="cell cm-res"><b>${cm.res_val}</b><small>unreadable</small></div>
       </div>
       <p style="color:var(--muted);font-size:12px;margin:12px 0 0">
         FP=${cm.fp}: honest buyers wrongly rejected. Small labeled sample — read error types, not rates.</p>`;
@@ -315,7 +347,24 @@ async function openCase(id){
       <div class="bar"><i style="width:${s.score*100}%;background:${col}"></i></div>
       <div class="sr">${s.reason||s.verdict}</div></div>`;
   }).join("");
+  // Evidence first — let the reviewer look before the AI's reasoning anchors them.
+  const ev = (c.evidence||[]).map(e=>{
+    const url = "/api/media/"+encodeURIComponent(e.filename);
+    const inner = e.kind==="video"
+      ? `<video controls preload="metadata" src="${url}"></video>`
+      : `<img src="${url}" loading="lazy" alt="${e.filename}"
+             onerror="this.parentElement.innerHTML='<div class=media-missing>Media file not found on disk</div>'"/>`;
+    return `<div class="media-item">${inner}
+      <div class="media-cap"><span>${e.filename} <span class="kind-pill">${e.kind}</span></span>
+        <a href="${url}" target="_blank">Open full size ↗</a></div></div>`;
+  }).join("");
+  const mediaBlock = c.evidence && c.evidence.length
+    ? `<div class="media-wrap"><div class="media-hd"><h2>Submitted proof</h2>
+         <span class="cnt">${c.evidence.length} file${c.evidence.length>1?"s":""}</span></div>${ev}</div>`
+    : `<div class="media-wrap"><div class="media-missing">No proof media attached to this case.</div></div>`;
+
   document.getElementById("drawerBody").innerHTML = `
+    ${mediaBlock}
     <div class="brief">${c.brief}</div>
     <div class="kv"><span>Decision</span><span>${badge(c.decision)}</span></div>
     <div class="kv"><span>Credibility</span><span class="cred" style="color:${credColor(c.credibility)}">${c.credibility??"—"}/100</span></div>
@@ -325,8 +374,47 @@ async function openCase(id){
     <h2 style="font-size:14px;margin:18px 0 10px">Signal breakdown</h2>
     ${sigs}
     ${c.economic?`<h2 style="font-size:14px;margin:18px 0 8px">Economic decision</h2>
-      <div class="sr" style="color:var(--muted)">${c.economic.reason||""}</div>`:""}`;
+      <div class="sr" style="color:var(--muted)">${c.economic.reason||""}</div>`:""}
+    <div class="rerun">
+      <div class="rerun-row">
+        <button class="btn" onclick="rerunCase('${id}')">↻ Re-run this case</button>
+        <button class="btn btn-ghost" onclick="setVerdict('${id}','reject')">Mark reject (human)</button>
+        <button class="btn btn-ghost" onclick="setVerdict('${id}','approve')">Mark approve (human)</button>
+      </div>
+      <div class="rerun-note" id="rerunNote">${
+        c.human_verdict
+          ? `Human verdict on record: <b>${c.human_verdict}</b>.`
+          : `Re-run re-judges the case under the <i>current</i> thresholds and prompts. `
+            + `If nothing about the config changed, a Rung-0 verdict is deterministic and will not move.`
+      }</div>
+    </div>`;
 }
+
+async function rerunCase(id){
+  const note = document.getElementById("rerunNote");
+  note.innerHTML = "Re-running…";
+  const r = await fetch(`/api/case/${SESSION}/${id}/rerun`, {method:"POST"});
+  const d = await r.json();
+  if(!r.ok){ note.innerHTML = `<span style="color:var(--red)">Re-run failed: ${d.detail||d.error}</span>`; return; }
+  await openCase(id);
+  document.getElementById("rerunNote").innerHTML = d.changed
+    ? `Re-run changed the outcome: <b>${d.before.decision} → ${d.after.decision}</b>.`
+    : `Re-run reproduced the same outcome (<b>${d.after.decision}</b>) — `
+      + `the inputs and thresholds are unchanged, so this verdict is stable, not a fluke.`;
+  renderIfVisible();
+}
+
+async function setVerdict(id, v){
+  const note = document.getElementById("rerunNote");
+  const r = await fetch(`/api/case/${SESSION}/${id}/verdict?verdict=${v}`, {method:"POST"});
+  const d = await r.json();
+  note.innerHTML = r.ok
+    ? `Human verdict recorded: <b>${v}</b>. The model's own output is left intact so the disagreement stays measurable.`
+    : `<span style="color:var(--red)">${d.error}</span>`;
+  renderIfVisible();
+}
+
+function renderIfVisible(){ try{ render(); }catch(e){} }
 function closeDrawer(){ document.getElementById("drawerBg").classList.remove("open");
   document.getElementById("drawer").classList.remove("open"); }
 

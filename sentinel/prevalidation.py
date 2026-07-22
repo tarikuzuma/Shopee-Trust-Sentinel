@@ -11,17 +11,24 @@ ROUTING PHILOSOPHY (locked with the user 2026-07-22):
   cheap phone is an honest buyer we must protect, not auto-reject. So the failure
   classes route differently:
 
-    - Corrupted / won't decode        -> ESCALATE  (corrupted_file)      ops failure
+    - Corrupted / won't decode        -> RESUBMIT  (corrupted_file)      ops failure
     - Too low-res / blurry / dark /
-      too short / degenerate          -> ESCALATE  (insufficient_evidence)
+      too short / degenerate          -> RESUBMIT  (insufficient_evidence)
     - Duplicate / reused proof        -> REJECT    (duplicate_proof)      FRAUD
     - EXIF editing fingerprint        -> pass through as a PRIOR into Authenticity
 
   Only the duplicate-hash match is dispositive fraud (like the scoring layer's
   strong-fraud veto): it short-circuits the whole pipeline straight to reject.
-  Everything else that "fails" escalates with a reason code so the swipe app can
-  bounce it for resubmission without doing case analysis. This honors the core
-  invariant: an unjudgeable signal is NEUTRAL / escalate, never suspicion.
+
+  Everything else that "fails" routes to RESUBMIT — auto-bounced to the buyer for
+  a readable file, with no human ever looking at it (revised 2026-07-23; this used
+  to ESCALATE). Rung 0's verdict is already final on unreadable media, so a
+  reviewer adds no information, and a review queue full of black rectangles gets
+  rubber-stamped into payouts. Bouncing costs nothing and is the only action that
+  can actually produce judgeable evidence.
+
+  This still honors the core invariant: an unjudgeable signal is NEUTRAL, never
+  suspicion. RESUBMIT denies nothing — it asks again.
 
 Frozen/looped-frame ("a still image passed off as video") is deliberately NOT
 owned here — it belongs to the Tamper agent, because a loop is evidence of
@@ -46,7 +53,7 @@ from .contract import (
     CaseRecord,
     Evidence,
     DECISION_REJECT,
-    DECISION_ESCALATE,
+    DECISION_RESUBMIT,
     REASON_DUPLICATE_PROOF,
     REASON_CORRUPTED_FILE,
     REASON_INSUFFICIENT_EVIDENCE,
@@ -339,7 +346,7 @@ def prevalidate(rec: CaseRecord, conn=None, session_id: Optional[str] = None,
     sid = session_id or rec.session_id
     result = PreValResult()
 
-    escalate_reason: Optional[str] = None  # a quality/corruption fail, if no dup found
+    bounce_reason: Optional[str] = None    # a quality/corruption fail, if no dup found
     has_usable = False                     # at least one 'ok' evidence file present
 
     for ev in rec.evidence:
@@ -358,7 +365,7 @@ def prevalidate(rec: CaseRecord, conn=None, session_id: Optional[str] = None,
 
         # Stage A — file integrity (this FILE fails; case-level route decided below).
         if metrics["status"] == "corrupted":
-            escalate_reason = escalate_reason or REASON_CORRUPTED_FILE
+            bounce_reason = bounce_reason or REASON_CORRUPTED_FILE
             continue  # can't hash a file we couldn't decode
 
         phash = metrics.get("phash")
@@ -387,7 +394,7 @@ def prevalidate(rec: CaseRecord, conn=None, session_id: Optional[str] = None,
         # Stages B-E — quality gates. A weak FILE is noted, but does not by itself
         # sink the case (see case-level roll-up below).
         if metrics["status"] == "insufficient":
-            escalate_reason = escalate_reason or REASON_INSUFFICIENT_EVIDENCE
+            bounce_reason = bounce_reason or REASON_INSUFFICIENT_EVIDENCE
         else:  # status == "ok"
             has_usable = True
 
@@ -398,13 +405,13 @@ def prevalidate(rec: CaseRecord, conn=None, session_id: Optional[str] = None,
                 db.record_phash(conn, sid, rec.case_id, m["filename"], m["phash"])
 
     # Case-level roll-up: proceed if ANY evidence file is usable — the agents can
-    # judge on it, and a single weak/corrupt file must not force a human review
+    # judge on it, and a single weak/corrupt file must not bounce the whole claim
     # (raises automation; still safe — quality != fraud, and a duplicate already
-    # returned above). Escalate only when something failed AND nothing is usable.
+    # returned above). Bounce only when something failed AND nothing is usable.
     # All-absent falls through (route stays None) to downstream no_information.
-    if not has_usable and escalate_reason is not None:
-        result.route = DECISION_ESCALATE
-        result.reason_code = escalate_reason
+    if not has_usable and bounce_reason is not None:
+        result.route = DECISION_RESUBMIT
+        result.reason_code = bounce_reason
 
     return result
 

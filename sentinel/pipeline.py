@@ -109,9 +109,11 @@ def process_case(rec: CaseRecord, client: Optional[VLMClient] = None,
     # --- Rung 0: deterministic pre-validation --------------------------------
     res = prevalidate(rec, conn=conn, session_id=sid)
     t = _mark("rung0", t0)
-    if apply_rung0(rec, res):           # terminal (reject dup / escalate quality)
-        # Rung 0 escalates are "cannot be judged" — economics must NOT downgrade
-        # them to auto-approve. Only the auto-reject gate applies here.
+    if apply_rung0(rec, res):           # terminal (reject dup / resubmit unreadable)
+        # Rung 0 resubmits are "cannot be judged" — economics must NOT touch them.
+        # Expected-loss reasoning prices the risk of PAYING a claim; a bounce pays
+        # nothing and denies nothing, so there is no exposure to trade against the
+        # review cost. Only the auto-reject gate (duplicates) applies here.
         _auto_reject_gate(rec, econ)
         rec.runtime_ms = int((time.perf_counter() - t0) * 1000)
         return rec

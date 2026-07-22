@@ -22,7 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from sentinel import db
 from sentinel.contract import (
     CaseRecord, Evidence,
-    DECISION_REJECT, DECISION_ESCALATE,
+    DECISION_REJECT, DECISION_RESUBMIT,
     REASON_DUPLICATE_PROOF, REASON_CORRUPTED_FILE,
     REASON_INSUFFICIENT_EVIDENCE, REASON_PASSED_PREVALIDATION,
 )
@@ -94,33 +94,33 @@ def main() -> int:
     check("route", r.route, None)
     check("reason", r.reason_code, REASON_PASSED_PREVALIDATION)
 
-    # --- blurry image -> escalate / insufficient -------------------------------
+    # --- blurry image -> resubmit / insufficient -------------------------------
     blur = _write_img("blur.jpg", cv2.GaussianBlur(_clean_image(), (31, 31), 0))
     r = _run(conn, _case("C_blur", [_img_ev("blur.jpg", blur)]))
     print("Blurry image:")
-    check("route", r.route, DECISION_ESCALATE)
+    check("route", r.route, DECISION_RESUBMIT)
     check("reason", r.reason_code, REASON_INSUFFICIENT_EVIDENCE)
 
-    # --- black image -> escalate (exposure) ------------------------------------
+    # --- black image -> resubmit (exposure) ------------------------------------
     dark = _write_img("dark.jpg", np.zeros((480, 640, 3), dtype=np.uint8))
     r = _run(conn, _case("C_dark", [_img_ev("dark.jpg", dark)]))
     print("Black image:")
-    check("route", r.route, DECISION_ESCALATE)
+    check("route", r.route, DECISION_RESUBMIT)
     check("reason", r.reason_code, REASON_INSUFFICIENT_EVIDENCE)
 
-    # --- tiny image -> escalate (resolution) -----------------------------------
+    # --- tiny image -> resubmit (resolution) -----------------------------------
     tiny = _write_img("tiny.jpg", _clean_image(w=120, h=90))
     r = _run(conn, _case("C_tiny", [_img_ev("tiny.jpg", tiny)]))
     print("Tiny image:")
-    check("route", r.route, DECISION_ESCALATE)
+    check("route", r.route, DECISION_RESUBMIT)
     check("reason", r.reason_code, REASON_INSUFFICIENT_EVIDENCE)
 
-    # --- corrupted file -> escalate (corrupted_file) ---------------------------
+    # --- corrupted file -> resubmit (corrupted_file) ---------------------------
     bad = TMP / "bad.jpg"
     bad.write_bytes(b"this is not a jpeg" * 100)
     r = _run(conn, _case("C_bad", [_img_ev("bad.jpg", str(bad))]))
     print("Corrupted image:")
-    check("route", r.route, DECISION_ESCALATE)
+    check("route", r.route, DECISION_RESUBMIT)
     check("reason", r.reason_code, REASON_CORRUPTED_FILE)
 
     # --- duplicate / reused proof -> second case REJECTS -----------------------
@@ -143,15 +143,15 @@ def main() -> int:
     print("Clean video:")
     check("route", r.route, None)
 
-    # --- degenerate (all-black) video -> escalate ------------------------------
+    # --- degenerate (all-black) video -> resubmit ------------------------------
     black_frames = [np.zeros((240, 320, 3), dtype=np.uint8) for _ in range(48)]
     bv = _write_video("black.mp4", black_frames)
     r = _run(conn, _case("C_blackvid", [Evidence("black.mp4", "video", bv)]))
     print("All-black video:")
-    check("route", r.route, DECISION_ESCALATE)
+    check("route", r.route, DECISION_RESUBMIT)
     check("reason", r.reason_code, REASON_INSUFFICIENT_EVIDENCE)
 
-    # --- mixed evidence (one crisp + one blurry) -> PROCEEDS, not escalate -----
+    # --- mixed evidence (one crisp + one blurry) -> PROCEEDS, not bounced -----
     good = _write_img("mix_good.jpg", _clean_image())
     soft = _write_img("mix_blur.jpg", cv2.GaussianBlur(_clean_image(), (31, 31), 0))
     r = _run(conn, _case("C_mixed", [_img_ev("mix_good.jpg", good),
@@ -159,13 +159,13 @@ def main() -> int:
     print("Mixed evidence (1 usable + 1 blurry):")
     check("route (proceeds on the usable file)", r.route, None)
 
-    # --- all evidence weak (both blurry, fresh content) -> escalate ------------
+    # --- all evidence weak (both blurry, fresh content) -> resubmit ------------
     w1 = _write_img("allweak1.jpg", cv2.GaussianBlur(_clean_image(), (31, 31), 0))
     w2 = _write_img("allweak2.jpg", cv2.GaussianBlur(_clean_image(), (31, 31), 0))
     r = _run(conn, _case("C_allweak", [_img_ev("allweak1.jpg", w1),
                                        _img_ev("allweak2.jpg", w2)]))
     print("All evidence weak (both blurry):")
-    check("route", r.route, DECISION_ESCALATE)
+    check("route", r.route, DECISION_RESUBMIT)
     check("reason", r.reason_code, REASON_INSUFFICIENT_EVIDENCE)
 
     # --- absent media -> Rung 0 no-op (passes; downstream escalates) -----------

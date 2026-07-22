@@ -30,15 +30,34 @@ SIGNAL_NAMES = ("authenticity", "completeness", "tamper", "relevance", "defender
 DECISION_APPROVE = "approve"
 DECISION_REJECT = "reject"
 DECISION_ESCALATE = "escalate"
+DECISION_RESUBMIT = "resubmit"
+
+# RESUBMIT is auto-decided, NOT a human-review route. It exists because Rung 0's
+# quality verdict is already final: a black or unfocused frame is a complete
+# determination, and a reviewer looking at the same black rectangle learns nothing
+# the pixel math didn't already know. Queueing it burns a review slot for zero
+# information and — worse — creates a payout path, because a reviewer with no
+# signal and a queue to clear tends to wave the case through. So "unreadable"
+# leaves the human queue entirely.
+#
+# It is deliberately not REJECT. Both routes cost the same (zero reviewers) and
+# both deny the fraudster a payout, so automation and fraud-leak closure do not
+# distinguish them; the only difference is what happens to an honest buyer with a
+# cheap camera in bad light. Reject denies that claim on evidence that was never
+# judged. Resubmit asks for a readable file and keeps the claim alive. Same
+# savings, without spending the false-positive budget on the poorest users.
+#
+# Decisions that count as automated (i.e. consume no human review).
+AUTO_DECISIONS = (DECISION_APPROVE, DECISION_REJECT, DECISION_RESUBMIT)
 
 # Reason codes carried alongside a decision. Rung 0 (deterministic pre-validation)
 # writes these so the swipe app / analytics can tell *why* a case was routed the
 # way it was without re-deriving it. Only DUPLICATE_PROOF is a fraud signal that
-# auto-rejects; every other Rung-0 failure ESCALATES (quality failure != fraud —
+# auto-rejects; unreadable media routes to RESUBMIT (quality failure != fraud —
 # an honest buyer with a bad phone camera must never be auto-rejected).
 REASON_DUPLICATE_PROOF = "duplicate_proof"        # reused/near-identical media -> reject
-REASON_CORRUPTED_FILE = "corrupted_file"          # won't decode -> escalate (ops)
-REASON_INSUFFICIENT_EVIDENCE = "insufficient_evidence"  # too blurry/dark/small/short -> escalate
+REASON_CORRUPTED_FILE = "corrupted_file"          # won't decode -> resubmit (ops)
+REASON_INSUFFICIENT_EVIDENCE = "insufficient_evidence"  # too blurry/dark/small/short -> resubmit
 REASON_PASSED_PREVALIDATION = "passed_prevalidation"    # cleared Rung 0, went to the agents
 
 # Rung 1a — Authenticity runs solo, first. If it alone meets the strong-fraud veto

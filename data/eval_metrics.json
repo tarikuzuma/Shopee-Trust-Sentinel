@@ -1,0 +1,5676 @@
+{
+ "cases": {
+  "train_eval/237872216204114": {
+   "session": "train_eval",
+   "case_id": "237872216204114",
+   "true_label": "Parcel was already opened",
+   "reason": "Suspicious Parcel",
+   "kinds": [
+    "video"
+   ],
+   "decision": "escalate",
+   "credibility": 100.0,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 19383,
+   "claim_value_php": 1299.0,
+   "economic": {
+    "route": "escalate",
+    "reason": "escalate: expected loss of review \u20b125.15 \u2264 expected loss of auto-approve \u20b132.48 (claim \u20b11,299, exposure \u20b1650, break-even p=3.8%, this p=5.0%)",
+    "claim_value_php": 1299.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 649.5,
+    "expected_loss_auto_approve": 32.475,
+    "expected_loss_escalate": 25.147499999999997,
+    "p_threshold_full": 0.03750745886966158,
+    "p_threshold_simple": 0.029253271747498075,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 1883,
+    "authenticity": 13480,
+    "rung1b": 4018
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 13.48,
+     "prompt_tokens": 5089,
+     "output_tokens": 68,
+     "thinking_tokens": 0,
+     "total_tokens": 5157,
+     "text_tokens": 358,
+     "video_tokens": 4731
+    },
+    {
+     "stage": "rung1b",
+     "secs": 4.02,
+     "prompt_tokens": 5746,
+     "output_tokens": 334,
+     "thinking_tokens": 0,
+     "total_tokens": 6080,
+     "text_tokens": 1015,
+     "video_tokens": 4731
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 1.0,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows a continuous, unedited recording of unboxing a package with natural hand movements, correct physics, and consistent lighting throughout."
+    },
+    "completeness": {
+     "score": 0.95,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "Continuous unboxing shown",
+     "reason": "The video provides a continuous, unedited recording showing the package being opened from the sealed mailer bag all the way to unboxing the item inside."
+    },
+    "tamper": {
+     "score": 0.95,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "Intact seal opened",
+     "reason": "The outer courier bag and inner product box both appear factory sealed and are opened live on camera without prior tampering."
+    },
+    "relevance": {
+     "score": 0.95,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "Wrong item found",
+     "reason": "The buyer claimed a suspicious parcel and the video directly demonstrates the issue by unboxing a Ugreen power bank box to reveal an entirely unrelated bottle of perfume."
+    },
+    "defender": {
+     "score": 0.9,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Genuine unboxing evidence",
+     "reason": "The video shows a seamless, uninterrupted take starting from a sealed black courier bag, cutting open the inner branded electronics box, and pulling out a completely different product item (perfume)."
+    }
+   }
+  },
+  "train_eval/237797364289378": {
+   "session": "train_eval",
+   "case_id": "237797364289378",
+   "true_label": "Parcel was already opened",
+   "reason": "Suspicious Parcel",
+   "kinds": [
+    "video"
+   ],
+   "decision": "escalate",
+   "credibility": 82.7,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 22279,
+   "claim_value_php": 1190.0,
+   "economic": {
+    "route": "escalate",
+    "reason": "escalate: expected loss of review \u20b124.88 \u2264 expected loss of auto-approve \u20b129.75 (claim \u20b11,190, exposure \u20b1595, break-even p=4.1%, this p=5.0%)",
+    "claim_value_php": 1190.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 595.0,
+    "expected_loss_auto_approve": 29.75,
+    "expected_loss_escalate": 24.875,
+    "p_threshold_full": 0.04093023255813953,
+    "p_threshold_simple": 0.031932773109243695,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 1789,
+    "authenticity": 16575,
+    "rung1b": 3913
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 16.58,
+     "prompt_tokens": 5534,
+     "output_tokens": 68,
+     "thinking_tokens": 0,
+     "total_tokens": 5602,
+     "video_tokens": 5176,
+     "text_tokens": 358
+    },
+    {
+     "stage": "rung1b",
+     "secs": 3.91,
+     "prompt_tokens": 6191,
+     "output_tokens": 328,
+     "thinking_tokens": 0,
+     "total_tokens": 6519,
+     "video_tokens": 5176,
+     "text_tokens": 1015
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 1.0,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows natural motion, consistent lighting, realistic box textures, and clear packaging details without any signs of artificial generation or digital manipulation."
+    },
+    "completeness": {
+     "score": 0.85,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "continuous unboxing shown",
+     "reason": "The video provides a continuous, unbroken shot showing the unboxing process from the sealed cardboard package all the way to extracting the wrapped item."
+    },
+    "tamper": {
+     "score": 0.8,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "seal intact initially",
+     "reason": "The parcel shows intact tape and shipping seals at the start of the video, which are then cut and opened live on camera."
+    },
+    "relevance": {
+     "score": 0.45,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "suspicion unverified",
+     "reason": "While an unboxing is shown, the video simply displays a standard package opening and does not clearly demonstrate or isolate why the parcel is specifically 'suspicious'."
+    },
+    "defender": {
+     "score": 0.6,
+     "conf": 0.75,
+     "applicable": true,
+     "verdict": "authentic unboxing chain",
+     "reason": "The footage displays a consistent lighting environment, natural camera motion, and a completely intact unboxing chain with no obvious signs of tampering or staging."
+    }
+   }
+  },
+  "train_eval/237714965285933": {
+   "session": "train_eval",
+   "case_id": "237714965285933",
+   "true_label": "Did not show unboxing/opening of parcel",
+   "reason": "Suspicious Parcel",
+   "kinds": [
+    "video"
+   ],
+   "decision": "escalate",
+   "credibility": 72.4,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 12543,
+   "claim_value_php": 199.0,
+   "economic": {
+    "route": "escalate",
+    "reason": "escalate: expected loss of review \u20b124.38 \u2264 expected loss of auto-approve \u20b129.85 (claim \u20b1199, exposure \u20b1100, break-even p=24.0%, this p=30.0%)",
+    "claim_value_php": 199.0,
+    "p_invalid": 0.3,
+    "net_loss_exposure": 99.5,
+    "expected_loss_auto_approve": 29.849999999999998,
+    "expected_loss_escalate": 24.384999999999998,
+    "p_threshold_full": 0.24030584380120154,
+    "p_threshold_simple": 0.19095477386934673,
+    "bucket": "escalate"
+   },
+   "stage_ms": {
+    "rung0": 696,
+    "authenticity": 9288,
+    "rung1b": 2558
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 9.29,
+     "prompt_tokens": 1216,
+     "output_tokens": 69,
+     "thinking_tokens": 0,
+     "total_tokens": 1285,
+     "text_tokens": 358,
+     "video_tokens": 858
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.56,
+     "prompt_tokens": 1875,
+     "output_tokens": 321,
+     "thinking_tokens": 0,
+     "total_tokens": 2196,
+     "video_tokens": 858,
+     "text_tokens": 1017
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows natural motion blur, realistic lighting, and consistent physical interaction with the cardboard package and plastic bag, indicating a genuine camera capture."
+    },
+    "completeness": {
+     "score": 0.85,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Complete Unboxing",
+     "reason": "The video shows a continuous, uninterrupted unboxing process where the parcel is opened and its inner contents are fully revealed on camera."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Uncertain Seal State",
+     "reason": "Packaging and tape are visible, but the initial video frames start right at the opened or heavily crumpled edge, making it unclear if it was pre-opened."
+    },
+    "relevance": {
+     "score": 0.4,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "Unclear Suspicion",
+     "reason": "The stated reason is a suspicious parcel, and while an open cardboard and plastic bag are shown, the specific nature of the suspicion is not clearly demonstrated on the item itself."
+    },
+    "defender": {
+     "score": 0.6,
+     "conf": 0.75,
+     "applicable": true,
+     "verdict": "Genuine Interaction",
+     "reason": "The video features natural lighting, consistent shadows, and realistic handling of cardboard and plastic packaging without obvious digital edits."
+    }
+   }
+  },
+  "train_eval/237776404294061": {
+   "session": "train_eval",
+   "case_id": "237776404294061",
+   "true_label": "Edited using AI",
+   "reason": "Item Missing",
+   "kinds": [
+    "image"
+   ],
+   "decision": "reject",
+   "credibility": 28.4,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 5477,
+   "claim_value_php": 764.0,
+   "economic": null,
+   "stage_ms": {
+    "rung0": 30,
+    "authenticity": 3178,
+    "rung1b": 2269
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 1.79,
+     "prompt_tokens": 1442,
+     "output_tokens": 86,
+     "thinking_tokens": 0,
+     "total_tokens": 1528,
+     "text_tokens": 357,
+     "image_tokens": 1085
+    },
+    {
+     "stage": "authenticity",
+     "secs": 1.39,
+     "prompt_tokens": 1442,
+     "output_tokens": 64,
+     "thinking_tokens": 0,
+     "total_tokens": 1506,
+     "text_tokens": 357,
+     "image_tokens": 1085
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.27,
+     "prompt_tokens": 3253,
+     "output_tokens": 291,
+     "thinking_tokens": 0,
+     "total_tokens": 3544,
+     "text_tokens": 1083,
+     "image_tokens": 2170
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.2,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "digitally edited",
+     "reason": "Worst of 2 files (237776404294061 - 1.jpg): The image features repeating watermarks or text overlays (\"858351430347752...\") superimposed digitally across various surfaces of the box and contents, indicating post-capture "
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Packaging Visible",
+     "reason": "Cardboard parcel packaging is visible, but static photos cannot confirm the prior state of the seal."
+    },
+    "relevance": {
+     "score": 0.2,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Reason Mismatch",
+     "reason": "The buyer claimed 'Item Missing', but the photos show damaged physical items inside the box rather than a missing product."
+    },
+    "defender": {
+     "score": 0.3,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "Damaged Items Shown",
+     "reason": "The photos clearly display broken plastic panels inside the shipping box, indicating potential transit damage despite the incorrect return reason."
+    }
+   }
+  },
+  "train_eval/237789680255463": {
+   "session": "train_eval",
+   "case_id": "237789680255463",
+   "true_label": "Edited using AI",
+   "reason": "Broken Products",
+   "kinds": [
+    "image"
+   ],
+   "decision": "approve",
+   "credibility": 100.0,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 4325,
+   "claim_value_php": 57.0,
+   "economic": {
+    "route": "auto_approve",
+    "reason": "auto_approve: expected loss of auto-approve \u20b11.43 < expected loss of review \u20b122.04 \u2014 the claim is too low-value to justify a \u20b119.00 review (exposure \u20b128, break-even p=79.6%, this p=5.0%)",
+    "claim_value_php": 57.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 28.5,
+    "expected_loss_auto_approve": 1.425,
+    "expected_loss_escalate": 22.042499999999997,
+    "p_threshold_full": 0.7956600361663653,
+    "p_threshold_simple": 0.6666666666666666,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 26,
+    "authenticity": 1931,
+    "rung1b": 2367
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 1.93,
+     "prompt_tokens": 1449,
+     "output_tokens": 69,
+     "thinking_tokens": 0,
+     "total_tokens": 1518,
+     "image_tokens": 1092,
+     "text_tokens": 357
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.37,
+     "prompt_tokens": 2105,
+     "output_tokens": 314,
+     "thinking_tokens": 0,
+     "total_tokens": 2419,
+     "image_tokens": 1092,
+     "text_tokens": 1013
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 1.0,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image shows natural lighting, realistic physical damage to the plastic case, and consistent textures without any AI-generated artifacts or digital editing traces."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: Parcel packaging, seals, or shipping wrap are not visible in the photo; only the opened product case and a piece of dark plastic film are shown."
+    },
+    "relevance": {
+     "score": 0.9,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Damage Clearly Depicted",
+     "reason": "The photo clearly shows the broken plastic storage case and a severely bent spoon, directly matching the stated reason of 'Broken Products'."
+    },
+    "defender": {
+     "score": 0.8,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "Consistent Physical Damage",
+     "reason": "The photo shows realistic structural fractures on the plastic case matching impact stress, with consistent lighting and natural wear textures pointing to genuine transit damage."
+    }
+   }
+  },
+  "train_eval/237721903250900": {
+   "session": "train_eval",
+   "case_id": "237721903250900",
+   "true_label": "Did not show unboxing/opening of parcel",
+   "reason": "Suspicious Parcel",
+   "kinds": [
+    "video"
+   ],
+   "decision": "approve",
+   "credibility": 59.8,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 14044,
+   "claim_value_php": 10.0,
+   "economic": {
+    "route": "auto_approve",
+    "reason": "auto_approve: expected loss of auto-approve \u20b11.50 < expected loss of review \u20b121.55 \u2014 the claim is too low-value to justify a \u20b119.00 review (exposure \u20b15, break-even p=338.5%, this p=30.0%)",
+    "claim_value_php": 10.0,
+    "p_invalid": 0.3,
+    "net_loss_exposure": 5.0,
+    "expected_loss_auto_approve": 1.5,
+    "expected_loss_escalate": 21.549999999999997,
+    "p_threshold_full": 3.3846153846153846,
+    "p_threshold_simple": 3.8,
+    "bucket": "escalate"
+   },
+   "stage_ms": {
+    "rung0": 1672,
+    "authenticity": 9607,
+    "rung1b": 2764
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 9.61,
+     "prompt_tokens": 1362,
+     "output_tokens": 71,
+     "thinking_tokens": 0,
+     "total_tokens": 1433,
+     "text_tokens": 358,
+     "video_tokens": 1004
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.76,
+     "prompt_tokens": 2024,
+     "output_tokens": 307,
+     "thinking_tokens": 0,
+     "total_tokens": 2331,
+     "text_tokens": 1020,
+     "video_tokens": 1004
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows natural motion blur, typical low-end camera sensor noise, and realistic handling of a parcel without any digital manipulation or AI generation artifacts."
+    },
+    "completeness": {
+     "score": 0.4,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Incomplete unboxing",
+     "reason": "The video shows the parcel being handled and rotated, but does not show the actual unboxing or opening of the package to reveal the contents."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.6,
+     "applicable": true,
+     "verdict": "Packaging visible",
+     "reason": "The outer black plastic mailer bag and shipping label are visible, but the video ends before any seal is opened."
+    },
+    "relevance": {
+     "score": 0.4,
+     "conf": 0.6,
+     "applicable": true,
+     "verdict": "Unproven suspicion",
+     "reason": "The video displays a wrapped parcel with a shipping label, but does not clearly show any specific defect or evidence corroborating a suspicious parcel claim."
+    },
+    "defender": {
+     "score": 0.45,
+     "conf": 0.6,
+     "applicable": true,
+     "verdict": "Natural handling",
+     "reason": "The video displays natural hand movements and realistic camera motion while showing the shipping label on the exterior of the parcel."
+    }
+   }
+  },
+  "train_eval/237685794247105": {
+   "session": "train_eval",
+   "case_id": "237685794247105",
+   "true_label": "Irrelevant/useless proof",
+   "reason": "Spilled Contents",
+   "kinds": [
+    "image",
+    "video"
+   ],
+   "decision": "escalate",
+   "credibility": 57.8,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 12197,
+   "claim_value_php": 178.0,
+   "economic": {
+    "route": "escalate",
+    "reason": "escalate: expected loss of review \u20b124.07 \u2264 expected loss of auto-approve \u20b126.70 (claim \u20b1178, exposure \u20b189, break-even p=26.8%, this p=30.0%)",
+    "claim_value_php": 178.0,
+    "p_invalid": 0.3,
+    "net_loss_exposure": 89.0,
+    "expected_loss_auto_approve": 26.7,
+    "expected_loss_escalate": 24.069999999999997,
+    "p_threshold_full": 0.26796589524969544,
+    "p_threshold_simple": 0.21348314606741572,
+    "bucket": "escalate"
+   },
+   "stage_ms": {
+    "rung0": 116,
+    "authenticity": 9627,
+    "rung1b": 2453
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 7.97,
+     "prompt_tokens": 875,
+     "output_tokens": 60,
+     "thinking_tokens": 0,
+     "total_tokens": 935,
+     "text_tokens": 358,
+     "video_tokens": 517
+    },
+    {
+     "stage": "authenticity",
+     "secs": 1.65,
+     "prompt_tokens": 1468,
+     "output_tokens": 66,
+     "thinking_tokens": 0,
+     "total_tokens": 1534,
+     "image_tokens": 1110,
+     "text_tokens": 358
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.45,
+     "prompt_tokens": 2708,
+     "output_tokens": 309,
+     "thinking_tokens": 0,
+     "total_tokens": 3017,
+     "image_tokens": 1110,
+     "text_tokens": 1081,
+     "video_tokens": 517
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.5,
+     "conf": 0.1,
+     "applicable": true,
+     "verdict": "uninformative",
+     "reason": "Worst of 2 files (237685794247105.mp4): The video is completely dark and lacks visible details, making it impossible to assess authenticity or manipulation."
+    },
+    "completeness": {
+     "score": 0.4,
+     "conf": 0.5,
+     "applicable": true,
+     "verdict": "incomplete unboxing",
+     "reason": "The video evidence is completely dark and shows no unboxing process, making it impossible to verify the claim through video."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: No outer parcel packaging or seals are visible in the evidence to assess whether the item was pre-opened or tampered with."
+    },
+    "relevance": {
+     "score": 0.7,
+     "conf": 0.6,
+     "applicable": true,
+     "verdict": "spilled contents shown",
+     "reason": "The provided photo clearly depicts a baby lotion product with spilled contents and damaged packaging consistent with the claim."
+    },
+    "defender": {
+     "score": 0.6,
+     "conf": 0.5,
+     "applicable": true,
+     "verdict": "spillage visible",
+     "reason": "The photo explicitly shows lotion spilled out onto bubble wrap next to a crushed box and tube, supporting the physical reality of the damage."
+    }
+   }
+  },
+  "train_eval/237828286244255": {
+   "session": "train_eval",
+   "case_id": "237828286244255",
+   "true_label": "Irrelevant/useless proof",
+   "reason": "Suspicious Parcel",
+   "kinds": [
+    "image"
+   ],
+   "decision": "escalate",
+   "credibility": 70.9,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 4996,
+   "claim_value_php": 379.0,
+   "economic": {
+    "route": "escalate",
+    "reason": "escalate: expected loss of review \u20b127.08 \u2264 expected loss of auto-approve \u20b156.85 (claim \u20b1379, exposure \u20b1190, break-even p=12.7%, this p=30.0%)",
+    "claim_value_php": 379.0,
+    "p_invalid": 0.3,
+    "net_loss_exposure": 189.5,
+    "expected_loss_auto_approve": 56.85,
+    "expected_loss_escalate": 27.084999999999997,
+    "p_threshold_full": 0.12749927557229787,
+    "p_threshold_simple": 0.10026385224274406,
+    "bucket": "escalate"
+   },
+   "stage_ms": {
+    "rung0": 71,
+    "authenticity": 2321,
+    "rung1b": 2603
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 2.31,
+     "prompt_tokens": 1422,
+     "output_tokens": 73,
+     "thinking_tokens": 0,
+     "total_tokens": 1495,
+     "text_tokens": 358,
+     "image_tokens": 1064
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.6,
+     "prompt_tokens": 2083,
+     "output_tokens": 311,
+     "thinking_tokens": 0,
+     "total_tokens": 2394,
+     "image_tokens": 1064,
+     "text_tokens": 1019
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image shows consistent natural textures, standard camera perspective, and a digitally overlaid timestamp commonly added by default camera apps, with no signs of manipulation or AI generation."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: No outer parcel packaging, shipping wrap, or seal is visible in the provided image; only a patterned fabric item and domestic flooring are shown."
+    },
+    "relevance": {
+     "score": 0.4,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Unrelated View",
+     "reason": "The image shows a patterned cushion or fabric on a floor with no visible sign of a suspicious parcel or shipping details related to the claim."
+    },
+    "defender": {
+     "score": 0.4,
+     "conf": 0.6,
+     "applicable": true,
+     "verdict": "Inconclusive Proof",
+     "reason": "The image displays natural lighting and a consistent domestic background, but lacks any visible shipping packaging or specific evidence demonstrating why the parcel is suspicious."
+    }
+   }
+  },
+  "train_eval/211886964225938": {
+   "session": "train_eval",
+   "case_id": "211886964225938",
+   "true_label": "Edited using AI",
+   "reason": "Broken Products",
+   "kinds": [
+    "image"
+   ],
+   "decision": "reject",
+   "credibility": 0.0,
+   "reason_code": "authenticity_dispositive_fraud",
+   "runtime_ms": 1547,
+   "claim_value_php": 1120.0,
+   "economic": null,
+   "stage_ms": {
+    "rung0": 23,
+    "authenticity": 1524
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 1.52,
+     "prompt_tokens": 1446,
+     "output_tokens": 79,
+     "thinking_tokens": 0,
+     "total_tokens": 1525,
+     "text_tokens": 357,
+     "image_tokens": 1089
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.0,
+     "conf": 0.99,
+     "applicable": true,
+     "verdict": "ai-generated",
+     "reason": "The image contains severe AI-generation artifacts, including garbled repeating metadata timestamps overlaid across the background and subject, impossible floating wiring inside an exposed appliance motor, and unnatural t"
+    }
+   }
+  },
+  "train_eval/215087824265855": {
+   "session": "train_eval",
+   "case_id": "215087824265855",
+   "true_label": "Irrelevant/useless proof",
+   "reason": "Suspicious Parcel",
+   "kinds": [
+    "video"
+   ],
+   "decision": "escalate",
+   "credibility": null,
+   "reason_code": "insufficient_evidence",
+   "runtime_ms": 1430,
+   "claim_value_php": 58.0,
+   "economic": null,
+   "stage_ms": {
+    "rung0": 1430
+   },
+   "calls": [],
+   "signals": {}
+  },
+  "valid_eval/VALID_moldy_food": {
+   "session": "valid_eval",
+   "case_id": "VALID_moldy_food",
+   "true_label": "valid (constructed)",
+   "reason": "Spilled Contents",
+   "kinds": [
+    "image"
+   ],
+   "decision": "escalate",
+   "credibility": 58.6,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 4506,
+   "claim_value_php": null,
+   "economic": {
+    "route": "escalate",
+    "claim_value_php": null,
+    "reason": "flagged_conflict: a fraud check raised a red flag (<0.40); routed to human review regardless of claim value \u2014 the base rate does not describe a conflicted case"
+   },
+   "stage_ms": {
+    "rung0": 423,
+    "authenticity": 1660,
+    "rung1b": 2422
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 1.66,
+     "prompt_tokens": 1438,
+     "output_tokens": 65,
+     "thinking_tokens": 0,
+     "total_tokens": 1503,
+     "text_tokens": 358,
+     "image_tokens": 1080
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.42,
+     "prompt_tokens": 2055,
+     "output_tokens": 329,
+     "thinking_tokens": 0,
+     "total_tokens": 2384,
+     "image_tokens": 1080,
+     "text_tokens": 975
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image displays natural lighting, realistic textures, and consistent camera noise without any signs of digital manipulation or AI generation artifacts."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: The image shows the interior of an open pouch but does not display any exterior shipping packaging, seals, or tape to verify the initial sealed state."
+    },
+    "relevance": {
+     "score": 0.2,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "Mismatched Issue",
+     "reason": "The buyer claimed spilled contents, but the photo displays an open pouch containing powder with mold growth, which contradicts the stated return reason."
+    },
+    "defender": {
+     "score": 0.3,
+     "conf": 0.6,
+     "applicable": true,
+     "verdict": "Contaminated Product",
+     "reason": "While the photo clearly shows a legitimate, unmanipulated scene of mold growing inside a powder pouch, it does not support the claimed spill issue, leaving the specific reason unproven."
+    }
+   }
+  },
+  "valid_eval/VALID_broken_trays": {
+   "session": "valid_eval",
+   "case_id": "VALID_broken_trays",
+   "true_label": "valid (constructed)",
+   "reason": "Broken Products",
+   "kinds": [
+    "image"
+   ],
+   "decision": "escalate",
+   "credibility": 100.0,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 4226,
+   "claim_value_php": null,
+   "economic": {
+    "route": "escalate",
+    "reason": "missing_price: claim value unknown, routed to human review",
+    "claim_value_php": null,
+    "p_invalid": 0.05,
+    "net_loss_exposure": null,
+    "expected_loss_auto_approve": null,
+    "expected_loss_escalate": null,
+    "p_threshold_full": null,
+    "p_threshold_simple": null,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 41,
+    "authenticity": 1759,
+    "rung1b": 2426
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 1.76,
+     "prompt_tokens": 1421,
+     "output_tokens": 80,
+     "thinking_tokens": 0,
+     "total_tokens": 1501,
+     "text_tokens": 357,
+     "image_tokens": 1064
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.43,
+     "prompt_tokens": 2051,
+     "output_tokens": 326,
+     "thinking_tokens": 0,
+     "total_tokens": 2377,
+     "image_tokens": 1064,
+     "text_tokens": 987
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image shows consistent lighting, natural shadows, and realistic physical damage to multiple plastic containers spread across a table. There are no signs of AI generation, digital splicing, or screen recapturing."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: No parcel packaging, tape, or shipping seals are visible in the submitted photograph. The image only displays the broken items laid out on a table."
+    },
+    "relevance": {
+     "score": 0.9,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "Matches Broken Claim",
+     "reason": "The photograph clearly depicts numerous black plastic meal prep containers laid out on a table with extensive cracks and structural damage matching the stated reason."
+    },
+    "defender": {
+     "score": 0.85,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Consistent Damage Pattern",
+     "reason": "The image shows a large batch of identical plastic containers spread across a table, exhibiting realistic shattering and crushing consistent with heavy transit mishandling or stacking pressure under natural lighting."
+    }
+   }
+  },
+  "valid_eval/VALID_cracked_watch": {
+   "session": "valid_eval",
+   "case_id": "VALID_cracked_watch",
+   "true_label": "valid (constructed)",
+   "reason": "Scratched",
+   "kinds": [
+    "image"
+   ],
+   "decision": "escalate",
+   "credibility": 100.0,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 3959,
+   "claim_value_php": null,
+   "economic": {
+    "route": "escalate",
+    "reason": "missing_price: claim value unknown, routed to human review",
+    "claim_value_php": null,
+    "p_invalid": 0.05,
+    "net_loss_exposure": null,
+    "expected_loss_auto_approve": null,
+    "expected_loss_escalate": null,
+    "p_threshold_full": null,
+    "p_threshold_simple": null,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 24,
+    "authenticity": 1652,
+    "rung1b": 2282
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 1.65,
+     "prompt_tokens": 1474,
+     "output_tokens": 70,
+     "thinking_tokens": 0,
+     "total_tokens": 1544,
+     "text_tokens": 358,
+     "image_tokens": 1116
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.28,
+     "prompt_tokens": 2096,
+     "output_tokens": 310,
+     "thinking_tokens": 0,
+     "total_tokens": 2406,
+     "image_tokens": 1116,
+     "text_tokens": 980
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image shows natural lighting, realistic textures on the hand and watch, and coherent reflections. There are no signs of digital manipulation or AI generation."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: Parcel packaging and shipping seals are not visible in the photo; the evidence only shows the item held against a piece of paper."
+    },
+    "relevance": {
+     "score": 0.9,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Damage Visible",
+     "reason": "The stated reason is 'Scratched' (or surface damage), and the photograph clearly shows heavy cracking and surface damage directly on the watch face."
+    },
+    "defender": {
+     "score": 0.8,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "Authentic Damage",
+     "reason": "The provided image displays realistic fracture patterns across the crystal face of the watch with consistent lighting and natural reflections, supporting the legitimacy of the damage claim."
+    }
+   }
+  },
+  "test_eval/237045122294597": {
+   "session": "test_eval",
+   "case_id": "237045122294597",
+   "true_label": null,
+   "reason": "Broken Products",
+   "kinds": [
+    "image"
+   ],
+   "decision": "approve",
+   "credibility": 96.0,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 3929,
+   "claim_value_php": 32.0,
+   "economic": {
+    "route": "auto_approve",
+    "reason": "auto_approve: expected loss of auto-approve \u20b10.80 < expected loss of review \u20b121.98 \u2014 the claim is too low-value to justify a \u20b119.00 review (exposure \u20b116, break-even p=134.1%, this p=5.0%)",
+    "claim_value_php": 32.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 16.0,
+    "expected_loss_auto_approve": 0.8,
+    "expected_loss_escalate": 21.979999999999997,
+    "p_threshold_full": 1.3414634146341464,
+    "p_threshold_simple": 1.1875,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 408,
+    "authenticity": 1583,
+    "rung1b": 1937
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 1.58,
+     "prompt_tokens": 1435,
+     "output_tokens": 68,
+     "thinking_tokens": 0,
+     "total_tokens": 1503,
+     "image_tokens": 1078,
+     "text_tokens": 357
+    },
+    {
+     "stage": "rung1b",
+     "secs": 1.94,
+     "prompt_tokens": 2091,
+     "output_tokens": 298,
+     "thinking_tokens": 0,
+     "total_tokens": 2389,
+     "image_tokens": 1078,
+     "text_tokens": 1013
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image shows natural lighting, realistic surface textures, and consistent crack formations on the handle without any signs of digital manipulation or AI generation."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: The submitted evidence only shows the item itself resting on a surface, with no parcel packaging, seals, or shipping wrap visible."
+    },
+    "relevance": {
+     "score": 0.8,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Damage Visible",
+     "reason": "The stated claim is 'Broken Products' and the photograph clearly depicts visible cracks on the handle of the item."
+    },
+    "defender": {
+     "score": 0.75,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "Authentic Damage",
+     "reason": "The image clearly displays realistic star-like stress fractures radiating across the blue plastic handle without any signs of digital alteration or staging."
+    }
+   }
+  },
+  "test_eval/237120460283155": {
+   "session": "test_eval",
+   "case_id": "237120460283155",
+   "true_label": null,
+   "reason": "Spilled Contents",
+   "kinds": [
+    "image"
+   ],
+   "decision": "escalate",
+   "credibility": 68.3,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 3602,
+   "claim_value_php": 949.0,
+   "economic": {
+    "route": "escalate",
+    "reason": "escalate: expected loss of review \u20b135.63 \u2264 expected loss of auto-approve \u20b1142.35 (claim \u20b1949, exposure \u20b1474, break-even p=5.1%, this p=30.0%)",
+    "claim_value_php": 949.0,
+    "p_invalid": 0.3,
+    "net_loss_exposure": 474.5,
+    "expected_loss_auto_approve": 142.35,
+    "expected_loss_escalate": 35.635,
+    "p_threshold_full": 0.051276075049528025,
+    "p_threshold_simple": 0.040042149631190724,
+    "bucket": "escalate"
+   },
+   "stage_ms": {
+    "rung0": 51,
+    "authenticity": 1708,
+    "rung1b": 1841
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 1.71,
+     "prompt_tokens": 1438,
+     "output_tokens": 63,
+     "thinking_tokens": 0,
+     "total_tokens": 1501,
+     "image_tokens": 1080,
+     "text_tokens": 358
+    },
+    {
+     "stage": "rung1b",
+     "secs": 1.84,
+     "prompt_tokens": 2091,
+     "output_tokens": 331,
+     "thinking_tokens": 0,
+     "total_tokens": 2422,
+     "image_tokens": 1080,
+     "text_tokens": 1011
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image shows consistent lighting, natural textures, and realistic photographic noise without any digital manipulation or AI generation artifacts."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: No exterior shipping box, label, or sealed outer parcel packaging is visible in the photo; it only shows the opened interior of the product pouch."
+    },
+    "relevance": {
+     "score": 0.4,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "Mismatched Issue Type",
+     "reason": "The stated claim is 'Spilled Contents', but the photograph actually displays mold and spoilage inside the open container rather than an external spill."
+    },
+    "defender": {
+     "score": 0.4,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Authentic Spoilage Photo",
+     "reason": "The image shows realistic mold growth with consistent natural lighting and textures on the product surface, supporting the reality of the damaged item condition even if the exact reason category differs."
+    }
+   }
+  },
+  "test_eval/237889657242532": {
+   "session": "test_eval",
+   "case_id": "237889657242532",
+   "true_label": null,
+   "reason": "Damaged Others",
+   "kinds": [
+    "video"
+   ],
+   "decision": "approve",
+   "credibility": 82.1,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 11184,
+   "claim_value_php": 791.0,
+   "economic": {
+    "route": "auto_approve",
+    "reason": "auto_approve: expected loss of auto-approve \u20b119.78 < expected loss of review \u20b123.88 \u2014 the claim is too low-value to justify a \u20b119.00 review (exposure \u20b1396, break-even p=6.1%, this p=5.0%)",
+    "claim_value_php": 791.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 395.5,
+    "expected_loss_auto_approve": 19.775000000000002,
+    "expected_loss_escalate": 23.877499999999998,
+    "p_threshold_full": 0.06146109791870373,
+    "p_threshold_simple": 0.04804045512010114,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 1515,
+    "authenticity": 8051,
+    "rung1b": 1617
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 8.05,
+     "prompt_tokens": 1348,
+     "output_tokens": 71,
+     "thinking_tokens": 0,
+     "total_tokens": 1419,
+     "text_tokens": 358,
+     "video_tokens": 990
+    },
+    {
+     "stage": "rung1b",
+     "secs": 1.62,
+     "prompt_tokens": 2009,
+     "output_tokens": 291,
+     "thinking_tokens": 0,
+     "total_tokens": 2300,
+     "text_tokens": 1019,
+     "video_tokens": 990
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows natural hand movements, realistic lighting, and consistent physical interactions with the headset plastic. There are no signs of AI generation or digital manipulation."
+    },
+    "completeness": {
+     "score": 0.4,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "No Unboxing Shown",
+     "reason": "The video starts directly with the item already out of its shipping container, missing the initial unboxing phase."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: No exterior parcel packaging or shipping seals are visible in the video frames to assess pre-opening condition."
+    },
+    "relevance": {
+     "score": 0.8,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "Damage Clearly Shown",
+     "reason": "The video explicitly demonstrates the specific physical break and structural damage on the ordered headset component."
+    },
+    "defender": {
+     "score": 0.75,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "Consistent Physical Damage",
+     "reason": "The video shows realistic handling and close-up views of a clean fracture on the headset plastic, consistent with transit stress."
+    }
+   }
+  },
+  "test_eval/237889661294852": {
+   "session": "test_eval",
+   "case_id": "237889661294852",
+   "true_label": null,
+   "reason": "Item Missing",
+   "kinds": [
+    "video"
+   ],
+   "decision": "escalate",
+   "credibility": 73.7,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 15695,
+   "claim_value_php": 108.5,
+   "economic": {
+    "route": "escalate",
+    "claim_value_php": 108.5,
+    "reason": "flagged_conflict: a fraud check raised a red flag (<0.40); routed to human review regardless of claim value \u2014 the base rate does not describe a conflicted case"
+   },
+   "stage_ms": {
+    "rung0": 1726,
+    "authenticity": 11279,
+    "rung1b": 2689
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 11.28,
+     "prompt_tokens": 2354,
+     "output_tokens": 67,
+     "thinking_tokens": 0,
+     "total_tokens": 2421,
+     "text_tokens": 357,
+     "video_tokens": 1997
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.69,
+     "prompt_tokens": 3066,
+     "output_tokens": 305,
+     "thinking_tokens": 0,
+     "total_tokens": 3371,
+     "text_tokens": 1069,
+     "video_tokens": 1997
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 1.0,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows natural hand movements, realistic lighting consistency, and unedited physical interaction with the package, indicating it is an authentic capture."
+    },
+    "completeness": {
+     "score": 0.8,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Unboxing shown",
+     "reason": "The video shows a continuous, uninterrupted opening of the parcel from the sealed outer plastic wrapper to extracting the contents."
+    },
+    "tamper": {
+     "score": 0.8,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Intact opening",
+     "reason": "The outer black plastic packaging was intact at the start of the video and torn open live on camera, showing no prior tampering."
+    },
+    "relevance": {
+     "score": 0.3,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "Items present",
+     "reason": "The buyer claims 'Item Missing', but the unboxing video clearly shows multiple items being pulled out of the package, contradicting the claim."
+    },
+    "defender": {
+     "score": 0.2,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Contradicted claim",
+     "reason": "It is difficult to find strong legitimacy evidence for a missing item claim when the video explicitly shows physical items emerging from the package."
+    }
+   }
+  },
+  "test_eval/237122422277782": {
+   "session": "test_eval",
+   "case_id": "237122422277782",
+   "true_label": null,
+   "reason": "Damaged Others",
+   "kinds": [
+    "image"
+   ],
+   "decision": "reject",
+   "credibility": 10.0,
+   "reason_code": "authenticity_dispositive_fraud",
+   "runtime_ms": 1937,
+   "claim_value_php": 83.0,
+   "economic": null,
+   "stage_ms": {
+    "rung0": 51,
+    "authenticity": 1885
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 1.88,
+     "prompt_tokens": 1422,
+     "output_tokens": 78,
+     "thinking_tokens": 0,
+     "total_tokens": 1500,
+     "image_tokens": 1064,
+     "text_tokens": 358
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.1,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "ai-generated",
+     "reason": "The image features clear AI generation artifacts, including nonsensical and warped watermark text at the bottom right ('Dola AI') along with ghosted numbers embedded into the surface texture."
+    }
+   }
+  },
+  "test_eval/237135552260994": {
+   "session": "test_eval",
+   "case_id": "237135552260994",
+   "true_label": null,
+   "reason": "Suspicious Parcel",
+   "kinds": [
+    "image"
+   ],
+   "decision": "approve",
+   "credibility": 73.8,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 4115,
+   "claim_value_php": 83.0,
+   "economic": {
+    "route": "auto_approve",
+    "reason": "auto_approve: expected loss of auto-approve \u20b112.45 < expected loss of review \u20b122.64 \u2014 the claim is too low-value to justify a \u20b119.00 review (exposure \u20b142, break-even p=55.9%, this p=30.0%)",
+    "claim_value_php": 83.0,
+    "p_invalid": 0.3,
+    "net_loss_exposure": 41.5,
+    "expected_loss_auto_approve": 12.45,
+    "expected_loss_escalate": 22.645,
+    "p_threshold_full": 0.5590851334180432,
+    "p_threshold_simple": 0.4578313253012048,
+    "bucket": "escalate"
+   },
+   "stage_ms": {
+    "rung0": 26,
+    "authenticity": 1731,
+    "rung1b": 2357
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 1.73,
+     "prompt_tokens": 1422,
+     "output_tokens": 68,
+     "thinking_tokens": 0,
+     "total_tokens": 1490,
+     "text_tokens": 358,
+     "image_tokens": 1064
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.36,
+     "prompt_tokens": 2080,
+     "output_tokens": 309,
+     "thinking_tokens": 0,
+     "total_tokens": 2389,
+     "text_tokens": 1016,
+     "image_tokens": 1064
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 1.0,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image shows natural textile textures, realistic lighting, and standard watermarking typical of e-commerce return platforms without any signs of digital manipulation."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: The evidence shows only a pair of grey sweatpants laid flat, with no parcel packaging, seals, or shipping wrap visible."
+    },
+    "relevance": {
+     "score": 0.4,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Mismatched Reason",
+     "reason": "The stated reason is 'Suspicious Parcel', but the photo only displays a damaged or torn textile item rather than the parcel itself."
+    },
+    "defender": {
+     "score": 0.4,
+     "conf": 0.6,
+     "applicable": true,
+     "verdict": "Insufficient Proof",
+     "reason": "While the textile tear appears authentic on the garment, there is no concrete evidence or unboxing chain provided to prove transit damage versus pre-existing condition."
+    }
+   }
+  },
+  "test_eval/237182131295620": {
+   "session": "test_eval",
+   "case_id": "237182131295620",
+   "true_label": null,
+   "reason": "Spilled Contents",
+   "kinds": [
+    "image"
+   ],
+   "decision": "approve",
+   "credibility": 85.5,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 4209,
+   "claim_value_php": 884.0,
+   "economic": {
+    "route": "auto_approve",
+    "reason": "auto_approve: expected loss of auto-approve \u20b122.10 < expected loss of review \u20b124.11 \u2014 the claim is too low-value to justify a \u20b119.00 review (exposure \u20b1442, break-even p=5.5%, this p=5.0%)",
+    "claim_value_php": 884.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 442.0,
+    "expected_loss_auto_approve": 22.1,
+    "expected_loss_escalate": 24.11,
+    "p_threshold_full": 0.055027513756878435,
+    "p_threshold_simple": 0.042986425339366516,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 25,
+    "authenticity": 1729,
+    "rung1b": 2453
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 1.73,
+     "prompt_tokens": 1422,
+     "output_tokens": 64,
+     "thinking_tokens": 0,
+     "total_tokens": 1486,
+     "text_tokens": 358,
+     "image_tokens": 1064
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.45,
+     "prompt_tokens": 2076,
+     "output_tokens": 317,
+     "thinking_tokens": 0,
+     "total_tokens": 2393,
+     "text_tokens": 1012,
+     "image_tokens": 1064
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image shows consistent lighting, natural textures, and realistic physical damage without any AI generation artifacts or digital tampering signs."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Product Packaging Visible",
+     "reason": "The evidence shows the product's own packaging with a tear and spilled contents, but no outer shipping parcel, tape, or delivery seal is visible."
+    },
+    "relevance": {
+     "score": 0.8,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Spilled Contents Shown",
+     "reason": "The image clearly depicts the cat litter bag with a tear in the middle and small white pellets spilling out, matching the stated reason."
+    },
+    "defender": {
+     "score": 0.75,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "Consistent Damage Pattern",
+     "reason": "The tear in the packaging and the scattered white litter pellets appear physically natural and consistent with transit puncture damage rather than digital manipulation."
+    }
+   }
+  },
+  "test_eval/237135461268496": {
+   "session": "test_eval",
+   "case_id": "237135461268496",
+   "true_label": null,
+   "reason": "Spilled Contents",
+   "kinds": [
+    "image"
+   ],
+   "decision": "reject",
+   "credibility": 10.0,
+   "reason_code": "authenticity_dispositive_fraud",
+   "runtime_ms": 3815,
+   "claim_value_php": 1179.0,
+   "economic": null,
+   "stage_ms": {
+    "rung0": 102,
+    "authenticity": 3712
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 2.1,
+     "prompt_tokens": 1458,
+     "output_tokens": 71,
+     "thinking_tokens": 0,
+     "total_tokens": 1529,
+     "image_tokens": 1100,
+     "text_tokens": 358
+    },
+    {
+     "stage": "authenticity",
+     "secs": 1.62,
+     "prompt_tokens": 1458,
+     "output_tokens": 63,
+     "thinking_tokens": 0,
+     "total_tokens": 1521,
+     "image_tokens": 1100,
+     "text_tokens": 358
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.1,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "digitally edited",
+     "reason": "Worst of 2 files (237135461268496 - 1.jpg): The image exhibits unnatural, repeated text overlays timestamping the frame across the background and bottle surface, indicating digital manipulation or app-based watermarking."
+    }
+   }
+  },
+  "test_eval/237187828216410": {
+   "session": "test_eval",
+   "case_id": "237187828216410",
+   "true_label": null,
+   "reason": "Item Missing",
+   "kinds": [
+    "image"
+   ],
+   "decision": "reject",
+   "credibility": 52.5,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 3573,
+   "claim_value_php": 1394.0,
+   "economic": null,
+   "stage_ms": {
+    "rung0": 27,
+    "authenticity": 1564,
+    "rung1b": 1981
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 1.56,
+     "prompt_tokens": 1421,
+     "output_tokens": 64,
+     "thinking_tokens": 0,
+     "total_tokens": 1485,
+     "text_tokens": 357,
+     "image_tokens": 1064
+    },
+    {
+     "stage": "rung1b",
+     "secs": 1.98,
+     "prompt_tokens": 2073,
+     "output_tokens": 299,
+     "thinking_tokens": 0,
+     "total_tokens": 2372,
+     "text_tokens": 1009,
+     "image_tokens": 1064
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image shows consistent physical lighting, realistic plastic fracturing, and normal camera noise without any AI artifacts or digital manipulation."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: The provided image only shows the product itself and does not capture any parcel packaging or shipping seals."
+    },
+    "relevance": {
+     "score": 0.1,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Mismatched Claim",
+     "reason": "The buyer claimed the item was missing, but the attached photo clearly shows a physical product with cracking damage instead of an empty space."
+    },
+    "defender": {
+     "score": 0.3,
+     "conf": 0.6,
+     "applicable": true,
+     "verdict": "Wrong Claim Type",
+     "reason": "While the photo displays realistic physical damage to a plastic component, it directly contradicts the stated 'Item Missing' return reason."
+    }
+   }
+  },
+  "test_eval/237198990271205": {
+   "session": "test_eval",
+   "case_id": "237198990271205",
+   "true_label": null,
+   "reason": "Item Missing",
+   "kinds": [
+    "image"
+   ],
+   "decision": "escalate",
+   "credibility": 61.1,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 5404,
+   "claim_value_php": 28.0,
+   "economic": {
+    "route": "escalate",
+    "claim_value_php": 28.0,
+    "reason": "flagged_conflict: a fraud check raised a red flag (<0.40); routed to human review regardless of claim value \u2014 the base rate does not describe a conflicted case"
+   },
+   "stage_ms": {
+    "rung0": 37,
+    "authenticity": 1701,
+    "rung1b": 3665
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 1.7,
+     "prompt_tokens": 1421,
+     "output_tokens": 69,
+     "thinking_tokens": 0,
+     "total_tokens": 1490,
+     "image_tokens": 1064,
+     "text_tokens": 357
+    },
+    {
+     "stage": "rung1b",
+     "secs": 3.67,
+     "prompt_tokens": 2078,
+     "output_tokens": 307,
+     "thinking_tokens": 0,
+     "total_tokens": 2385,
+     "image_tokens": 1064,
+     "text_tokens": 1014
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 1.0,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image displays natural lighting, realistic hand textures, and consistent physical cracks on the objects without any signs of digital manipulation or AI generation artifacts."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: The provided image displays only the items held in hand without any parcel packaging, shipping wrap, or delivery seals visible."
+    },
+    "relevance": {
+     "score": 0.2,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Contradicts Reason",
+     "reason": "The buyer claimed 'Item Missing', but the submitted photo clearly depicts two physical items in hand rather than an absent product."
+    },
+    "defender": {
+     "score": 0.3,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Items Present",
+     "reason": "The image shows physically real objects with natural cracking and consistent hand textures, though this directly contradicts the stated 'Item Missing' claim."
+    }
+   }
+  },
+  "test_eval/237204022230019": {
+   "session": "test_eval",
+   "case_id": "237204022230019",
+   "true_label": null,
+   "reason": "Spilled Contents",
+   "kinds": [
+    "image"
+   ],
+   "decision": "approve",
+   "credibility": 100.0,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 4018,
+   "claim_value_php": 293.0,
+   "economic": {
+    "route": "auto_approve",
+    "reason": "auto_approve: expected loss of auto-approve \u20b17.33 < expected loss of review \u20b122.63 \u2014 the claim is too low-value to justify a \u20b119.00 review (exposure \u20b1146, break-even p=16.4%, this p=5.0%)",
+    "claim_value_php": 293.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 146.5,
+    "expected_loss_auto_approve": 7.325,
+    "expected_loss_escalate": 22.6325,
+    "p_threshold_full": 0.16436309301456856,
+    "p_threshold_simple": 0.1296928327645051,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 38,
+    "authenticity": 1714,
+    "rung1b": 2264
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 1.71,
+     "prompt_tokens": 1422,
+     "output_tokens": 69,
+     "thinking_tokens": 0,
+     "total_tokens": 1491,
+     "image_tokens": 1064,
+     "text_tokens": 358
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.26,
+     "prompt_tokens": 2106,
+     "output_tokens": 299,
+     "thinking_tokens": 0,
+     "total_tokens": 2405,
+     "text_tokens": 1042,
+     "image_tokens": 1064
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 1.0,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image shows consistent lighting, natural textures, and readable product labels without any visible AI-generation artifacts, splicing, or screen recapture patterns."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: The image shows the products on a dark plastic sheet, but shipping packaging or outer boxes are not visible."
+    },
+    "relevance": {
+     "score": 0.9,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Spillage Shown",
+     "reason": "The photo clearly shows gel-like contents spilled across the products and surface, directly matching the stated reason of spilled contents."
+    },
+    "defender": {
+     "score": 0.8,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "Consistent Damage",
+     "reason": "The cracked container lid and the clear gel substance pooling around the products provide concrete visual evidence of product failure consistent with the claim."
+    }
+   }
+  },
+  "test_eval/237224617245387": {
+   "session": "test_eval",
+   "case_id": "237224617245387",
+   "true_label": null,
+   "reason": "Spilled Contents",
+   "kinds": [
+    "image"
+   ],
+   "decision": "reject",
+   "credibility": 30.0,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 4549,
+   "claim_value_php": 721.0,
+   "economic": null,
+   "stage_ms": {
+    "rung0": 46,
+    "authenticity": 1891,
+    "rung1b": 2611
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 1.89,
+     "prompt_tokens": 1460,
+     "output_tokens": 73,
+     "thinking_tokens": 0,
+     "total_tokens": 1533,
+     "image_tokens": 1102,
+     "text_tokens": 358
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.61,
+     "prompt_tokens": 2122,
+     "output_tokens": 307,
+     "thinking_tokens": 0,
+     "total_tokens": 2429,
+     "text_tokens": 1020,
+     "image_tokens": 1102
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.3,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "digitally edited",
+     "reason": "The image exhibits unnatural, repeated text overlays and watermarks stamped across different surfaces like the palette lid and shadows, which is indicative of digital manipulation or tampering."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: No outer parcel packaging, seals, or shipping wrap are visible in the image to verify transit conditions, only the product itself."
+    },
+    "relevance": {
+     "score": 0.3,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "Matches Claim",
+     "reason": "The image shows powder spilled and broken across multiple eyeshadow pans, matching the stated reason of spilled contents, but previous analysis indicates digital tampering."
+    },
+    "defender": {
+     "score": 0.3,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Digital Artifacts Present",
+     "reason": "While the damage pattern resembles a shattered makeup palette, the presence of digitally repeated text overlays on the surface undermines the claim's legitimacy."
+    }
+   }
+  },
+  "test_eval/237708362275375": {
+   "session": "test_eval",
+   "case_id": "237708362275375",
+   "true_label": null,
+   "reason": "Suspicious Parcel",
+   "kinds": [
+    "video"
+   ],
+   "decision": "reject",
+   "credibility": 76.0,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 17987,
+   "claim_value_php": 2617.5,
+   "economic": null,
+   "stage_ms": {
+    "rung0": 1969,
+    "authenticity": 12684,
+    "rung1b": 3334
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 12.68,
+     "prompt_tokens": 2904,
+     "output_tokens": 75,
+     "thinking_tokens": 0,
+     "total_tokens": 2979,
+     "text_tokens": 358,
+     "video_tokens": 2546
+    },
+    {
+     "stage": "rung1b",
+     "secs": 3.33,
+     "prompt_tokens": 3647,
+     "output_tokens": 321,
+     "thinking_tokens": 0,
+     "total_tokens": 3968,
+     "video_tokens": 2546,
+     "text_tokens": 1101
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 1.0,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows a natural unboxing process with realistic hand movements, consistent lighting, and normal physical interactions with packaging materials, showing no signs of digital editing or AI generation."
+    },
+    "completeness": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Full Unboxing",
+     "reason": "The video provides a continuous, unedited view from the sealed black mailing bag being cut open to the complete removal of bubble wrap and contents."
+    },
+    "tamper": {
+     "score": 0.9,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "Sealed Start",
+     "reason": "The black plastic courier bag is shown fully sealed and intact at the start of the video before being cut open with scissors."
+    },
+    "relevance": {
+     "score": 0.15,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "Irrelevant Content",
+     "reason": "The buyer claims a 'Suspicious Parcel', but the video shows standard packaging being opened and contains ordinary items without demonstrating any suspicious anomaly or tampering."
+    },
+    "defender": {
+     "score": 0.4,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Authentic Handling",
+     "reason": "The video displays a natural, continuous unboxing process with consistent lighting and realistic physical interactions, showing no signs of digital manipulation."
+    }
+   }
+  },
+  "test_eval/237231004292129": {
+   "session": "test_eval",
+   "case_id": "237231004292129",
+   "true_label": null,
+   "reason": "Spilled Contents",
+   "kinds": [
+    "image"
+   ],
+   "decision": "escalate",
+   "credibility": 96.4,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 3263,
+   "claim_value_php": 1120.0,
+   "economic": {
+    "route": "escalate",
+    "reason": "escalate: expected loss of review \u20b124.70 \u2264 expected loss of auto-approve \u20b128.00 (claim \u20b11,120, exposure \u20b1560, break-even p=4.3%, this p=5.0%)",
+    "claim_value_php": 1120.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 560.0,
+    "expected_loss_auto_approve": 28.0,
+    "expected_loss_escalate": 24.7,
+    "p_threshold_full": 0.043478260869565216,
+    "p_threshold_simple": 0.033928571428571426,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 24,
+    "authenticity": 1196,
+    "rung1b": 2042
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 1.2,
+     "prompt_tokens": 1447,
+     "output_tokens": 64,
+     "thinking_tokens": 0,
+     "total_tokens": 1511,
+     "text_tokens": 358,
+     "image_tokens": 1089
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.04,
+     "prompt_tokens": 2129,
+     "output_tokens": 306,
+     "thinking_tokens": 0,
+     "total_tokens": 2435,
+     "image_tokens": 1089,
+     "text_tokens": 1040
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 1.0,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image shows consistent lighting, natural textures, and realistic camera capture details with no signs of AI generation or digital tampering."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: The submitted photo displays only the cosmetic items themselves resting on a textured surface, with no outer parcel packaging or shipping seals visible."
+    },
+    "relevance": {
+     "score": 0.8,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Relevant Damage Shown",
+     "reason": "The photograph clearly depicts cosmetics with cracked powder and scattered debris matching the stated 'Spilled Contents' return reason."
+    },
+    "defender": {
+     "score": 0.7,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "Consistent Damage Pattern",
+     "reason": "The image shows realistic cracking in the pressed powder and loose debris scattered around the items, consistent with transit shock to fragile cosmetics rather than digital manipulation."
+    }
+   }
+  },
+  "test_eval/237354516249529": {
+   "session": "test_eval",
+   "case_id": "237354516249529",
+   "true_label": null,
+   "reason": "Spilled Contents",
+   "kinds": [
+    "image"
+   ],
+   "decision": "reject",
+   "credibility": 10.0,
+   "reason_code": "authenticity_dispositive_fraud",
+   "runtime_ms": 1781,
+   "claim_value_php": 89.0,
+   "economic": null,
+   "stage_ms": {
+    "rung0": 16,
+    "authenticity": 1765
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 1.76,
+     "prompt_tokens": 1422,
+     "output_tokens": 71,
+     "thinking_tokens": 0,
+     "total_tokens": 1493,
+     "text_tokens": 358,
+     "image_tokens": 1064
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.1,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "ai-generated",
+     "reason": "The image exhibits clear AI generation artifacts, including garbled, repeating digital text overlays spanning across multiple cans and background surfaces, along with unnatural textures."
+    }
+   }
+  },
+  "test_eval/237391822290969": {
+   "session": "test_eval",
+   "case_id": "237391822290969",
+   "true_label": null,
+   "reason": "Broken Products",
+   "kinds": [
+    "image"
+   ],
+   "decision": "approve",
+   "credibility": 100.0,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 3645,
+   "claim_value_php": 118.0,
+   "economic": {
+    "route": "auto_approve",
+    "reason": "auto_approve: expected loss of auto-approve \u20b12.95 < expected loss of review \u20b122.20 \u2014 the claim is too low-value to justify a \u20b119.00 review (exposure \u20b159, break-even p=39.9%, this p=5.0%)",
+    "claim_value_php": 118.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 59.0,
+    "expected_loss_auto_approve": 2.95,
+    "expected_loss_escalate": 22.195,
+    "p_threshold_full": 0.3992740471869328,
+    "p_threshold_simple": 0.3220338983050847,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 30,
+    "authenticity": 1570,
+    "rung1b": 2045
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 1.57,
+     "prompt_tokens": 1421,
+     "output_tokens": 79,
+     "thinking_tokens": 0,
+     "total_tokens": 1500,
+     "image_tokens": 1064,
+     "text_tokens": 357
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.05,
+     "prompt_tokens": 2089,
+     "output_tokens": 309,
+     "thinking_tokens": 0,
+     "total_tokens": 2398,
+     "text_tokens": 1025,
+     "image_tokens": 1064
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 1.0,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image shows consistent lighting, natural shadows, and realistic physical damage to multiple plastic containers spread across a table. There are no signs of AI generation artifacts, digital splicing, or screen recaptu"
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: The image shows broken items laid out on a table without any shipping boxes, seals, or wrapping visible to evaluate prior tampering."
+    },
+    "relevance": {
+     "score": 0.9,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "broken products shown",
+     "reason": "The photo clearly depicts multiple black plastic food containers spread across a table showing significant cracks and physical breakage matching the stated reason."
+    },
+    "defender": {
+     "score": 0.85,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "consistent damage pattern",
+     "reason": "The damage appears uniformly distributed across a large bulk batch of brittle plastic containers, showing realistic stress fractures and natural lighting consistent with heavy transit crushing."
+    }
+   }
+  },
+  "test_eval/237396511278223": {
+   "session": "test_eval",
+   "case_id": "237396511278223",
+   "true_label": null,
+   "reason": "Spilled Contents",
+   "kinds": [
+    "image"
+   ],
+   "decision": "approve",
+   "credibility": 92.0,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 4021,
+   "claim_value_php": 85.0,
+   "economic": {
+    "route": "auto_approve",
+    "reason": "auto_approve: expected loss of auto-approve \u20b12.12 < expected loss of review \u20b122.11 \u2014 the claim is too low-value to justify a \u20b119.00 review (exposure \u20b142, break-even p=54.7%, this p=5.0%)",
+    "claim_value_php": 85.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 42.5,
+    "expected_loss_auto_approve": 2.125,
+    "expected_loss_escalate": 22.112499999999997,
+    "p_threshold_full": 0.546583850931677,
+    "p_threshold_simple": 0.4470588235294118,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 36,
+    "authenticity": 1724,
+    "rung1b": 2260
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 1.72,
+     "prompt_tokens": 1446,
+     "output_tokens": 71,
+     "thinking_tokens": 0,
+     "total_tokens": 1517,
+     "text_tokens": 358,
+     "image_tokens": 1088
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.26,
+     "prompt_tokens": 2107,
+     "output_tokens": 300,
+     "thinking_tokens": 0,
+     "total_tokens": 2407,
+     "text_tokens": 1019,
+     "image_tokens": 1088
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 1.0,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image shows consistent physical lighting, realistic texture rendering on the packaging, and natural-looking spills without any obvious signs of digital splicing or AI generation artifacts."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Packaging Visible",
+     "reason": "The items are shown inside an open shipping box lined with bubble wrap, but the initial sealing or unopened state of the parcel is not captured."
+    },
+    "relevance": {
+     "score": 0.9,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Spilled Contents Shown",
+     "reason": "The photograph clearly shows white creamy product spilled from the bottles and packaging onto the bubble wrap lining the box."
+    },
+    "defender": {
+     "score": 0.8,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "Consistent Damage Pattern",
+     "reason": "The scene displays realistic physical damage with cream leaking naturally from multiple opened containers and smeared across the surrounding bubble wrap."
+    }
+   }
+  },
+  "test_eval/237425716287675": {
+   "session": "test_eval",
+   "case_id": "237425716287675",
+   "true_label": null,
+   "reason": "Spilled Contents",
+   "kinds": [
+    "image"
+   ],
+   "decision": "reject",
+   "credibility": 10.0,
+   "reason_code": "authenticity_dispositive_fraud",
+   "runtime_ms": 2187,
+   "claim_value_php": 389.0,
+   "economic": null,
+   "stage_ms": {
+    "rung0": 54,
+    "authenticity": 2132
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 2.13,
+     "prompt_tokens": 1464,
+     "output_tokens": 79,
+     "thinking_tokens": 0,
+     "total_tokens": 1543,
+     "image_tokens": 1064,
+     "text_tokens": 400
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.1,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "digitally manipulated",
+     "reason": "The image shows severe physical distortions and unnatural overlapping visual artifacts, including text burnt into random parts of the frame and a nonsensical shatter pattern across a plastic bottle that contradicts reali"
+    }
+   }
+  },
+  "test_eval/237452234258861": {
+   "session": "test_eval",
+   "case_id": "237452234258861",
+   "true_label": null,
+   "reason": "Scratched",
+   "kinds": [
+    "image"
+   ],
+   "decision": "approve",
+   "credibility": 76.5,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 4225,
+   "claim_value_php": 659.0,
+   "economic": {
+    "route": "auto_approve",
+    "reason": "auto_approve: expected loss of auto-approve \u20b116.48 < expected loss of review \u20b123.55 \u2014 the claim is too low-value to justify a \u20b119.00 review (exposure \u20b1330, break-even p=7.4%, this p=5.0%)",
+    "claim_value_php": 659.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 329.5,
+    "expected_loss_auto_approve": 16.475,
+    "expected_loss_escalate": 23.5475,
+    "p_threshold_full": 0.07368949924635738,
+    "p_threshold_simple": 0.057663125948406675,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 24,
+    "authenticity": 1860,
+    "rung1b": 2340
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 1.86,
+     "prompt_tokens": 1474,
+     "output_tokens": 66,
+     "thinking_tokens": 0,
+     "total_tokens": 1540,
+     "text_tokens": 358,
+     "image_tokens": 1116
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.34,
+     "prompt_tokens": 2128,
+     "output_tokens": 319,
+     "thinking_tokens": 0,
+     "total_tokens": 2447,
+     "text_tokens": 1012,
+     "image_tokens": 1116
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 1.0,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image displays natural lighting, realistic textures on the hand and watch, and coherent text on the packaging without any digital manipulation artifacts."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: Parcel packaging, seals, or shipping wrap are not visible in the photo; the image only shows the product itself being held."
+    },
+    "relevance": {
+     "score": 0.5,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "Damage Differs",
+     "reason": "The buyer claimed the item was 'Scratched', but the photo clearly shows a heavily shattered or cracked watch crystal rather than a minor surface scratch."
+    },
+    "defender": {
+     "score": 0.5,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Authentic Item Shown",
+     "reason": "The photo displays natural lighting, realistic textures, and consistent details on the genuine watch item without digital manipulation artifacts, though it depicts a crack instead of a scratch."
+    }
+   }
+  },
+  "test_eval/237472035223977": {
+   "session": "test_eval",
+   "case_id": "237472035223977",
+   "true_label": null,
+   "reason": "Functional Damage",
+   "kinds": [
+    "video"
+   ],
+   "decision": "approve",
+   "credibility": 89.6,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 12804,
+   "claim_value_php": 409.0,
+   "economic": {
+    "route": "auto_approve",
+    "reason": "auto_approve: expected loss of auto-approve \u20b110.23 < expected loss of review \u20b122.92 \u2014 the claim is too low-value to justify a \u20b119.00 review (exposure \u20b1204, break-even p=11.8%, this p=5.0%)",
+    "claim_value_php": 409.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 204.5,
+    "expected_loss_auto_approve": 10.225000000000001,
+    "expected_loss_escalate": 22.9225,
+    "p_threshold_full": 0.11824778285407148,
+    "p_threshold_simple": 0.09290953545232274,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 1938,
+    "authenticity": 8569,
+    "rung1b": 2296
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 8.57,
+     "prompt_tokens": 1266,
+     "output_tokens": 65,
+     "thinking_tokens": 0,
+     "total_tokens": 1331,
+     "text_tokens": 357,
+     "video_tokens": 909
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.3,
+     "prompt_tokens": 1921,
+     "output_tokens": 315,
+     "thinking_tokens": 0,
+     "total_tokens": 2236,
+     "video_tokens": 909,
+     "text_tokens": 1012
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows natural lighting, realistic water flow dynamics, and consistent physical interactions without any digital manipulation or AI generation artifacts."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "No Unboxing Shown",
+     "reason": "The video starts directly with the assembled water dispenser already mounted on a bottle, omitting any unboxing or packaging opening footage."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: No shipping box, tape, or product packaging is visible in the video, as the device is already installed on a water jug."
+    },
+    "relevance": {
+     "score": 0.9,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Functional Damage Shown",
+     "reason": "The video clearly shows water leaking out of the side and body of the Meenida dispenser instead of flowing cleanly through the spout when activated."
+    },
+    "defender": {
+     "score": 0.8,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "Clear Defect Demonstrated",
+     "reason": "The video provides a direct, close-up demonstration of the unit malfunctioning, with water visibly spraying and leaking from an unintended seam during operation."
+    }
+   }
+  },
+  "test_eval/237543869283145": {
+   "session": "test_eval",
+   "case_id": "237543869283145",
+   "true_label": null,
+   "reason": "Suspicious Parcel",
+   "kinds": [
+    "image"
+   ],
+   "decision": "escalate",
+   "credibility": 71.2,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 4354,
+   "claim_value_php": 708.0,
+   "economic": {
+    "route": "escalate",
+    "reason": "escalate: expected loss of review \u20b132.02 \u2264 expected loss of auto-approve \u20b1106.20 (claim \u20b1708, exposure \u20b1354, break-even p=6.9%, this p=30.0%)",
+    "claim_value_php": 708.0,
+    "p_invalid": 0.3,
+    "net_loss_exposure": 354.0,
+    "expected_loss_auto_approve": 106.2,
+    "expected_loss_escalate": 32.019999999999996,
+    "p_threshold_full": 0.06862133499688085,
+    "p_threshold_simple": 0.05367231638418079,
+    "bucket": "escalate"
+   },
+   "stage_ms": {
+    "rung0": 30,
+    "authenticity": 2036,
+    "rung1b": 2287
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 2.04,
+     "prompt_tokens": 1436,
+     "output_tokens": 69,
+     "thinking_tokens": 0,
+     "total_tokens": 1505,
+     "image_tokens": 1078,
+     "text_tokens": 358
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.29,
+     "prompt_tokens": 2093,
+     "output_tokens": 301,
+     "thinking_tokens": 0,
+     "total_tokens": 2394,
+     "text_tokens": 1015,
+     "image_tokens": 1078
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image shows consistent lighting, natural textures of packaging materials and bubble wrap, and legible barcode details without signs of digital manipulation or AI generation."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Packaging Visible",
+     "reason": "The outer black mailer bag and bubble wrap are clearly visible, but static photos cannot confirm whether the parcel was pre-opened."
+    },
+    "relevance": {
+     "score": 0.5,
+     "conf": 0.6,
+     "applicable": true,
+     "verdict": "Ambiguous Parcel",
+     "reason": "The image shows packing materials and a shipping label, but it is unclear what specifically makes the parcel suspicious based on this view alone."
+    },
+    "defender": {
+     "score": 0.6,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Consistent Materials",
+     "reason": "The evidence displays realistic packaging components including crumpled paper, bubble wrap, and an authentic-looking shipping label with consistent lighting."
+    }
+   }
+  },
+  "test_eval/237619971279655": {
+   "session": "test_eval",
+   "case_id": "237619971279655",
+   "true_label": null,
+   "reason": "Functional Damage",
+   "kinds": [
+    "image"
+   ],
+   "decision": "approve",
+   "credibility": 93.7,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 4869,
+   "claim_value_php": 264.0,
+   "economic": {
+    "route": "auto_approve",
+    "reason": "auto_approve: expected loss of auto-approve \u20b16.60 < expected loss of review \u20b122.56 \u2014 the claim is too low-value to justify a \u20b119.00 review (exposure \u20b1132, break-even p=18.2%, this p=5.0%)",
+    "claim_value_php": 264.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 132.0,
+    "expected_loss_auto_approve": 6.6000000000000005,
+    "expected_loss_escalate": 22.56,
+    "p_threshold_full": 0.18211920529801326,
+    "p_threshold_simple": 0.14393939393939395,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 54,
+    "authenticity": 2076,
+    "rung1b": 2738
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 2.08,
+     "prompt_tokens": 1421,
+     "output_tokens": 76,
+     "thinking_tokens": 0,
+     "total_tokens": 1497,
+     "image_tokens": 1064,
+     "text_tokens": 357
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.74,
+     "prompt_tokens": 2084,
+     "output_tokens": 302,
+     "thinking_tokens": 0,
+     "total_tokens": 2386,
+     "text_tokens": 1020,
+     "image_tokens": 1064
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image displays natural lighting, consistent compression, and realistic textures typical of a direct smartphone capture. There are no digital artifacts, AI-generation flaws, or signs of manipulation."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: The evidence shows a detached item with some shipping materials in the background, but no intact parcel seal or opening process is visible."
+    },
+    "relevance": {
+     "score": 0.8,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "Functional Damage Shown",
+     "reason": "The photo clearly shows the microphone body separated from the head/grille assembly, directly matching the claimed functional damage."
+    },
+    "defender": {
+     "score": 0.7,
+     "conf": 0.75,
+     "applicable": true,
+     "verdict": "Consistent Damage",
+     "reason": "The break between the microphone body and the grille shows clean structural separation rather than artificial edits, supporting the authenticity of the damage."
+    }
+   }
+  },
+  "test_eval/237634479270466": {
+   "session": "test_eval",
+   "case_id": "237634479270466",
+   "true_label": null,
+   "reason": "Suspicious Parcel",
+   "kinds": [
+    "video"
+   ],
+   "decision": "escalate",
+   "credibility": null,
+   "reason_code": "insufficient_evidence",
+   "runtime_ms": 124,
+   "claim_value_php": 310.0,
+   "economic": null,
+   "stage_ms": {
+    "rung0": 124
+   },
+   "calls": [],
+   "signals": {}
+  },
+  "test_eval/237709757200435": {
+   "session": "test_eval",
+   "case_id": "237709757200435",
+   "true_label": null,
+   "reason": "Suspicious Parcel",
+   "kinds": [
+    "video"
+   ],
+   "decision": "escalate",
+   "credibility": 75.4,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 13957,
+   "claim_value_php": 2692.0,
+   "economic": {
+    "route": "escalate",
+    "claim_value_php": 2692.0,
+    "reason": "flagged_conflict: a fraud check raised a red flag (<0.40); routed to human review regardless of claim value \u2014 the base rate does not describe a conflicted case"
+   },
+   "stage_ms": {
+    "rung0": 502,
+    "authenticity": 10091,
+    "rung1b": 3363
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 10.09,
+     "prompt_tokens": 6369,
+     "output_tokens": 70,
+     "thinking_tokens": 0,
+     "total_tokens": 6439,
+     "text_tokens": 358,
+     "video_tokens": 6011
+    },
+    {
+     "stage": "rung1b",
+     "secs": 3.36,
+     "prompt_tokens": 7029,
+     "output_tokens": 333,
+     "thinking_tokens": 0,
+     "total_tokens": 7362,
+     "text_tokens": 1018,
+     "video_tokens": 6011
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 1.0,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows a natural, continuous unpacking process with realistic physics, consistent lighting, and clear product details without any signs of digital manipulation or AI generation."
+    },
+    "completeness": {
+     "score": 0.9,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "Complete Unboxing",
+     "reason": "The video shows a continuous, uninterrupted unboxing process starting from opening the outer mailer to inspecting the product retail box."
+    },
+    "tamper": {
+     "score": 0.9,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "Sealed Package",
+     "reason": "The outer mailer is intact at the start of the video and is torn open live on camera, showing no signs of pre-opening."
+    },
+    "relevance": {
+     "score": 0.2,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Unrelated Claim",
+     "reason": "The buyer claims 'Suspicious Parcel', but the video simply shows a normal unboxing of a retail product box with standard packaging contents, failing to depict any suspicious tampering or issue with the parcel."
+    },
+    "defender": {
+     "score": 0.3,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "No Legitimacy Proof",
+     "reason": "While the unboxing is continuous and clean, there is no visible evidence showing why the parcel was 'suspicious' or demonstrating a valid defect with the item itself."
+    }
+   }
+  },
+  "test_eval/237716645279032": {
+   "session": "test_eval",
+   "case_id": "237716645279032",
+   "true_label": null,
+   "reason": "Suspicious Parcel",
+   "kinds": [
+    "video"
+   ],
+   "decision": "approve",
+   "credibility": 66.2,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 20486,
+   "claim_value_php": 152.0,
+   "economic": {
+    "route": "auto_approve",
+    "reason": "auto_approve: expected loss of auto-approve \u20b122.80 < expected loss of review \u20b123.68 \u2014 the claim is too low-value to justify a \u20b119.00 review (exposure \u20b176, break-even p=31.2%, this p=30.0%)",
+    "claim_value_php": 152.0,
+    "p_invalid": 0.3,
+    "net_loss_exposure": 76.0,
+    "expected_loss_auto_approve": 22.8,
+    "expected_loss_escalate": 23.68,
+    "p_threshold_full": 0.3125,
+    "p_threshold_simple": 0.25,
+    "bucket": "escalate"
+   },
+   "stage_ms": {
+    "rung0": 2217,
+    "authenticity": 13244,
+    "rung1b": 5024
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 13.24,
+     "prompt_tokens": 4093,
+     "output_tokens": 71,
+     "thinking_tokens": 0,
+     "total_tokens": 4164,
+     "text_tokens": 358,
+     "video_tokens": 3735
+    },
+    {
+     "stage": "rung1b",
+     "secs": 5.02,
+     "prompt_tokens": 4754,
+     "output_tokens": 303,
+     "thinking_tokens": 0,
+     "total_tokens": 5057,
+     "text_tokens": 1019,
+     "video_tokens": 3735
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 1.0,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows natural, continuous handling of a parcel in a real indoor environment with consistent lighting and physics, showing no signs of digital manipulation or generation."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "incomplete unboxing",
+     "reason": "The video shows the outer packaging being torn open, but it does not show the actual item or product being fully removed and inspected."
+    },
+    "tamper": {
+     "score": 0.6,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "sealed package",
+     "reason": "The parcel starts in a sealed black plastic mailer bag and is pulled open on camera by hand without visible pre-cutting."
+    },
+    "relevance": {
+     "score": 0.4,
+     "conf": 0.6,
+     "applicable": true,
+     "verdict": "unclear suspicion",
+     "reason": "The video shows the opening of a mailer bag, but fails to reveal the actual product or display what makes the parcel suspicious."
+    },
+    "defender": {
+     "score": 0.4,
+     "conf": 0.5,
+     "applicable": true,
+     "verdict": "unproven handling",
+     "reason": "The handling appears natural and continuous in a real environment, but lacks specific affirmative evidence of the reported issue."
+    }
+   }
+  },
+  "test_eval/237717357234324": {
+   "session": "test_eval",
+   "case_id": "237717357234324",
+   "true_label": null,
+   "reason": "Suspicious Parcel",
+   "kinds": [
+    "video"
+   ],
+   "decision": "escalate",
+   "credibility": 71.5,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 16527,
+   "claim_value_php": 563.0,
+   "economic": {
+    "route": "escalate",
+    "reason": "escalate: expected loss of review \u20b129.84 \u2264 expected loss of auto-approve \u20b184.45 (claim \u20b1563, exposure \u20b1282, break-even p=8.6%, this p=30.0%)",
+    "claim_value_php": 563.0,
+    "p_invalid": 0.3,
+    "net_loss_exposure": 281.5,
+    "expected_loss_auto_approve": 84.45,
+    "expected_loss_escalate": 29.845,
+    "p_threshold_full": 0.08615625611905228,
+    "p_threshold_simple": 0.0674955595026643,
+    "bucket": "escalate"
+   },
+   "stage_ms": {
+    "rung0": 1395,
+    "authenticity": 12077,
+    "rung1b": 3054
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 12.08,
+     "prompt_tokens": 2173,
+     "output_tokens": 71,
+     "thinking_tokens": 0,
+     "total_tokens": 2244,
+     "text_tokens": 358,
+     "video_tokens": 1815
+    },
+    {
+     "stage": "rung1b",
+     "secs": 3.05,
+     "prompt_tokens": 2834,
+     "output_tokens": 324,
+     "thinking_tokens": 0,
+     "total_tokens": 3158,
+     "video_tokens": 1815,
+     "text_tokens": 1019
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 1.0,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows consistent motion, natural lighting, and legible text on labels and packaging without any signs of digital manipulation, AI generation, or screen recapture."
+    },
+    "completeness": {
+     "score": 0.85,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Unboxing shown",
+     "reason": "The video provides a continuous shot showing the parcel being opened and inspected. This captures the state of the packaging and contents clearly."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "Pre-opened box",
+     "reason": "The box appears to be already opened or easily accessible at the start of the video rather than showing an unbroken factory seal being cut. Packaging is visible throughout the clip."
+    },
+    "relevance": {
+     "score": 0.4,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Unclear suspicion",
+     "reason": "The video shows a box and packing materials, but does not clearly demonstrate or highlight the specific suspicious parcel issue claimed by the buyer."
+    },
+    "defender": {
+     "score": 0.5,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Consistent footage",
+     "reason": "The lighting and physical environment remain consistent throughout the unboxing video without overt signs of digital editing. However, specific concrete proof of legitimacy regarding the suspicious nature is lacking."
+    }
+   }
+  },
+  "test_eval/237722409265023": {
+   "session": "test_eval",
+   "case_id": "237722409265023",
+   "true_label": null,
+   "reason": "Item Missing",
+   "kinds": [
+    "video"
+   ],
+   "decision": "escalate",
+   "credibility": 43.3,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 12530,
+   "claim_value_php": 297.0,
+   "economic": {
+    "route": "escalate",
+    "claim_value_php": 297.0,
+    "reason": "flagged_conflict: a fraud check raised a red flag (<0.40); routed to human review regardless of claim value \u2014 the base rate does not describe a conflicted case"
+   },
+   "stage_ms": {
+    "rung0": 1417,
+    "authenticity": 8950,
+    "rung1b": 2162
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 8.95,
+     "prompt_tokens": 801,
+     "output_tokens": 67,
+     "thinking_tokens": 0,
+     "total_tokens": 868,
+     "text_tokens": 357,
+     "video_tokens": 444
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.16,
+     "prompt_tokens": 1457,
+     "output_tokens": 300,
+     "thinking_tokens": 0,
+     "total_tokens": 1757,
+     "video_tokens": 444,
+     "text_tokens": 1013
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows consistent natural lighting, realistic shadows, and standard smartphone camera compression artifacts without any signs of digital manipulation or AI generation."
+    },
+    "completeness": {
+     "score": 0.2,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "Missing unboxing",
+     "reason": "The video shows an already open box with no continuous unboxing footage to prove the item was missing from the start."
+    },
+    "tamper": {
+     "score": 0.2,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "Pre-opened box",
+     "reason": "The parcel was already fully open and unpacked at the beginning of the video, allowing contents to be easily staged."
+    },
+    "relevance": {
+     "score": 0.3,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Empty box shown",
+     "reason": "The video displays an open box with tags and tissue paper, but fails to provide relevant proof of the actual missing product."
+    },
+    "defender": {
+     "score": 0.3,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "No proof found",
+     "reason": "I cannot name any concrete legitimacy evidence because the video skips the sealed unboxing process entirely and only shows an open box."
+    }
+   }
+  },
+  "test_eval/237722555201108": {
+   "session": "test_eval",
+   "case_id": "237722555201108",
+   "true_label": null,
+   "reason": "Wrong Item",
+   "kinds": [
+    "video"
+   ],
+   "decision": "reject",
+   "credibility": 74.3,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 17896,
+   "claim_value_php": 2608.0,
+   "economic": null,
+   "stage_ms": {
+    "rung0": 1525,
+    "authenticity": 13709,
+    "rung1b": 2662
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 13.71,
+     "prompt_tokens": 4730,
+     "output_tokens": 79,
+     "thinking_tokens": 0,
+     "total_tokens": 4809,
+     "video_tokens": 4373,
+     "text_tokens": 357
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.66,
+     "prompt_tokens": 5399,
+     "output_tokens": 315,
+     "thinking_tokens": 0,
+     "total_tokens": 5714,
+     "text_tokens": 1026,
+     "video_tokens": 4373
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows a continuous, uninterrupted unboxing of a package with natural hand movements, correct physics, and legible text on labels and product packaging without any signs of digital manipulation or AI generation."
+    },
+    "completeness": {
+     "score": 0.95,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "Full unboxing shown",
+     "reason": "The video captures a continuous, uninterrupted opening of both the outer mailing bag and the inner product boxes."
+    },
+    "tamper": {
+     "score": 0.95,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "Intact seal opened",
+     "reason": "The parcel mailer shows intact shipping labels and seals being actively torn open on camera without prior tampering."
+    },
+    "relevance": {
+     "score": 0.1,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Correct item received",
+     "reason": "The video clearly unboxes the exact ordered item (Dr. Althea PDRN Reju 5000 Cream), contradicting the wrong item claim."
+    },
+    "defender": {
+     "score": 0.2,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "Claim unsupported",
+     "reason": "While the unboxing chain is continuous and well-filmed, it clearly reveals the correct item was shipped, showing no evidence of the claimed wrong item."
+    }
+   }
+  },
+  "test_eval/237801307286481": {
+   "session": "test_eval",
+   "case_id": "237801307286481",
+   "true_label": null,
+   "reason": "Suspicious Parcel",
+   "kinds": [
+    "video"
+   ],
+   "decision": "escalate",
+   "credibility": 66.5,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 12032,
+   "claim_value_php": 661.0,
+   "economic": {
+    "route": "escalate",
+    "reason": "escalate: expected loss of review \u20b131.31 \u2264 expected loss of auto-approve \u20b199.15 (claim \u20b1661, exposure \u20b1330, break-even p=7.3%, this p=30.0%)",
+    "claim_value_php": 661.0,
+    "p_invalid": 0.3,
+    "net_loss_exposure": 330.5,
+    "expected_loss_auto_approve": 99.14999999999999,
+    "expected_loss_escalate": 31.314999999999998,
+    "p_threshold_full": 0.07346802471197195,
+    "p_threshold_simple": 0.057488653555219364,
+    "bucket": "escalate"
+   },
+   "stage_ms": {
+    "rung0": 1523,
+    "authenticity": 8256,
+    "rung1b": 2253
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 8.26,
+     "prompt_tokens": 1265,
+     "output_tokens": 70,
+     "thinking_tokens": 0,
+     "total_tokens": 1335,
+     "text_tokens": 358,
+     "video_tokens": 907
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.25,
+     "prompt_tokens": 1976,
+     "output_tokens": 314,
+     "thinking_tokens": 0,
+     "total_tokens": 2290,
+     "video_tokens": 907,
+     "text_tokens": 1069
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows natural movement, consistent lighting, and realistic handling of a shipping package by a person without any signs of digital manipulation or AI generation."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.6,
+     "applicable": true,
+     "verdict": "Partial Unboxing",
+     "reason": "The video shows opening a parcel bag on camera, but it starts partway through the process rather than a full continuous unboxing from a completely sealed state."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.6,
+     "applicable": true,
+     "verdict": "Packaging Opened On Camera",
+     "reason": "The video shows the user tearing open a black shipping pouch, though the initial pristine seal state before filming is not clearly established."
+    },
+    "relevance": {
+     "score": 0.4,
+     "conf": 0.5,
+     "applicable": true,
+     "verdict": "Unclear Suspicion",
+     "reason": "The video shows the opening of a shipping mailer, but it does not clearly demonstrate or isolate the specific suspicious nature claimed for the parcel."
+    },
+    "defender": {
+     "score": 0.6,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Natural Handling",
+     "reason": "The video displays natural hand movements and lighting consistency while tearing open a standard black shipping mailer without apparent digital tampering."
+    }
+   }
+  },
+  "test_eval/237904487279513": {
+   "session": "test_eval",
+   "case_id": "237904487279513",
+   "true_label": null,
+   "reason": "Broken Products",
+   "kinds": [
+    "video"
+   ],
+   "decision": "escalate",
+   "credibility": 100.0,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 50046,
+   "claim_value_php": 2692.0,
+   "economic": {
+    "route": "escalate",
+    "reason": "escalate: expected loss of review \u20b128.63 \u2264 expected loss of auto-approve \u20b167.30 (claim \u20b12,692, exposure \u20b11,346, break-even p=1.8%, this p=5.0%)",
+    "claim_value_php": 2692.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 1346.0,
+    "expected_loss_auto_approve": 67.3,
+    "expected_loss_escalate": 28.629999999999995,
+    "p_threshold_full": 0.01813087193011373,
+    "p_threshold_simple": 0.01411589895988113,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 1820,
+    "authenticity": 42505,
+    "rung1b": 5720
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 42.51,
+     "prompt_tokens": 16014,
+     "output_tokens": 74,
+     "thinking_tokens": 0,
+     "total_tokens": 16088,
+     "text_tokens": 357,
+     "video_tokens": 15657
+    },
+    {
+     "stage": "rung1b",
+     "secs": 5.72,
+     "prompt_tokens": 16678,
+     "output_tokens": 318,
+     "thinking_tokens": 0,
+     "total_tokens": 16996,
+     "video_tokens": 15657,
+     "text_tokens": 1021
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 1.0,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows a continuous, unedited unboxing of a flat-pack furniture package. There are no signs of AI generation, digital splicing, or frame manipulation."
+    },
+    "completeness": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Full Unboxing",
+     "reason": "The video shows a continuous, uninterrupted unboxing of the flat-pack package from the initial cutting of the straps and tape all the way through revealing the wooden panels inside."
+    },
+    "tamper": {
+     "score": 0.9,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "Sealed Box",
+     "reason": "The parcel packaging and straps are clearly visible and intact at the start of the video before being cut open on camera."
+    },
+    "relevance": {
+     "score": 0.9,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Damage Shown",
+     "reason": "The stated reason is broken products, and the video directly shows prominent surface scratches and cracks across the panels of the unboxed furniture item."
+    },
+    "defender": {
+     "score": 0.85,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "Authentic Damage",
+     "reason": "The unboxing chain is entirely unbroken, showing realistic transit damage with scratches visibly pointed out on the wood panels under consistent lighting."
+    }
+   }
+  },
+  "test_eval/237875191218249": {
+   "session": "test_eval",
+   "case_id": "237875191218249",
+   "true_label": null,
+   "reason": "Change of Mind",
+   "kinds": [
+    "video"
+   ],
+   "decision": "approve",
+   "credibility": 50.0,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 10134,
+   "claim_value_php": 64.0,
+   "economic": {
+    "route": "auto_approve",
+    "reason": "auto_approve: expected loss of auto-approve \u20b19.60 < expected loss of review \u20b122.36 \u2014 the claim is too low-value to justify a \u20b119.00 review (exposure \u20b132, break-even p=71.4%, this p=30.0%)",
+    "claim_value_php": 64.0,
+    "p_invalid": 0.3,
+    "net_loss_exposure": 32.0,
+    "expected_loss_auto_approve": 9.6,
+    "expected_loss_escalate": 22.36,
+    "p_threshold_full": 0.7142857142857143,
+    "p_threshold_simple": 0.59375,
+    "bucket": "escalate"
+   },
+   "stage_ms": {
+    "rung0": 248,
+    "authenticity": 7411,
+    "rung1b": 2474
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 7.41,
+     "prompt_tokens": 858,
+     "output_tokens": 62,
+     "thinking_tokens": 0,
+     "total_tokens": 920,
+     "video_tokens": 500,
+     "text_tokens": 358
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.47,
+     "prompt_tokens": 1537,
+     "output_tokens": 328,
+     "thinking_tokens": 0,
+     "total_tokens": 1865,
+     "text_tokens": 1037,
+     "video_tokens": 500
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.5,
+     "conf": 0.2,
+     "applicable": true,
+     "verdict": "poor quality",
+     "reason": "The video is extremely blurry and low quality, making it impossible to reliably determine authenticity or detect manipulation signs."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.5,
+     "applicable": true,
+     "verdict": "Unboxing absent",
+     "reason": "The video fails to show an unboxing process, displaying only a blurry close-up view without context. This is neutral rather than fraudulent given the change of mind reason."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: No parcel packaging, seals, or shipping labels are visible in the blurry footage to assess tamper status. The evidence only shows indistinct surfaces and a hand."
+    },
+    "relevance": {
+     "score": 0.5,
+     "conf": 0.4,
+     "applicable": true,
+     "verdict": "Unclear relevance",
+     "reason": "The stated reason is change of mind, but the extremely blurry video fails to clearly depict the ordered items or any relevant context. It is inconclusive."
+    },
+    "defender": {
+     "score": 0.4,
+     "conf": 0.3,
+     "applicable": true,
+     "verdict": "Low legitimacy proof",
+     "reason": "There is no concrete, nameable evidence of legitimacy such as clear item identification or packaging. Vague assertions cannot replace affirmative proof."
+    }
+   }
+  },
+  "test_eval/237878765269872": {
+   "session": "test_eval",
+   "case_id": "237878765269872",
+   "true_label": null,
+   "reason": "Spilled Contents",
+   "kinds": [
+    "video"
+   ],
+   "decision": "escalate",
+   "credibility": 42.0,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 9019,
+   "claim_value_php": 200.0,
+   "economic": {
+    "route": "escalate",
+    "claim_value_php": 200.0,
+    "reason": "flagged_conflict: a fraud check raised a red flag (<0.40); routed to human review regardless of claim value \u2014 the base rate does not describe a conflicted case"
+   },
+   "stage_ms": {
+    "rung0": 680,
+    "authenticity": 5885,
+    "rung1b": 2452
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 5.89,
+     "prompt_tokens": 793,
+     "output_tokens": 66,
+     "thinking_tokens": 0,
+     "total_tokens": 859,
+     "text_tokens": 358,
+     "video_tokens": 435
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.45,
+     "prompt_tokens": 1449,
+     "output_tokens": 331,
+     "thinking_tokens": 0,
+     "total_tokens": 1780,
+     "text_tokens": 1014,
+     "video_tokens": 435
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.9,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video displays natural camera motion and consistent lighting typical of a genuine phone capture, with no signs of AI generation or digital manipulation."
+    },
+    "completeness": {
+     "score": 0.2,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "No Unboxing Shown",
+     "reason": "The video shows a stationary scene under chairs with a lunch box on the floor, failing to capture any unboxing or inspection process related to the ordered item."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: No parcel packaging, shipping wrap, or seals are visible in the video, making it impossible to verify the initial state of the shipment."
+    },
+    "relevance": {
+     "score": 0.2,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Unrelated Scene",
+     "reason": "The evidence displays an unrelated indoor scene with a lunch container on the floor, failing to demonstrate any spilled contents or issues with the ordered product."
+    },
+    "defender": {
+     "score": 0.25,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "No Legitimacy Evidence",
+     "reason": "There are no visible product packaging, shipping details, or unboxing actions to support the legitimacy of the spill claim, leaving only an unrelated scene."
+    }
+   }
+  },
+  "test_eval/237880150258407": {
+   "session": "test_eval",
+   "case_id": "237880150258407",
+   "true_label": null,
+   "reason": "Change of Mind",
+   "kinds": [
+    "image"
+   ],
+   "decision": "escalate",
+   "credibility": 65.0,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 12002,
+   "claim_value_php": 109.0,
+   "economic": {
+    "route": "escalate",
+    "claim_value_php": 109.0,
+    "reason": "flagged_conflict: a fraud check raised a red flag (<0.40); routed to human review regardless of claim value \u2014 the base rate does not describe a conflicted case"
+   },
+   "stage_ms": {
+    "rung0": 190,
+    "authenticity": 5665,
+    "rung1b": 6146
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 5.67,
+     "prompt_tokens": 1422,
+     "output_tokens": 62,
+     "thinking_tokens": 0,
+     "total_tokens": 1484,
+     "text_tokens": 358,
+     "image_tokens": 1064
+    },
+    {
+     "stage": "rung1b",
+     "secs": 6.15,
+     "prompt_tokens": 2074,
+     "output_tokens": 310,
+     "thinking_tokens": 0,
+     "total_tokens": 2384,
+     "image_tokens": 1064,
+     "text_tokens": 1010
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 1.0,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image shows natural lighting, realistic skin textures, and consistent compression artifacts typical of a direct smartphone camera capture."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: No parcel packaging, tape, or shipping seals are visible in the image, showing only a hand and a leg instead."
+    },
+    "relevance": {
+     "score": 0.3,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Irrelevant Evidence",
+     "reason": "The stated reason is Change of Mind, but the submitted image only shows a hand giving a thumbs down and a leg, providing zero relevance to the ordered product."
+    },
+    "defender": {
+     "score": 0.2,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "No Legitimacy Evidence",
+     "reason": "There is no concrete evidence of the ordered item or the stated reason visible in the image, preventing any affirmative defense of the claim."
+    }
+   }
+  },
+  "test_eval/237888694239053": {
+   "session": "test_eval",
+   "case_id": "237888694239053",
+   "true_label": null,
+   "reason": "Spilled Contents",
+   "kinds": [
+    "video"
+   ],
+   "decision": "escalate",
+   "credibility": null,
+   "reason_code": "insufficient_evidence",
+   "runtime_ms": 589,
+   "claim_value_php": 535.5,
+   "economic": null,
+   "stage_ms": {
+    "rung0": 589
+   },
+   "calls": [],
+   "signals": {}
+  },
+  "test_eval/237889400278393": {
+   "session": "test_eval",
+   "case_id": "237889400278393",
+   "true_label": null,
+   "reason": "Broken Products",
+   "kinds": [
+    "image"
+   ],
+   "decision": "reject",
+   "credibility": 10.0,
+   "reason_code": "authenticity_dispositive_fraud",
+   "runtime_ms": 1953,
+   "claim_value_php": 396.0,
+   "economic": null,
+   "stage_ms": {
+    "rung0": 50,
+    "authenticity": 1902
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 1.9,
+     "prompt_tokens": 1421,
+     "output_tokens": 64,
+     "thinking_tokens": 0,
+     "total_tokens": 1485,
+     "image_tokens": 1064,
+     "text_tokens": 357
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.1,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "digitally manipulated",
+     "reason": "The image shows obvious signs of digital manipulation with repeated artificial timestamp watermarks overlaid across the frame in unnatural ways."
+    }
+   }
+  },
+  "test_eval/237721003299419": {
+   "session": "test_eval",
+   "case_id": "237721003299419",
+   "true_label": null,
+   "reason": "Suspicious Parcel",
+   "kinds": [
+    "video"
+   ],
+   "decision": "escalate",
+   "credibility": 61.3,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 15233,
+   "claim_value_php": 654.0,
+   "economic": {
+    "route": "escalate",
+    "reason": "escalate: expected loss of review \u20b131.21 \u2264 expected loss of auto-approve \u20b198.10 (claim \u20b1654, exposure \u20b1327, break-even p=7.4%, this p=30.0%)",
+    "claim_value_php": 654.0,
+    "p_invalid": 0.3,
+    "net_loss_exposure": 327.0,
+    "expected_loss_auto_approve": 98.1,
+    "expected_loss_escalate": 31.209999999999994,
+    "p_threshold_full": 0.07424907188660142,
+    "p_threshold_simple": 0.0581039755351682,
+    "bucket": "escalate"
+   },
+   "stage_ms": {
+    "rung0": 1303,
+    "authenticity": 11589,
+    "rung1b": 2340
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 11.59,
+     "prompt_tokens": 2362,
+     "output_tokens": 69,
+     "thinking_tokens": 0,
+     "total_tokens": 2431,
+     "video_tokens": 2004,
+     "text_tokens": 358
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.34,
+     "prompt_tokens": 3047,
+     "output_tokens": 321,
+     "thinking_tokens": 0,
+     "total_tokens": 3368,
+     "text_tokens": 1043,
+     "video_tokens": 2004
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 1.0,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows natural hand movements, realistic lighting and reflections on plastic packaging, and consistent physical interactions without any digital artifacts or signs of manipulation."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "partial unboxing",
+     "reason": "The video shows the opening of inner plastic bags containing the items, but misses the opening of the outer shipping container or parcel bag."
+    },
+    "tamper": {
+     "score": 0.4,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "pre-opened packaging",
+     "reason": "The inner Ziploc-style bags are already out of the outer packaging and handled loosely before filming starts, making it impossible to verify the initial seal state."
+    },
+    "relevance": {
+     "score": 0.4,
+     "conf": 0.6,
+     "applicable": true,
+     "verdict": "unclear suspicion",
+     "reason": "The buyer claims a suspicious parcel, but the video merely shows opening standard inner product bags without highlighting any specific defect or suspicious circumstance on the items."
+    },
+    "defender": {
+     "score": 0.4,
+     "conf": 0.6,
+     "applicable": true,
+     "verdict": "standard items shown",
+     "reason": "The video features continuous, natural movement showing labeled inner garment bags being unzipped and inspected, showing consistent physical handling without digital edits."
+    }
+   }
+  },
+  "test_eval/237889610240661": {
+   "session": "test_eval",
+   "case_id": "237889610240661",
+   "true_label": null,
+   "reason": "Broken Products",
+   "kinds": [
+    "image"
+   ],
+   "decision": "escalate",
+   "credibility": 98.0,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 5414,
+   "claim_value_php": 1069.0,
+   "economic": {
+    "route": "escalate",
+    "reason": "escalate: expected loss of review \u20b124.57 \u2264 expected loss of auto-approve \u20b126.73 (claim \u20b11,069, exposure \u20b1534, break-even p=4.6%, this p=5.0%)",
+    "claim_value_php": 1069.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 534.5,
+    "expected_loss_auto_approve": 26.725,
+    "expected_loss_escalate": 24.572499999999998,
+    "p_threshold_full": 0.04554393955077114,
+    "p_threshold_simple": 0.03554724041159962,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 55,
+    "authenticity": 2350,
+    "rung1b": 3008
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 2.35,
+     "prompt_tokens": 1421,
+     "output_tokens": 69,
+     "thinking_tokens": 0,
+     "total_tokens": 1490,
+     "image_tokens": 1064,
+     "text_tokens": 357
+    },
+    {
+     "stage": "rung1b",
+     "secs": 3.01,
+     "prompt_tokens": 2078,
+     "output_tokens": 294,
+     "thinking_tokens": 0,
+     "total_tokens": 2372,
+     "image_tokens": 1064,
+     "text_tokens": 1014
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image shows consistent lighting, natural textures, and realistic physical damage typical of a genuine camera capture without signs of digital manipulation or AI generation."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: The evidence shows only the product itself outside of any shipping box or packaging materials."
+    },
+    "relevance": {
+     "score": 0.85,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "damage clearly shown",
+     "reason": "The stated reason is broken products, and the provided photograph clearly depicts structural damage and breakage on the mesh chair component."
+    },
+    "defender": {
+     "score": 0.75,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "consistent physical damage",
+     "reason": "The photo reveals realistic stress fracture and structural snapping around the plastic frame and mesh attachment points consistent with transit impact."
+    }
+   }
+  },
+  "test_eval/237890154253863": {
+   "session": "test_eval",
+   "case_id": "237890154253863",
+   "true_label": null,
+   "reason": "Scratched",
+   "kinds": [
+    "video"
+   ],
+   "decision": "escalate",
+   "credibility": 55.7,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 9251,
+   "claim_value_php": 149.0,
+   "economic": {
+    "route": "escalate",
+    "claim_value_php": 149.0,
+    "reason": "flagged_conflict: a fraud check raised a red flag (<0.40); routed to human review regardless of claim value \u2014 the base rate does not describe a conflicted case"
+   },
+   "stage_ms": {
+    "rung0": 542,
+    "authenticity": 6816,
+    "rung1b": 1891
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 6.82,
+     "prompt_tokens": 712,
+     "output_tokens": 84,
+     "thinking_tokens": 0,
+     "total_tokens": 796,
+     "text_tokens": 358,
+     "video_tokens": 354
+    },
+    {
+     "stage": "rung1b",
+     "secs": 1.89,
+     "prompt_tokens": 1387,
+     "output_tokens": 318,
+     "thinking_tokens": 0,
+     "total_tokens": 1705,
+     "text_tokens": 1033,
+     "video_tokens": 354
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.9,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows natural hand motion and realistic lighting changes as the camera moves over the laptop and SIM tray packaging. Although the video quality is low, there are no structural anomalies, warping, or editing art"
+    },
+    "completeness": {
+     "score": 0.35,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "Missing unboxing",
+     "reason": "The video shows the laptop and SIM tray packaging already out of the box, skipping the complete unboxing process required for a thorough completeness check."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: The evidence does not show parcel packaging, tape, or shipping seals at the start, making it impossible to verify pre-opening conditions."
+    },
+    "relevance": {
+     "score": 0.4,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Damage unclear",
+     "reason": "The video focuses on the laptop keyboard and a SIM tray wrapper, but the claimed scratch is not clearly visible or pointed out on the item surface."
+    },
+    "defender": {
+     "score": 0.45,
+     "conf": 0.65,
+     "applicable": true,
+     "verdict": "Natural motion",
+     "reason": "The natural hand movement and consistent lighting indicate the video is unedited and genuinely recorded, even though specific damage details remain hard to discern."
+    }
+   }
+  },
+  "test_eval/237891455207710": {
+   "session": "test_eval",
+   "case_id": "237891455207710",
+   "true_label": null,
+   "reason": "Spilled Contents",
+   "kinds": [
+    "image"
+   ],
+   "decision": "approve",
+   "credibility": 100.0,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 4408,
+   "claim_value_php": 599.0,
+   "economic": {
+    "route": "auto_approve",
+    "reason": "auto_approve: expected loss of auto-approve \u20b114.98 < expected loss of review \u20b123.40 \u2014 the claim is too low-value to justify a \u20b119.00 review (exposure \u20b1300, break-even p=8.1%, this p=5.0%)",
+    "claim_value_php": 599.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 299.5,
+    "expected_loss_auto_approve": 14.975000000000001,
+    "expected_loss_escalate": 23.397499999999997,
+    "p_threshold_full": 0.08101638740563431,
+    "p_threshold_simple": 0.06343906510851419,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 31,
+    "authenticity": 1928,
+    "rung1b": 2448
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 1.93,
+     "prompt_tokens": 1422,
+     "output_tokens": 74,
+     "thinking_tokens": 0,
+     "total_tokens": 1496,
+     "image_tokens": 1064,
+     "text_tokens": 358
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.45,
+     "prompt_tokens": 2085,
+     "output_tokens": 327,
+     "thinking_tokens": 0,
+     "total_tokens": 2412,
+     "text_tokens": 1021,
+     "image_tokens": 1064
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image shows a standard smartphone photo of a damaged detergent bag with natural lighting, sharp text, and realistic texture wrinkles without any signs of digital manipulation or AI generation."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: The image shows only the damaged product itself without any shipping box, mailer, or seal visible, preventing any assessment of pre-opening tamper signs."
+    },
+    "relevance": {
+     "score": 0.9,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Spilled Contents Shown",
+     "reason": "The submitted photo clearly displays the Member's Mark detergent bag with a torn seam and powder visibly leaking out, directly matching the stated reason of spilled contents."
+    },
+    "defender": {
+     "score": 0.85,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "Authentic Damage Pattern",
+     "reason": "The photo shows a realistic tear along the packaging seal with natural powder residue escaping, consistent with transit stress rather than intentional staging."
+    }
+   }
+  },
+  "test_eval/237891844240352": {
+   "session": "test_eval",
+   "case_id": "237891844240352",
+   "true_label": null,
+   "reason": "Broken Products",
+   "kinds": [
+    "video"
+   ],
+   "decision": "approve",
+   "credibility": 100.0,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 67529,
+   "claim_value_php": 338.0,
+   "economic": {
+    "route": "auto_approve",
+    "reason": "auto_approve: expected loss of auto-approve \u20b18.45 < expected loss of review \u20b122.74 \u2014 the claim is too low-value to justify a \u20b119.00 review (exposure \u20b1169, break-even p=14.3%, this p=5.0%)",
+    "claim_value_php": 338.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 169.0,
+    "expected_loss_auto_approve": 8.450000000000001,
+    "expected_loss_escalate": 22.744999999999997,
+    "p_threshold_full": 0.1427644386761843,
+    "p_threshold_simple": 0.11242603550295859,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 1093,
+    "authenticity": 59460,
+    "rung1b": 6976
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 59.46,
+     "prompt_tokens": 21825,
+     "output_tokens": 75,
+     "thinking_tokens": 0,
+     "total_tokens": 21900,
+     "video_tokens": 21468,
+     "text_tokens": 357
+    },
+    {
+     "stage": "rung1b",
+     "secs": 6.98,
+     "prompt_tokens": 22516,
+     "output_tokens": 309,
+     "thinking_tokens": 0,
+     "total_tokens": 22825,
+     "video_tokens": 21468,
+     "text_tokens": 1048
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows consistent lighting, natural motion, and uninterrupted footage of unboxing a package with typical amateur camera quality, showing no signs of digital manipulation or AI generation."
+    },
+    "completeness": {
+     "score": 0.9,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "Full unboxing",
+     "reason": "The video provides a continuous, uninterrupted unboxing of the package starting from the unopened sealed box right through to revealing the items."
+    },
+    "tamper": {
+     "score": 0.9,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Sealed intact",
+     "reason": "The parcel is clearly wrapped and sealed at the start, and the packaging is cut open live on camera without prior pre-opening detected."
+    },
+    "relevance": {
+     "score": 0.9,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "Damage shown",
+     "reason": "The buyer displays the ordered solar light products and explicitly points out visible cracks and structural damage corresponding to the claim."
+    },
+    "defender": {
+     "score": 0.85,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Legitimate damage",
+     "reason": "The video shows a seamless unboxing chain starting from a properly sealed box and clear, visible cracks on the actual ordered solar light items."
+    }
+   }
+  },
+  "test_eval/237029229265515": {
+   "session": "test_eval",
+   "case_id": "237029229265515",
+   "true_label": null,
+   "reason": "Spilled Contents",
+   "kinds": [
+    "image"
+   ],
+   "decision": "approve",
+   "credibility": 92.3,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 6155,
+   "claim_value_php": 599.0,
+   "economic": {
+    "route": "auto_approve",
+    "reason": "auto_approve: expected loss of auto-approve \u20b114.98 < expected loss of review \u20b123.40 \u2014 the claim is too low-value to justify a \u20b119.00 review (exposure \u20b1300, break-even p=8.1%, this p=5.0%)",
+    "claim_value_php": 599.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 299.5,
+    "expected_loss_auto_approve": 14.975000000000001,
+    "expected_loss_escalate": 23.397499999999997,
+    "p_threshold_full": 0.08101638740563431,
+    "p_threshold_simple": 0.06343906510851419,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 29,
+    "authenticity": 2229,
+    "rung1b": 3896
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 2.23,
+     "prompt_tokens": 1438,
+     "output_tokens": 71,
+     "thinking_tokens": 0,
+     "total_tokens": 1509,
+     "text_tokens": 358,
+     "image_tokens": 1080
+    },
+    {
+     "stage": "rung1b",
+     "secs": 3.9,
+     "prompt_tokens": 2097,
+     "output_tokens": 313,
+     "thinking_tokens": 0,
+     "total_tokens": 2410,
+     "image_tokens": 1080,
+     "text_tokens": 1017
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 1.0,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image shows natural camera noise, consistent lighting, and realistic physical damage to a compact mirror and powder without any signs of digital manipulation or AI generation."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "shipping bag visible",
+     "reason": "A portion of a red shipping mailer bag is partially visible in the background, but the packaging seal status cannot be determined from the still photo."
+    },
+    "relevance": {
+     "score": 0.9,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "matches stated reason",
+     "reason": "The image directly depicts shattered powder makeup and a cracked mirror on the compact, which visually corresponds to the spilled or damaged contents claim."
+    },
+    "defender": {
+     "score": 0.8,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "realistic transit damage",
+     "reason": "The compact mirror shows realistic radial fracture patterns and the powder displays natural crumbling consistent with severe impact during shipping, with no indicators of digital tampering."
+    }
+   }
+  },
+  "test_eval/237892274266914": {
+   "session": "test_eval",
+   "case_id": "237892274266914",
+   "true_label": null,
+   "reason": "Broken Products",
+   "kinds": [
+    "video"
+   ],
+   "decision": "escalate",
+   "credibility": 91.2,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 17598,
+   "claim_value_php": 1826.0,
+   "economic": {
+    "route": "escalate",
+    "reason": "escalate: expected loss of review \u20b126.46 \u2264 expected loss of auto-approve \u20b145.65 (claim \u20b11,826, exposure \u20b1913, break-even p=2.7%, this p=5.0%)",
+    "claim_value_php": 1826.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 913.0,
+    "expected_loss_auto_approve": 45.650000000000006,
+    "expected_loss_escalate": 26.464999999999996,
+    "p_threshold_full": 0.026708753186839868,
+    "p_threshold_simple": 0.0208105147864184,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 1629,
+    "authenticity": 13488,
+    "rung1b": 2480
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 13.49,
+     "prompt_tokens": 2912,
+     "output_tokens": 71,
+     "thinking_tokens": 0,
+     "total_tokens": 2983,
+     "text_tokens": 357,
+     "video_tokens": 2555
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.48,
+     "prompt_tokens": 3572,
+     "output_tokens": 299,
+     "thinking_tokens": 0,
+     "total_tokens": 3871,
+     "text_tokens": 1017,
+     "video_tokens": 2555
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows consistent physics, natural lighting, and unmanipulated handling of packaging materials and objects, with no signs of digital editing or AI generation."
+    },
+    "completeness": {
+     "score": 0.85,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Unboxing shown clearly",
+     "reason": "The video captures the ongoing unpacking process from inside the shipping carton down to revealing the item."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "Pre-opened box",
+     "reason": "The outer packaging is already open at the start of the video, so we cannot verify if it was previously tampered with."
+    },
+    "relevance": {
+     "score": 0.9,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "Broken product visible",
+     "reason": "The video clearly displays glass components that are visibly shattered and broken right out of the packaging."
+    },
+    "defender": {
+     "score": 0.8,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "Consistent damage evidence",
+     "reason": "The lighting and handling appear continuous, and the glass items show realistic splintering and fracture patterns consistent with rough transit inside standard packing foam."
+    }
+   }
+  },
+  "test_eval/237892519278797": {
+   "session": "test_eval",
+   "case_id": "237892519278797",
+   "true_label": null,
+   "reason": "Item Missing",
+   "kinds": [
+    "video"
+   ],
+   "decision": "reject",
+   "credibility": 75.5,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 28232,
+   "claim_value_php": 409.0,
+   "economic": null,
+   "stage_ms": {
+    "rung0": 1730,
+    "authenticity": 23394,
+    "rung1b": 3107
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 23.39,
+     "prompt_tokens": 5009,
+     "output_tokens": 74,
+     "thinking_tokens": 0,
+     "total_tokens": 5083,
+     "video_tokens": 4652,
+     "text_tokens": 357
+    },
+    {
+     "stage": "rung1b",
+     "secs": 3.11,
+     "prompt_tokens": 5674,
+     "output_tokens": 291,
+     "thinking_tokens": 0,
+     "total_tokens": 5965,
+     "text_tokens": 1022,
+     "video_tokens": 4652
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 1.0,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows a continuous, unedited unboxing of a package on a natural surface with consistent lighting, realistic handling, and no signs of digital manipulation or artificial generation."
+    },
+    "completeness": {
+     "score": 0.95,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "Complete Unboxing",
+     "reason": "The video shows a continuous, uninterrupted unboxing of the package from start to finish without any cuts or hidden edits."
+    },
+    "tamper": {
+     "score": 0.95,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "Sealed Package",
+     "reason": "The parcel is shown sealed with shipping labels intact before being opened live on camera."
+    },
+    "relevance": {
+     "score": 0.1,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Item Present",
+     "reason": "The buyer claimed an item was missing, but the video clearly shows the ordered red shorts being removed from the package."
+    },
+    "defender": {
+     "score": 0.1,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "No Defense",
+     "reason": "There is no concrete evidence supporting the missing item claim, as the unboxing clearly reveals the product inside."
+    }
+   }
+  },
+  "test_eval/237892541203094": {
+   "session": "test_eval",
+   "case_id": "237892541203094",
+   "true_label": null,
+   "reason": "Spilled Contents",
+   "kinds": [
+    "image"
+   ],
+   "decision": "escalate",
+   "credibility": 99.7,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 3961,
+   "claim_value_php": 1420.0,
+   "economic": {
+    "route": "escalate",
+    "reason": "escalate: expected loss of review \u20b125.45 \u2264 expected loss of auto-approve \u20b135.50 (claim \u20b11,420, exposure \u20b1710, break-even p=3.4%, this p=5.0%)",
+    "claim_value_php": 1420.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 710.0,
+    "expected_loss_auto_approve": 35.5,
+    "expected_loss_escalate": 25.45,
+    "p_threshold_full": 0.0343213728549142,
+    "p_threshold_simple": 0.02676056338028169,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 43,
+    "authenticity": 1813,
+    "rung1b": 2104
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 1.81,
+     "prompt_tokens": 1422,
+     "output_tokens": 70,
+     "thinking_tokens": 0,
+     "total_tokens": 1492,
+     "image_tokens": 1064,
+     "text_tokens": 358
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.1,
+     "prompt_tokens": 2080,
+     "output_tokens": 307,
+     "thinking_tokens": 0,
+     "total_tokens": 2387,
+     "text_tokens": 1016,
+     "image_tokens": 1064
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image shows consistent lighting, sharp typography, and realistic physical damage typical of a camera capture without any visible signs of AI generation or digital tampering."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: The evidence shows a single milk carton rather than an unopened parcel packaging or seal. The packaging is not visible."
+    },
+    "relevance": {
+     "score": 0.85,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "Spilled Contents Shown",
+     "reason": "The image clearly shows the actual Cowhead milk carton with crushed edges and leaked fluid around the top cap area, directly matching the stated reason."
+    },
+    "defender": {
+     "score": 0.8,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "Realistic Transit Damage",
+     "reason": "The milk carton exhibits realistic physical deformation at the top crease and visible fluid residue around the screw cap, consistent with crushing and leakage during shipping."
+    }
+   }
+  },
+  "test_eval/237892600217269": {
+   "session": "test_eval",
+   "case_id": "237892600217269",
+   "true_label": null,
+   "reason": "Spilled Contents",
+   "kinds": [
+    "image"
+   ],
+   "decision": "approve",
+   "credibility": 84.9,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 9257,
+   "claim_value_php": 783.0,
+   "economic": {
+    "route": "auto_approve",
+    "reason": "auto_approve: expected loss of auto-approve \u20b119.58 < expected loss of review \u20b123.86 \u2014 the claim is too low-value to justify a \u20b119.00 review (exposure \u20b1392, break-even p=6.2%, this p=5.0%)",
+    "claim_value_php": 783.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 391.5,
+    "expected_loss_auto_approve": 19.575000000000003,
+    "expected_loss_escalate": 23.857499999999998,
+    "p_threshold_full": 0.06208550867786087,
+    "p_threshold_simple": 0.04853128991060025,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 146,
+    "authenticity": 3832,
+    "rung1b": 5278
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 3.83,
+     "prompt_tokens": 1422,
+     "output_tokens": 65,
+     "thinking_tokens": 0,
+     "total_tokens": 1487,
+     "text_tokens": 358,
+     "image_tokens": 1064
+    },
+    {
+     "stage": "rung1b",
+     "secs": 5.28,
+     "prompt_tokens": 2075,
+     "output_tokens": 301,
+     "thinking_tokens": 0,
+     "total_tokens": 2376,
+     "text_tokens": 1011,
+     "image_tokens": 1064
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image shows consistent lighting, natural textures, and readable product labeling without any signs of digital manipulation or AI generation artifacts."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Packaging Visible",
+     "reason": "A cardboard box and black plastic wrap are visible in the image, but pre-opening status cannot be determined from a static photo."
+    },
+    "relevance": {
+     "score": 0.8,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "Matches Reason",
+     "reason": "The image clearly shows product leaking and smeared down the side of the container, directly matching the 'Spilled Contents' claim."
+    },
+    "defender": {
+     "score": 0.75,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "Consistent Damage",
+     "reason": "The product label is visibly covered in smeared mayonnaise leaking from beneath the lid seal, showing authentic product damage without signs of staging."
+    }
+   }
+  },
+  "test_eval/237893720215341": {
+   "session": "test_eval",
+   "case_id": "237893720215341",
+   "true_label": null,
+   "reason": "Item Missing",
+   "kinds": [
+    "video"
+   ],
+   "decision": "reject",
+   "credibility": 70.9,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 589125,
+   "claim_value_php": 276.5,
+   "economic": null,
+   "stage_ms": {
+    "rung0": 1055,
+    "authenticity": 584860,
+    "rung1b": 3210
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 584.86,
+     "prompt_tokens": 3441,
+     "output_tokens": 66,
+     "thinking_tokens": 0,
+     "total_tokens": 3507,
+     "text_tokens": 357,
+     "video_tokens": 3084
+    },
+    {
+     "stage": "rung1b",
+     "secs": 3.21,
+     "prompt_tokens": 4097,
+     "output_tokens": 306,
+     "thinking_tokens": 0,
+     "total_tokens": 4403,
+     "text_tokens": 1013,
+     "video_tokens": 3084
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows a continuous, uninterrupted unboxing of a package with natural hand movements, consistent lighting, and realistic physics throughout."
+    },
+    "completeness": {
+     "score": 0.9,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "Continuous Unboxing",
+     "reason": "The video shows a continuous, uninterrupted unboxing process from the initial outer packaging to revealing the contents inside."
+    },
+    "tamper": {
+     "score": 0.9,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "Sealed Package",
+     "reason": "The parcel packaging is clearly visible, sealed at the start, and opened live on camera without prior tampering."
+    },
+    "relevance": {
+     "score": 0.1,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "Item Not Missing",
+     "reason": "The buyer claimed the item was missing, but the video clearly shows an item being successfully unpacked from the parcel."
+    },
+    "defender": {
+     "score": 0.2,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "Contradictory Claim",
+     "reason": "While the unboxing chain is intact and natural, it directly contradicts the stated 'Item Missing' reason by showing that an item was indeed delivered and unpacked."
+    }
+   }
+  },
+  "test_eval/237893773255366": {
+   "session": "test_eval",
+   "case_id": "237893773255366",
+   "true_label": null,
+   "reason": "Item Missing",
+   "kinds": [
+    "video"
+   ],
+   "decision": "reject",
+   "credibility": 39.9,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 16725,
+   "claim_value_php": 1262.0,
+   "economic": null,
+   "stage_ms": {
+    "rung0": 1172,
+    "authenticity": 13239,
+    "rung1b": 2313
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 13.24,
+     "prompt_tokens": 1641,
+     "output_tokens": 59,
+     "thinking_tokens": 0,
+     "total_tokens": 1700,
+     "text_tokens": 357,
+     "video_tokens": 1284
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.31,
+     "prompt_tokens": 2291,
+     "output_tokens": 317,
+     "thinking_tokens": 0,
+     "total_tokens": 2608,
+     "video_tokens": 1284,
+     "text_tokens": 1007
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 1.0,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows natural movement, consistent lighting, and realistic physical interactions without any digital manipulation artifacts."
+    },
+    "completeness": {
+     "score": 0.2,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "No Unboxing Shown",
+     "reason": "The video starts with the item already out of the box and functioning, completely skipping any unboxing process to verify an 'Item Missing' claim."
+    },
+    "tamper": {
+     "score": 0.3,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "Pre-opened Product",
+     "reason": "Parcel packaging is barely visible in the corner at the start, but the item is already unpacked and wired up before filming begins."
+    },
+    "relevance": {
+     "score": 0.1,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "Irrelevant Footage",
+     "reason": "The buyer claims 'Item Missing', yet the video clearly shows the item present and operating, contradicting the stated return reason entirely."
+    },
+    "defender": {
+     "score": 0.2,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "No Legitimacy Evidence",
+     "reason": "There is no unboxing chain or proof supporting an item missing claim; instead, the video shows the item successfully operating on a desk."
+    }
+   }
+  },
+  "test_eval/237894350259428": {
+   "session": "test_eval",
+   "case_id": "237894350259428",
+   "true_label": null,
+   "reason": "Broken Products",
+   "kinds": [
+    "video"
+   ],
+   "decision": "escalate",
+   "credibility": 80.5,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 13077,
+   "claim_value_php": 2199.0,
+   "economic": {
+    "route": "escalate",
+    "reason": "escalate: expected loss of review \u20b127.40 \u2264 expected loss of auto-approve \u20b154.98 (claim \u20b12,199, exposure \u20b11,100, break-even p=2.2%, this p=5.0%)",
+    "claim_value_php": 2199.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 1099.5,
+    "expected_loss_auto_approve": 54.975,
+    "expected_loss_escalate": 27.397499999999997,
+    "p_threshold_full": 0.022187484241843577,
+    "p_threshold_simple": 0.017280582082764895,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 2741,
+    "authenticity": 8131,
+    "rung1b": 2205
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 8.13,
+     "prompt_tokens": 815,
+     "output_tokens": 69,
+     "thinking_tokens": 0,
+     "total_tokens": 884,
+     "text_tokens": 357,
+     "video_tokens": 458
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.2,
+     "prompt_tokens": 1471,
+     "output_tokens": 292,
+     "thinking_tokens": 0,
+     "total_tokens": 1763,
+     "video_tokens": 458,
+     "text_tokens": 1013
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows consistent lighting, natural motion, and realistic physical damage to the product and packaging without any signs of digital manipulation or AI generation."
+    },
+    "completeness": {
+     "score": 0.45,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Partial Unboxing",
+     "reason": "The video starts with the box already partially opened rather than showing a continuous unboxing from a sealed state."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.75,
+     "applicable": true,
+     "verdict": "Pre-opened Packaging",
+     "reason": "The packaging is visible and already torn open before the recording begins, leaving the contents accessible beforehand."
+    },
+    "relevance": {
+     "score": 0.85,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "Visible Damage",
+     "reason": "The video clearly displays the exact item requested with physical breakage matching the stated reason of broken products."
+    },
+    "defender": {
+     "score": 0.8,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "Consistent Damage",
+     "reason": "The visual evidence shows realistic structural damage to the item and packaging with natural lighting and consistent physical interaction."
+    }
+   }
+  },
+  "test_eval/237894676272106": {
+   "session": "test_eval",
+   "case_id": "237894676272106",
+   "true_label": null,
+   "reason": "Broken Products",
+   "kinds": [
+    "video"
+   ],
+   "decision": "approve",
+   "credibility": 85.1,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 14861,
+   "claim_value_php": 959.0,
+   "economic": {
+    "route": "auto_approve",
+    "reason": "auto_approve: expected loss of auto-approve \u20b123.98 < expected loss of review \u20b124.30 \u2014 the claim is too low-value to justify a \u20b119.00 review (exposure \u20b1480, break-even p=5.1%, this p=5.0%)",
+    "claim_value_php": 959.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 479.5,
+    "expected_loss_auto_approve": 23.975,
+    "expected_loss_escalate": 24.2975,
+    "p_threshold_full": 0.05074385883981086,
+    "p_threshold_simple": 0.03962460896767466,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 2051,
+    "authenticity": 10602,
+    "rung1b": 2207
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 10.6,
+     "prompt_tokens": 2263,
+     "output_tokens": 76,
+     "thinking_tokens": 0,
+     "total_tokens": 2339,
+     "video_tokens": 1906,
+     "text_tokens": 357
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.21,
+     "prompt_tokens": 2928,
+     "output_tokens": 293,
+     "thinking_tokens": 0,
+     "total_tokens": 3221,
+     "video_tokens": 1906,
+     "text_tokens": 1022
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows natural hand movements, realistic lighting, and consistent physics as packaging materials and damaged wooden panels are handled in a box, with no signs of AI generation or editing."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Partial Unboxing",
+     "reason": "The video starts with the box already open and foam being removed, omitting the initial unsealing and opening moments."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Pre-opened Box",
+     "reason": "The parcel was already open at the start of recording, so it is unclear if the contents were manipulated beforehand."
+    },
+    "relevance": {
+     "score": 0.9,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Broken Wood Panels",
+     "reason": "The video directly shows large wooden panels inside the shipping box with a severe structural crack across them."
+    },
+    "defender": {
+     "score": 0.85,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "Visible Transit Damage",
+     "reason": "The video shows realistic wood fracturing and splintering consistent with heavy impact during transit inside original protective foam packing."
+    }
+   }
+  },
+  "test_eval/237895447220787": {
+   "session": "test_eval",
+   "case_id": "237895447220787",
+   "true_label": null,
+   "reason": "Damaged Others",
+   "kinds": [
+    "video"
+   ],
+   "decision": "escalate",
+   "credibility": 64.7,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 13002,
+   "claim_value_php": 52.0,
+   "economic": {
+    "route": "escalate",
+    "claim_value_php": 52.0,
+    "reason": "flagged_conflict: a fraud check raised a red flag (<0.40); routed to human review regardless of claim value \u2014 the base rate does not describe a conflicted case"
+   },
+   "stage_ms": {
+    "rung0": 1426,
+    "authenticity": 9298,
+    "rung1b": 2277
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 9.3,
+     "prompt_tokens": 1539,
+     "output_tokens": 63,
+     "thinking_tokens": 0,
+     "total_tokens": 1602,
+     "video_tokens": 1181,
+     "text_tokens": 358
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.28,
+     "prompt_tokens": 2191,
+     "output_tokens": 311,
+     "thinking_tokens": 0,
+     "total_tokens": 2502,
+     "video_tokens": 1181,
+     "text_tokens": 1010
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows natural movement, consistent lighting, and realistic fabric textures without any digital editing artifacts or manipulation signs."
+    },
+    "completeness": {
+     "score": 0.2,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "No Unboxing Shown",
+     "reason": "The video starts directly with the item already out of any shipping package, completely bypassing the unboxing process."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: No parcel packaging, box, tape, or shipping wrap is visible in the video, as the item is already unboxed."
+    },
+    "relevance": {
+     "score": 0.8,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "Damage Clearly Depicted",
+     "reason": "The video shows the exact black ribbed garment requested in the order, and clearly points out a visible hole/damage matching the stated reason."
+    },
+    "defender": {
+     "score": 0.5,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Damage Visible",
+     "reason": "The video provides a clear and natural view of the actual item showing a distinct hole in the fabric, with consistent lighting and no signs of digital manipulation."
+    }
+   }
+  },
+  "test_eval/237895480288349": {
+   "session": "test_eval",
+   "case_id": "237895480288349",
+   "true_label": null,
+   "reason": "Damaged Others",
+   "kinds": [
+    "image"
+   ],
+   "decision": "escalate",
+   "credibility": 88.7,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 8736,
+   "claim_value_php": null,
+   "economic": {
+    "route": "escalate",
+    "reason": "missing_price: claim value unknown, routed to human review",
+    "claim_value_php": null,
+    "p_invalid": 0.05,
+    "net_loss_exposure": null,
+    "expected_loss_auto_approve": null,
+    "expected_loss_escalate": null,
+    "p_threshold_full": null,
+    "p_threshold_simple": null,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 191,
+    "authenticity": 3220,
+    "rung1b": 5324
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 3.22,
+     "prompt_tokens": 1422,
+     "output_tokens": 63,
+     "thinking_tokens": 0,
+     "total_tokens": 1485,
+     "text_tokens": 358,
+     "image_tokens": 1064
+    },
+    {
+     "stage": "rung1b",
+     "secs": 5.32,
+     "prompt_tokens": 2076,
+     "output_tokens": 321,
+     "thinking_tokens": 0,
+     "total_tokens": 2397,
+     "text_tokens": 1012,
+     "image_tokens": 1064
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 1.0,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image shows natural lighting, realistic skin textures, and consistent fabric details without any digital manipulation or AI generation artifacts."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: No parcel packaging, shipping wrap, or seals are visible in the image to verify whether the item was pre-opened or tampered with."
+    },
+    "relevance": {
+     "score": 0.7,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "Damage Shown",
+     "reason": "The image clearly shows a small hole or tear near the stitched seam of the gray fabric, aligning with the stated claim of 'Damaged Others'."
+    },
+    "defender": {
+     "score": 0.6,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Localized Fabric Flaw",
+     "reason": "The image shows a specific physical flaw near the garment's stitching with realistic fabric textures and natural lighting consistent with an actual defect."
+    }
+   }
+  },
+  "test_eval/237905239223145": {
+   "session": "test_eval",
+   "case_id": "237905239223145",
+   "true_label": null,
+   "reason": "Broken Products",
+   "kinds": [
+    "image",
+    "video"
+   ],
+   "decision": "reject",
+   "credibility": 49.5,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 281878,
+   "claim_value_php": 3970.0,
+   "economic": null,
+   "stage_ms": {
+    "rung0": 2006,
+    "authenticity": 276735,
+    "rung1b": 3135
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 2.12,
+     "prompt_tokens": 1457,
+     "output_tokens": 64,
+     "thinking_tokens": 0,
+     "total_tokens": 1521,
+     "text_tokens": 357,
+     "image_tokens": 1100
+    },
+    {
+     "stage": "authenticity",
+     "secs": 274.61,
+     "prompt_tokens": 20366,
+     "output_tokens": 77,
+     "thinking_tokens": 0,
+     "total_tokens": 20443,
+     "video_tokens": 20009,
+     "text_tokens": 357
+    },
+    {
+     "stage": "rung1b",
+     "secs": 3.14,
+     "prompt_tokens": 22162,
+     "output_tokens": 310,
+     "thinking_tokens": 0,
+     "total_tokens": 22472,
+     "image_tokens": 1100,
+     "text_tokens": 1053,
+     "video_tokens": 20009
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.2,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "digitally manipulated",
+     "reason": "Worst of 2 files (237905239223145.jpg): The image features repetitive overlaid text patterns and unnatural geometric distortions across the keyboard keys, strongly indicating digital manipulation."
+    },
+    "completeness": {
+     "score": 0.85,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Unboxing shown",
+     "reason": "The video provides continuous footage showing the outer shipping wrap being cut open and the product being extracted from its packaging."
+    },
+    "tamper": {
+     "score": 0.8,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "Sealed parcel opened",
+     "reason": "The outer packaging is sealed in black plastic wrap and tape, which is cut open live on camera during the unboxing video."
+    },
+    "relevance": {
+     "score": 0.15,
+     "conf": 0.95,
+     "applicable": true,
+     "verdict": "Digital manipulation",
+     "reason": "The provided image exhibits repetitive overlaid text patterns and unnatural geometric distortions across the keyboard, matching known digital tampering indicators."
+    },
+    "defender": {
+     "score": 0.2,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Evidence manipulated",
+     "reason": "While the unboxing footage appears continuous, the submitted photo evidence clearly fails authenticity checks due to digital overlays and geometric distortion, undermining the legitimacy of the visual proof."
+    }
+   }
+  },
+  "test_eval/237907681251201": {
+   "session": "test_eval",
+   "case_id": "237907681251201",
+   "true_label": null,
+   "reason": "Spilled Contents",
+   "kinds": [
+    "image"
+   ],
+   "decision": "approve",
+   "credibility": 65.2,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 3592,
+   "claim_value_php": 119.0,
+   "economic": {
+    "route": "auto_approve",
+    "reason": "auto_approve: expected loss of auto-approve \u20b117.85 < expected loss of review \u20b123.18 \u2014 the claim is too low-value to justify a \u20b119.00 review (exposure \u20b160, break-even p=39.6%, this p=30.0%)",
+    "claim_value_php": 119.0,
+    "p_invalid": 0.3,
+    "net_loss_exposure": 59.5,
+    "expected_loss_auto_approve": 17.849999999999998,
+    "expected_loss_escalate": 23.185,
+    "p_threshold_full": 0.396039603960396,
+    "p_threshold_simple": 0.31932773109243695,
+    "bucket": "escalate"
+   },
+   "stage_ms": {
+    "rung0": 25,
+    "authenticity": 1304,
+    "rung1b": 2261
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 1.3,
+     "prompt_tokens": 1458,
+     "output_tokens": 63,
+     "thinking_tokens": 0,
+     "total_tokens": 1521,
+     "text_tokens": 358,
+     "image_tokens": 1100
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.26,
+     "prompt_tokens": 2109,
+     "output_tokens": 312,
+     "thinking_tokens": 0,
+     "total_tokens": 2421,
+     "image_tokens": 1100,
+     "text_tokens": 1009
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image displays natural lighting, consistent physics in packaging, and no visible signs of AI generation or digital tampering."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.6,
+     "applicable": true,
+     "verdict": "Packaging Visible",
+     "reason": "Parcel packaging and bubble wrap are visible around the items, but since this is a still photo, pre-opening status cannot be definitively tracked."
+    },
+    "relevance": {
+     "score": 0.4,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Spillage Unclear",
+     "reason": "The reason is spilled contents, but the image primarily shows bottles wrapped in bubble wrap without clear evidence of active spillage or leakage from the items."
+    },
+    "defender": {
+     "score": 0.5,
+     "conf": 0.5,
+     "applicable": true,
+     "verdict": "Natural Lighting",
+     "reason": "The lighting and physical layout of the packaged bottles appear internally consistent with a household unpacking scene, though no concrete proof of the spill itself is explicitly isolated."
+    }
+   }
+  },
+  "test_eval/237908748274121": {
+   "session": "test_eval",
+   "case_id": "237908748274121",
+   "true_label": null,
+   "reason": "Broken Products",
+   "kinds": [
+    "image"
+   ],
+   "decision": "approve",
+   "credibility": 100.0,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 5604,
+   "claim_value_php": 963.0,
+   "economic": {
+    "route": "auto_approve",
+    "reason": "auto_approve: expected loss of auto-approve \u20b124.08 < expected loss of review \u20b124.31 \u2014 the claim is too low-value to justify a \u20b119.00 review (exposure \u20b1482, break-even p=5.1%, this p=5.0%)",
+    "claim_value_php": 963.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 481.5,
+    "expected_loss_auto_approve": 24.075000000000003,
+    "expected_loss_escalate": 24.307499999999997,
+    "p_threshold_full": 0.05053405306075571,
+    "p_threshold_simple": 0.03946002076843198,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 54,
+    "authenticity": 2405,
+    "rung1b": 3144
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 2.4,
+     "prompt_tokens": 1421,
+     "output_tokens": 68,
+     "thinking_tokens": 0,
+     "total_tokens": 1489,
+     "text_tokens": 357,
+     "image_tokens": 1064
+    },
+    {
+     "stage": "rung1b",
+     "secs": 3.14,
+     "prompt_tokens": 2103,
+     "output_tokens": 342,
+     "thinking_tokens": 0,
+     "total_tokens": 2445,
+     "image_tokens": 1064,
+     "text_tokens": 1039
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image displays natural lighting, realistic shadows, and consistent physical textures without any signs of AI generation, digital splicing, or screen recapture."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: The image shows product boxes and the items themselves, but no sealed parcel packaging or shipping wrap is visible. Therefore, tamper evidence from packaging cannot be assessed."
+    },
+    "relevance": {
+     "score": 0.9,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Damage Visible",
+     "reason": "The buyer claimed broken products, and the photo clearly depicts physical damage on the actual solar LED items purchased. The plastic corner brackets on the units are visibly snapped off."
+    },
+    "defender": {
+     "score": 0.8,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "Legitimate Damage",
+     "reason": "The evidence shows clean fractures on the orange plastic corner protective pieces of the ordered solar LED lamps, consistent with impact sustained during transit. The scene is internally consistent and the items match th"
+    }
+   }
+  },
+  "test_eval/237910847253404": {
+   "session": "test_eval",
+   "case_id": "237910847253404",
+   "true_label": null,
+   "reason": "Broken Products",
+   "kinds": [
+    "video"
+   ],
+   "decision": "approve",
+   "credibility": 78.6,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 16232,
+   "claim_value_php": 518.0,
+   "economic": {
+    "route": "auto_approve",
+    "reason": "auto_approve: expected loss of auto-approve \u20b112.95 < expected loss of review \u20b123.19 \u2014 the claim is too low-value to justify a \u20b119.00 review (exposure \u20b1259, break-even p=9.4%, this p=5.0%)",
+    "claim_value_php": 518.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 259.0,
+    "expected_loss_auto_approve": 12.950000000000001,
+    "expected_loss_escalate": 23.194999999999997,
+    "p_threshold_full": 0.09357720119098256,
+    "p_threshold_simple": 0.07335907335907337,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 2708,
+    "authenticity": 11219,
+    "rung1b": 2304
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 11.22,
+     "prompt_tokens": 1730,
+     "output_tokens": 60,
+     "thinking_tokens": 0,
+     "total_tokens": 1790,
+     "video_tokens": 1373,
+     "text_tokens": 357
+    },
+    {
+     "stage": "rung1b",
+     "secs": 2.3,
+     "prompt_tokens": 2406,
+     "output_tokens": 310,
+     "thinking_tokens": 0,
+     "total_tokens": 2716,
+     "video_tokens": 1373,
+     "text_tokens": 1033
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 1.0,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The video shows natural lighting reflections, realistic physics, and no signs of digital editing or AI generation."
+    },
+    "completeness": {
+     "score": 0.4,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "No Unboxing",
+     "reason": "The video starts directly with a close-up of the item already out of any packaging, providing no unboxing footage to verify the context."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "no_packaging",
+     "reason": "No packaging/seal visible to assess: No parcel packaging, shipping wrap, or seals are visible in the clip, as it focuses entirely on the item itself."
+    },
+    "relevance": {
+     "score": 0.8,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "Damage Visible",
+     "reason": "The evidence clearly focuses on a fracture or crack in the metal structure of the item, directly supporting the broken products claim."
+    },
+    "defender": {
+     "score": 0.6,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "Clear Damage Shown",
+     "reason": "The close-up video consistently displays a distinct crack across one of the metal spokes of the product under natural lighting without any signs of digital manipulation."
+    }
+   }
+  },
+  "test_eval/237923635269896": {
+   "session": "test_eval",
+   "case_id": "237923635269896",
+   "true_label": null,
+   "reason": "Broken Products",
+   "kinds": [
+    "image"
+   ],
+   "decision": "escalate",
+   "credibility": 85.7,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 8771,
+   "claim_value_php": 2199.0,
+   "economic": {
+    "route": "escalate",
+    "reason": "escalate: expected loss of review \u20b127.40 \u2264 expected loss of auto-approve \u20b154.98 (claim \u20b12,199, exposure \u20b11,100, break-even p=2.2%, this p=5.0%)",
+    "claim_value_php": 2199.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 1099.5,
+    "expected_loss_auto_approve": 54.975,
+    "expected_loss_escalate": 27.397499999999997,
+    "p_threshold_full": 0.022187484241843577,
+    "p_threshold_simple": 0.017280582082764895,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 171,
+    "authenticity": 3823,
+    "rung1b": 4776
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 3.82,
+     "prompt_tokens": 1421,
+     "output_tokens": 76,
+     "thinking_tokens": 0,
+     "total_tokens": 1497,
+     "text_tokens": 357,
+     "image_tokens": 1064
+    },
+    {
+     "stage": "rung1b",
+     "secs": 4.78,
+     "prompt_tokens": 2085,
+     "output_tokens": 321,
+     "thinking_tokens": 0,
+     "total_tokens": 2406,
+     "image_tokens": 1064,
+     "text_tokens": 1021
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image shows natural lighting, consistent focus, and realistic physical damage without any AI generation artifacts or digital tampering signs, other than the standard timestamp overlay added by the camera app."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "Packaging Visible",
+     "reason": "Cardboard box packaging is visible in the background, but the pre-opened state cannot be verified as an unboxing video was not supplied."
+    },
+    "relevance": {
+     "score": 0.85,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "Broken Product Shown",
+     "reason": "The photo clearly shows a crack running across the edge of a white board panel held up by the user, directly matching the stated reason of broken products."
+    },
+    "defender": {
+     "score": 0.75,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "Consistent Physical Damage",
+     "reason": "The fracture line on the panel edge appears structurally authentic with clean-break characteristics typical of shipping stress, and natural lighting aligns with the scene."
+    }
+   }
+  },
+  "test_eval/237932362294371": {
+   "session": "test_eval",
+   "case_id": "237932362294371",
+   "true_label": null,
+   "reason": "Broken Products",
+   "kinds": [
+    "image"
+   ],
+   "decision": "escalate",
+   "credibility": 84.9,
+   "reason_code": "passed_prevalidation",
+   "runtime_ms": 5582,
+   "claim_value_php": 2799.0,
+   "economic": {
+    "route": "escalate",
+    "reason": "escalate: expected loss of review \u20b128.90 \u2264 expected loss of auto-approve \u20b169.98 (claim \u20b12,799, exposure \u20b11,400, break-even p=1.7%, this p=5.0%)",
+    "claim_value_php": 2799.0,
+    "p_invalid": 0.05,
+    "net_loss_exposure": 1399.5,
+    "expected_loss_auto_approve": 69.97500000000001,
+    "expected_loss_escalate": 28.897499999999997,
+    "p_threshold_full": 0.0174388648884309,
+    "p_threshold_simple": 0.013576277241872096,
+    "bucket": "approve"
+   },
+   "stage_ms": {
+    "rung0": 35,
+    "authenticity": 1521,
+    "rung1b": 4024
+   },
+   "calls": [
+    {
+     "stage": "authenticity",
+     "secs": 1.52,
+     "prompt_tokens": 1421,
+     "output_tokens": 67,
+     "thinking_tokens": 0,
+     "total_tokens": 1488,
+     "text_tokens": 357,
+     "image_tokens": 1064
+    },
+    {
+     "stage": "rung1b",
+     "secs": 4.02,
+     "prompt_tokens": 2076,
+     "output_tokens": 303,
+     "thinking_tokens": 0,
+     "total_tokens": 2379,
+     "image_tokens": 1064,
+     "text_tokens": 1012
+    }
+   ],
+   "signals": {
+    "authenticity": {
+     "score": 0.95,
+     "conf": 0.9,
+     "applicable": true,
+     "verdict": "authentic",
+     "reason": "The image displays natural lighting, consistent shadows, and realistic handheld perspectives without any signs of digital manipulation, splicing, or AI generation."
+    },
+    "completeness": {
+     "score": 0.5,
+     "conf": 0.0,
+     "applicable": false,
+     "verdict": "photo_only",
+     "reason": "Photo-only evidence; an unboxing video is not expected, so this check is neutral by design."
+    },
+    "tamper": {
+     "score": 0.5,
+     "conf": 0.7,
+     "applicable": true,
+     "verdict": "packaging visible",
+     "reason": "Parcel packaging and cardboard boxes are visible in the photo, but a single snapshot cannot confirm the pre-opening seal integrity."
+    },
+    "relevance": {
+     "score": 0.8,
+     "conf": 0.85,
+     "applicable": true,
+     "verdict": "broken product shown",
+     "reason": "The image clearly displays a cracked or broken black plastic component being held up, matching the stated claim of 'Broken Products'."
+    },
+    "defender": {
+     "score": 0.75,
+     "conf": 0.8,
+     "applicable": true,
+     "verdict": "visible breakage",
+     "reason": "The photo shows a clear structural fracture on the plastic component consistent with transit damage, and contains natural lighting with no digital tampering."
+    }
+   }
+  }
+ }
+}
