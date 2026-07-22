@@ -39,6 +39,22 @@ CREATE TABLE IF NOT EXISTS cases (
 );
 CREATE INDEX IF NOT EXISTS idx_cases_session ON cases(session_id);
 CREATE INDEX IF NOT EXISTS idx_cases_decision ON cases(session_id, decision);
+
+-- Running perceptual-hash store for Rung-0 duplicate/reuse detection. Every piece
+-- of media that clears decode gets its pHash recorded here; a new submission whose
+-- pHash is near-identical to an EARLIER case's is reused proof -> auto-reject.
+-- Hamming distance can't be expressed in SQL cheaply, so we load candidate hashes
+-- and compare in Python (fine at hackathon scale). phash is a 64-bit hex string.
+CREATE TABLE IF NOT EXISTS media_hashes (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_id  TEXT NOT NULL,
+    case_id     TEXT NOT NULL,
+    filename    TEXT NOT NULL,
+    phash       TEXT NOT NULL,     -- 64-bit perceptual hash, hex
+    created_at  TEXT NOT NULL,
+    UNIQUE(session_id, case_id, filename)
+);
+CREATE INDEX IF NOT EXISTS idx_hashes_lookup ON media_hashes(session_id);
 """
 
 
@@ -134,6 +150,44 @@ def get_escalated(conn: sqlite3.Connection, session_id: str) -> list[CaseRecord]
         (session_id, DECISION_ESCALATE),
     ).fetchall()
     return [CaseRecord.from_row(dict(r)) for r in rows]
+
+
+def record_phash(conn: sqlite3.Connection, session_id: str, case_id: str,
+                 filename: str, phash: str) -> None:
+    """Add one media file's pHash to the running store (idempotent per file)."""
+    from datetime import datetime, timezone
+    conn.execute(
+        """
+        INSERT INTO media_hashes (session_id, case_id, filename, phash, created_at)
+        VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT(session_id, case_id, filename) DO UPDATE SET phash = excluded.phash
+        """,
+        (session_id, case_id, filename, phash,
+         datetime.now(timezone.utc).isoformat()),
+    )
+    conn.commit()
+
+
+def find_duplicate_phash(conn: sqlite3.Connection, phash: str, session_id: str,
+                         exclude_case_id: str, max_distance: int) -> Optional[dict]:
+    """Return the nearest EARLIER media whose pHash is within max_distance, or None.
+
+    Reused/near-identical proof across different cases is a strong, cheap, purely
+    deterministic fraud signal. We compare against hashes from the same session
+    (the batch being judged) but a DIFFERENT case_id, so re-scoring the same case
+    never self-matches. Hamming distance is computed in Python.
+    """
+    target = int(phash, 16)
+    rows = conn.execute(
+        "SELECT case_id, filename, phash FROM media_hashes WHERE session_id = ? AND case_id != ?",
+        (session_id, exclude_case_id),
+    ).fetchall()
+    best: Optional[dict] = None
+    for r in rows:
+        dist = bin(target ^ int(r["phash"], 16)).count("1")
+        if dist <= max_distance and (best is None or dist < best["distance"]):
+            best = {"case_id": r["case_id"], "filename": r["filename"], "distance": dist}
+    return best
 
 
 def list_sessions(conn: sqlite3.Connection) -> list[dict]:

@@ -31,6 +31,16 @@ DECISION_APPROVE = "approve"
 DECISION_REJECT = "reject"
 DECISION_ESCALATE = "escalate"
 
+# Reason codes carried alongside a decision. Rung 0 (deterministic pre-validation)
+# writes these so the swipe app / analytics can tell *why* a case was routed the
+# way it was without re-deriving it. Only DUPLICATE_PROOF is a fraud signal that
+# auto-rejects; every other Rung-0 failure ESCALATES (quality failure != fraud —
+# an honest buyer with a bad phone camera must never be auto-rejected).
+REASON_DUPLICATE_PROOF = "duplicate_proof"        # reused/near-identical media -> reject
+REASON_CORRUPTED_FILE = "corrupted_file"          # won't decode -> escalate (ops)
+REASON_INSUFFICIENT_EVIDENCE = "insufficient_evidence"  # too blurry/dark/small/short -> escalate
+REASON_PASSED_PREVALIDATION = "passed_prevalidation"    # cleared Rung 0, went to the agents
+
 
 @dataclass
 class Evidence:
@@ -38,6 +48,12 @@ class Evidence:
     filename: str                 # e.g. "237872216204114.mp4"
     kind: str = "unknown"         # "image" | "video" | "unknown"
     path: Optional[str] = None    # local path once the media is located/downloaded
+
+    # Filled by Rung 0 (pre-validation), all deterministic / zero API cost.
+    phash: Optional[str] = None   # perceptual hash (hex), for reuse/duplicate detection
+    exif_editor: Optional[str] = None  # editing-software fingerprint from EXIF, if any.
+                                       # A soft PRIOR passed into the Authenticity agent —
+                                       # NOT a gate. Absence is neutral (screenshots strip EXIF).
 
     @staticmethod
     def infer_kind(filename: str) -> str:
@@ -96,8 +112,13 @@ class CaseRecord:
     # Filled by the combiner / router / synthesis.
     credibility_score: Optional[float] = None   # 0..100 (higher = more trustworthy)
     decision: Optional[str] = None              # approve | reject | escalate
+    reason_code: Optional[str] = None           # why (esp. Rung-0 routes); see REASON_*
     brief: str = ""                             # synthesis agent's plain-language note
     runtime_ms: Optional[int] = None
+
+    # Rung-0 (pre-validation) trace: per-evidence QC metrics + gate outcome. Kept
+    # for the brief / swipe-app explanation and for tuning thresholds vs the dataset.
+    prevalidation: Optional[dict] = None
 
     # Filled later.
     human_verdict: Optional[str] = None         # swipe app writes this back
@@ -134,6 +155,8 @@ class CaseRecord:
             "submitted_at": self.submitted_at,
             "signals": {k: asdict(v) for k, v in self.signals.items()},
             "brief": self.brief,
+            "reason_code": self.reason_code,
+            "prevalidation": self.prevalidation,
         }
         return json.dumps(payload, ensure_ascii=False)
 
@@ -152,7 +175,9 @@ class CaseRecord:
             signals={k: SignalOutput(**v) for k, v in blob.get("signals", {}).items()},
             credibility_score=row.get("credibility_score"),
             decision=row.get("decision"),
+            reason_code=blob.get("reason_code"),
             brief=blob.get("brief", ""),
+            prevalidation=blob.get("prevalidation"),
             runtime_ms=row.get("runtime_ms"),
             human_verdict=row.get("human_verdict"),
             true_label=row.get("true_label"),
