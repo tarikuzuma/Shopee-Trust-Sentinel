@@ -1,42 +1,54 @@
-Shopee Trust Sentinel — Full Build Brief for Claude Code
-What this is
+# Shopee Trust Sentinel — Full Build Brief for Claude Code (v2)
 
-A hackathon project (TRAILBLAZE Shopee AI Hackathon 2026, Fraud Detection track). We have ~1 day. This brief is a cold-start handoff — everything you need is here.
+TRAILBLAZE Shopee AI Hackathon 2026, Fraud Detection track. ~1 day. v2 adds Rung 0, a deterministic pre-filter that runs before any paid model call.
 
-The problem, in one line
+## The problem, in one line
 
-When a buyer files a return/refund claim on Shopee, they submit photo/video "proof." A huge share of that proof is faked. Right now a human reviews it case by case — slow, expensive, and Shopee's own regional team can't crack automated image-checking because of GPU cost and tiny privacy-limited datasets. We're building the autonomous system that judges whether return proof is authentic.
+A buyer files a return/refund claim with photo/video proof. A share of that proof is faked. A human reviews every case by hand. We're building the system that judges proof validity autonomously, using front-end/face-value signals only — backend data (IP, device, address, order history) is out of scope.
 
-The exact task (scoped by the organizers)
+## The exact task
 
-Given a return case (stated return reason + image/video evidence), decide whether the proof is valid or invalid, autonomously, using front-end / face-value signals only. Backend data (IP, device, address, order history) is HARD out of scope — confidential, not available to us. Judge the evidence at face value.
+Given a return case (stated reason + image/video evidence), decide valid or invalid, autonomously. Invalid cases fall into three types: irrelevant proof, tampered proof (parcel pre-opened, or no unboxing shown), AI-generated/edited proof.
 
-The three ways proof gets faked (this is our detection target)
+## Judge intel that drives every design choice
 
-The training data labels every invalid case as one of:
+- Cost asymmetry: a wrong VALID verdict pays a fraudster — expensive. A wrong INVALID is cheap. When uncertain, lean reject/escalate. Never auto-approve on uncertainty.
+- Automation is the goal; escalate-to-human is the exception, not the default.
+- External VLMs (Claude/Gemini API) are explicitly allowed. No fine-tuning — no time, no dataset for it.
+- Graded deliverables: working classifier, confusion matrix (TP/FP/TN/FN + escalation count), reproducible script, bonus sped-up demo video.
+- Training data is invalid-only; test data is unlabeled mixed valid/invalid. Architecture and reasoning are graded alongside accuracy.
+- Judges are cross-panel, mostly non-technical. Clarity beats cleverness.
 
-Irrelevant proof — e.g. a video of the floor or an empty box that doesn't match the stated reason
-Tampered — parcel already opened/swapped before filming; or no unboxing shown
-AI-generated / edited — synthetic frames, splices, edited photos
-Critical judge intel (this drives the design)
-Cost asymmetry: a wrong "VALID" verdict hands money to fraudsters — that's the expensive mistake. A wrong "INVALID" is cheaper. So when uncertain, the system must lean toward reject/escalate, NEVER auto-approve. The judge said explicitly he'd rather see "escalate to human" than a confident wrong approval.
-Automation is the goal. Escalate-to-human is an acceptable exception, not the default. Auto-decide as much as possible.
-External VLMs (Claude/Gemini API) are explicitly allowed. Don't fine-tune our own model — no time, tiny dataset. Use an external vision model API.
-Deliverables graded: (1) a working classifier, (2) a confusion matrix — TP/FP/TN/FN with an escalation count on the side, (3) a reproducible script/repo they can re-run at scale, (4) bonus: a sped-up demo video proving it runs fast (their real bottleneck is GPU cost/speed at Shopee scale).
-Test data has no ground truth and is mixed valid/invalid. Training data is invalid-only (infer "valid" as absence of invalid signals). So our thought process/architecture is graded as much as raw accuracy.
-Judges are cross-panel and mostly non-technical — clarity beats cleverness.
-The architecture — "Rung 1", flat and autonomous (BUILD THIS)
+## Architecture — Rung 0 (new) + Rung 1
 
-Deliberately simple so it ships and demos clean. One case → four checks always run in parallel → scores combine → synthesis writes a brief → decision router acts. No dynamic routing, nothing fancy to break.
+Rung 0 is a deterministic Python layer: `cv2` + `Pillow` + `imagehash`, zero tokens, zero API calls. It runs first and does two unrelated jobs that must not be filed under one name:
 
-Flow:
+1. **Quality gating** — corrupt file, too blurry, too dark, too short. These are "can't be judged" outcomes. They route to **escalate** (`insufficient_evidence`), never reject. Auto-rejecting a blurry photo punishes an honest buyer with a cheap phone camera — the exact false positive the Defender exists to prevent, tripped one layer earlier. Low-end-device photos are a large slice of real traffic here, not an edge case.
+2. **Duplicate detection** — perceptual hash (`imagehash.phash`) against every prior submitted proof. A reused image across unrelated claims is a genuine fraud signal, more reliable than anything the VLM agents produce, because it's deterministic. A match routes straight to **reject** (`duplicate_proof`), skipping the four agents entirely.
 
+Same layer, two exit routes. A third check — EXIF read — never gates at all: it extracts the `Software` tag (Photoshop/GIMP/Lightroom/etc.) for free and hands it forward as a prior into the Authenticity agent's prompt, instead of making an expensive VLM call re-derive from pixels something a metadata read already answered.
+
+Two boundary calls, decided and locked:
+
+- **Frozen/looped frame** (a still image passed off as video) is NOT a Rung 0 quality signal. It's deception, not bad capture — it belongs to the **Tamper** agent. Rung 0 asks "can this be judged"; Tamper asks "does this look faked." A frozen frame can be judged, and what it shows is fraud, so it must be able to contribute to a reject verdict, not an escalate.
+- **EXIF editing-software tag** never gets a verdict of its own. It's a prior, injected into the Authenticity agent's prompt.
+
+Anything Rung 0 hard-stops (escalate or reject) never reaches a VLM — that's where the API cost savings come from, on top of catching a fraud class (duplicate proof) the four-agent layer doesn't otherwise cover.
+
+```
 Return case (reason + video + photo)
-      ↓  (all run in parallel)
+      ↓
+┌─────────────────────────── Rung 0 — deterministic, zero tokens ───────────────────────────┐
+│  integrity + quality (blur/dark/corrupt/too-short)   →  fail  →  ESCALATE insufficient_evidence
+│  duplicate check (perceptual hash vs prior proofs)   →  fail  →  REJECT duplicate_proof
+│  EXIF read (editing-software tag)                    →  always passes through as a prior
+└──────────────────────────────────────────────────────────────────────────────────────────┘
+      ↓ (pass-through only, + EXIF prior attached)
 ┌─────────────┬──────────────┬───────────┬────────────┐
 │ Authenticity│ Completeness │  Tamper   │ Relevance  │   + Defender
-│ AI-edited?  │ unboxing     │ pre-      │ matches    │   (argues the
-│             │ shown?       │ opened?   │ reason?    │   claim is legit)
+│ AI-edited?  │ unboxing     │ pre-opened│ matches    │   (argues the
+│ (+EXIF prior│ shown?       │ / frozen  │ reason?    │   claim is legit)
+│  as context)│              │  frame?   │            │
 └─────────────┴──────────────┴───────────┴────────────┘
       ↓  each returns { score 0-1, reason_string, applicable: bool }
 Scoring combiner → credibility 0–100 (higher = more trustworthy)
@@ -48,69 +60,77 @@ Decision router (asymmetric thresholds):
    credibility < ~35  → AUTO-REJECT  (invalid, behind the scenes)
    35–75 (uncertain)  → ESCALATE to human swipe queue
       ↓
-Everything logged to SQLite → produces confusion matrix + labeled seed
-The agents (each is a check that reads evidence and votes)
-Authenticity — detects AI-editing/splices/synthetic frames. This is the hardest and highest-value one; the judge admitted his dev team can't crack it. Use an external VLM.
-Completeness — does the video actually show the parcel being opened?
-Tamper — was the parcel already open / seal broken before filming?
-Relevance — does the evidence match the stated return reason? (floor video for a "broken item" claim = irrelevant)
-Defender — the "not-guilty vote." Actively argues the claim is LEGITIMATE and pulls credibility UP. This protects honest buyers whose item really did arrive broken. It's what keeps us from being a blind auto-reject machine. It points OPPOSITE to the other four.
-Scoring direction (lock this — do not mix)
+Everything logged to SQLite → confusion matrix + labeled seed
+```
 
-Every signal outputs credibility (high = trustworthy), never risk (high = bad). Mixing directions makes the combined score cancel to mush. Low credibility escalates/rejects.
+## Scoring direction (unchanged, still locked)
 
-Critical implementation detail — the applicable flag
+Every signal outputs credibility (high = trustworthy), never risk. Rung 0's two gates are the one exception to "everything feeds the combiner" — they act before the combiner exists for that case, by design, because they're deterministic enough to skip the deliberation step entirely.
 
-Every check returns applicable: true/false alongside its score. If a check can't run (e.g. Completeness needs video but the case is photo-only), it returns applicable: false and contributes NEUTRAL to the score — never suspicious. A missing signal must NOT lower credibility, or honest photo-only buyers get wrongly flagged. This is the single most important field to get right.
+## The applicable flag (unchanged, still the most important field)
 
-Fallback behavior
-Check can't run (missing data) → returns not_applicable, neutral, others still vote.
-All checks inconclusive / no information → do NOT guess, do NOT auto-approve → escalate to human. (No-information must never default to approve — cost asymmetry.)
-Storage — SQLite (hybrid schema)
+Every check — Rung 0 included — returns `applicable: true/false`. A check that can't run contributes NEUTRAL, never suspicious. Rung 0's duplicate check is the clearest example: photo-only cases run it, video-only cases mark it not applicable and move on.
 
-One .db file in the repo (reproducibility + zero setup + safe live demo). One table, cases:
+## Fallback behavior (unchanged)
 
-Real columns (we filter/update on these): case_id, session_id, return_reason, credibility_score, decision (approve/reject/escalate), runtime_ms, created_at, human_verdict (filled later by swipe), true_label (filled if ground truth exists)
-One TEXT column signals_json — the full per-signal breakdown (scores + reason strings + brief) stored as a JSON blob, since we only ever read it back whole, never query into it.
+No information anywhere in the pipeline → escalate, never auto-approve.
 
-Why SQLite over flat JSON: our access pattern is read-filter-update (the swipe app updates a case after the human decides, and queries "escalated cases in this session"). That's SQL's home turf; flat files make in-place updates and filtered reads fiddly. But we keep the nested detail as JSON inside the row — best of both.
+## Storage — SQLite, one new table
 
-session_id groups a run so an analyst can return to a batch, see the stored remarks, and review why the AI decided what it did — without re-running.
+Existing `cases` table is untouched. Rung 0 adds:
 
-The human escalation UI — the swipe app (BUILD, but scope tight)
+```sql
+CREATE TABLE IF NOT EXISTS proof_hashes (
+    case_id TEXT PRIMARY KEY,
+    phash   TEXT NOT NULL
+);
+```
 
-A Tinder-style web app, correctly scoped as the exception path for low-confidence escalated cases ONLY. Each card shows: the credibility score, WHICH signal was ambiguous, and the synthesis brief. The safe gesture (hold/reject) is the easy swipe; approve is the deliberate one (cost asymmetry made physical). Every swipe writes human_verdict back to the DB → generates a labeled example → this IS the "seed for whatever comes next" the judge asked for. Do NOT build a separate admin/history browser — the swipe app filtered by session_id covers "look back."
+Read-filter-update against this table is how the duplicate check works: every clean, non-duplicate case's hash gets written on the way through, so it becomes the comparison set for every later case. Kept as its own table, not folded into `cases`, since it's queried by hash value, not by the case-record fields the rest of the schema is built around.
 
-The output artifact (this is graded — don't skip)
+## Data contract — one addition
 
-A script that queries the DB and prints/plots a confusion matrix: TP / FP / TN / FN, plus an escalation count column. Build the logging in from the start so this falls out for free.
+Existing shape (`case_id`, `session_id`, `return_reason`, `evidence_refs`, `video_frames`, `submitted_at`, per-agent slots, `credibility_score`, `decision`, `brief`, `runtime_ms`) is unchanged. Add one slot:
 
-Data contract (step 0 — build this FIRST, everything hangs off it)
+- `rung0`: `{quality: {...}, duplicate: {...}, exif_prior: {...}}` — the three Rung 0 check outputs, same `{signal_name, applicable, verdict, reason_string, confidence}` shape as every other agent, for consistency and so the swipe app / confusion-matrix script can read it without a special case.
+- `authenticity_prior`: the EXIF extract handed forward, read once by the Authenticity agent's prompt builder.
 
-Define one internal case-record shape (a dict/dataclass) with every field: case_id, session_id, return_reason, evidence_refs, video_frames, submitted_at, a per-agent output slot {signal_name, score, verdict, reason_string, confidence, applicable}, and final slots credibility_score, decision, brief, runtime_ms. Every component reads/writes this one shape. When real Shopee data arrives, we write ONE loader that maps their format into this shape — nothing else changes. The case-record shape IS the SQLite row.
+When a Rung 0 gate fires, `case["decision"]` and `case["gate_reason"]` are set immediately and the four-agent stage is skipped for that case — but the case still gets a full row in `cases`, so it still counts in the confusion matrix.
 
-Tech stack
-Python backend
-External VLM API (Claude or Gemini) for Authenticity + optionally Relevance judgments
-imagehash/Pillow for cheap deterministic image checks where possible (fast, no API cost)
-SQLite (stdlib sqlite3)
-Simple web frontend for the swipe app (whatever's fastest — plain HTML/JS or a light framework)
-Build sequence (dependency order)
-Data contract + SQLite schema (unblocks everyone — do first)
-Scoring combiner + decision router with hand-fed fake numbers (gives a demoable spine immediately)
-The four checks + defender (start with Relevance and Tamper — cheapest; Authenticity is the hard VLM one)
-Synthesis agent (LLM brief — depends on all signals existing)
-Confusion-matrix script (queries the DB)
-Swipe app (reads escalated cases from DB, writes human_verdict back) — parallelizable by the second partner
-What to NAME but NOT build (roadmap — say it in the pitch, don't code it)
-Selective triage router (picks which checks per case — pure risk today, we run all four anyway)
-CS-authored triages in plain language (the platform/self-extending story)
-Self-recalibration from swipe labels (Rung 5)
-Anything using backend data (out of scope) — including courier/logistics fault attribution
-Guardrail / thesis (don't let any "improvement" break this)
+## Threshold discipline (the same rule extended)
 
-The AI investigates and decides autonomously for the confident cases, but the design must (a) always keep credibility direction consistent, (b) never auto-approve under uncertainty, (c) treat missing signals as neutral not suspicious, (d) keep the defender pulling honest claims up. The differentiator is: we separate "is the proof authentic" (the AI's job) from "whose fault is the damage" (a human's job, out of scope) — and we protect honest buyers, not just catch liars.
+Every Rung 0 threshold — resolution floor, blur/Laplacian floor, brightness range, video duration floor, duplicate-hash hamming distance — is a placeholder until tuned against the labeled dataset. Same rule as the 35/75 credibility split. Guess these and the system rejects or escalates a large share of honest low-end-device photos.
 
-Two things before you paste it in: I made a couple of default calls you should confirm with your partner in the first 5 minutes with Claude Code — the exact thresholds (35/75 are placeholders, tune against whatever eval you build) and soft-scores-vs-hard-verdicts (this brief assumes soft scores 0–1 that combine into a number, with each agent also emitting a reason string). Both are stated in the brief; just make sure you two agree before building.
+One technical detail that breaks silently if missed: the blur metric (variance of Laplacian) scales with image resolution. Resize to a fixed reference width before thresholding, or the same cutoff means something different for a 400px phone photo than a 4K one. For video, sample ~10 frames and take the median blur/brightness — one motion-blurred frame in an otherwise clear video should not fail the whole clip.
 
-Good luck — this is a genuinely strong, well-scoped project and you did the hard thinking already. Go build it.
+## Tech stack — one addition
+
+- `opencv-python-headless`, `imagehash`, `Pillow` for Rung 0 — no network calls, no GPU, runs before any external API touches the case.
+- Everything else unchanged: external VLM API (Claude/Gemini) for Authenticity + optionally Relevance, SQLite (`sqlite3`), plain HTML/JS swipe app.
+
+## Build sequence (updated, dependency order)
+
+1. Data contract + SQLite schema, including `proof_hashes` — unblocks everyone.
+2. **Rung 0** — quality gate, duplicate hash, EXIF read. No external dependency, so it can be built and unit-tested in isolation before the agents exist. Gives a second demoable spine: "here's a case getting rejected/escalated before it ever costs a token."
+3. Scoring combiner + decision router with hand-fed fake numbers.
+4. The four checks + Defender (Relevance and Tamper first — cheapest; Authenticity is the hard VLM one, and now takes the EXIF prior as input; Tamper now also takes the frozen-frame motion score as input).
+5. Synthesis agent (LLM brief — depends on all signals existing).
+6. Confusion-matrix script (queries the DB; Rung 0 short-circuited cases must appear in it too).
+7. Swipe app (parallelizable by the second partner).
+
+## What to name but not build (unchanged, still roadmap)
+
+Selective triage router, CS-authored triages in plain language, self-recalibration from swipe labels, anything using backend data.
+
+## Guardrail / thesis — extended
+
+The AI investigates and decides autonomously for confident cases, but the design must:
+
+(a) always keep credibility direction consistent,
+(b) never auto-approve under uncertainty,
+(c) treat missing signals as neutral, not suspicious,
+(d) keep the Defender pulling honest claims up,
+(e) **never let a capture-quality problem auto-reject** — Rung 0's quality gate only escalates, and
+(f) **never let a deterministic fraud signal wait on a VLM call** — Rung 0's duplicate check rejects directly, and the frozen-frame signal reaches Tamper as a first-class input rather than being silently absorbed into the quality gate.
+
+The differentiator stays the same: "is the proof authentic" (the AI's job) is separated from "whose fault is the damage" (a human's job, out of scope). Rung 0 adds a second differentiator: an obvious, deterministic fraud check (duplicate proof) is caught before spending a single token, and an obvious non-fraud problem (bad camera) never gets treated as fraud.
