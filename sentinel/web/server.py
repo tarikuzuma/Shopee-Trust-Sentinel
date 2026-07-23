@@ -84,6 +84,81 @@ def _case_brief(rec: CaseRecord) -> str:
     return " ".join(parts) or "No strong signals either way."
 
 
+# Credibility band a naive "uncertainty gate" would send to a human. This is the
+# strawman we are measured against: it routes on how unsure the MODEL is and is
+# blind to how much MONEY is on the table.
+GATE_LO, GATE_HI = 35, 75
+
+
+def _policy_cost(routes: list[tuple[str, float, float]], cfg: EconomicConfig) -> dict:
+    """Cost one routing policy over (route, exposure_php, p_invalid) triples.
+
+    Both policies are costed with the SAME per-case p_invalid, so the difference
+    between them is attributable to routing alone and not to a friendlier risk
+    assumption on our side.
+    """
+    review = leak = exposure_reviewed = 0.0
+    n_reviewed = 0
+    approve_loss = 0.0
+    for route, exposure, p in routes:
+        if route == "escalate":
+            n_reviewed += 1
+            exposure_reviewed += exposure
+            review += cfg.review_cost_php + cfg.delay_cost_php
+            # a human is good, not perfect: what they miss still leaks
+            leak += p * (1.0 - cfg.human_invalid_detection_rate) * exposure
+            leak += (1.0 - p) * cfg.human_false_reject_rate * cfg.wrong_rejection_cost_php
+        else:
+            approve_loss += p * exposure
+    return {
+        "n_reviewed": n_reviewed,
+        "exposure_reviewed_php": exposure_reviewed,
+        "review_cost_php": review,
+        "residual_loss_php": leak + approve_loss,
+        "total_cost_php": review + leak + approve_loss,
+    }
+
+
+def _gate_compare(cases: list[CaseRecord], cfg: EconomicConfig) -> Optional[dict]:
+    """Us (value-aware escalation) vs a naive credibility-band gate.
+
+    Scope: only the cases the economic layer actually owns — the approve/escalate
+    pool. Auto-rejects and bounces come from dispositive evidence rules that fire
+    identically under either policy, so including them would pad both sides with
+    the same number and dilute the honest difference.
+    """
+    pool = [r for r in cases if r.decision in ("approve", "escalate")]
+    if not pool:
+        return None
+
+    ours, gate = [], []
+    total_exposure = 0.0
+    for r in pool:
+        exposure = (r.claim_value_php or 0) * cfg.shopee_net_loss_fraction
+        p = cfg.bucket_p_invalid["approve" if r.decision == "approve" else "escalate"]
+        total_exposure += exposure
+        ours.append((r.decision, exposure, p))
+        c = r.credibility_score
+        # No score is itself uncertainty — the gate sends it to a human.
+        band = c is None or (GATE_LO <= c <= GATE_HI)
+        gate.append(("escalate" if band else "approve", exposure, p))
+
+    a = _policy_cost(ours, cfg)
+    b = _policy_cost(gate, cfg)
+    n = len(pool)
+    for d, src in ((a, ours), (b, gate)):
+        d["review_rate"] = d["n_reviewed"] / n
+        d["exposure_coverage"] = (d["exposure_reviewed_php"] / total_exposure
+                                  if total_exposure else 0)
+    return {
+        "n_pool": n, "band": [GATE_LO, GATE_HI],
+        "total_exposure_php": total_exposure,
+        "ours": a, "gate": b,
+        "saved_php": b["total_cost_php"] - a["total_cost_php"],
+        "reviews_avoided": b["n_reviewed"] - a["n_reviewed"],
+    }
+
+
 def _row(rec: CaseRecord) -> dict:
     return {
         "case_id": rec.case_id,
@@ -149,9 +224,13 @@ def summary(session: str = Query(DEFAULT_SESSION)):
                            for r in cases if r.decision == "approve")
     slippage = approve_exposure * cfg.bucket_p_invalid["approve"]
     has_labels = any(_true_class(r.true_label) for r in cases)
+    escalated_value = sum((r.claim_value_php or 0) for r in cases
+                          if r.decision == "escalate")
 
     return {
         "session": session, "n": n, "mix": mix,
+        "escalated_value_php": escalated_value,
+        "gate": _gate_compare(cases, cfg),
         "automation_rate": (auto / n) if n else 0,
         "avg_runtime_ms": (total_runtime / n) if n else 0,
         "total_claim_php": total_claim,

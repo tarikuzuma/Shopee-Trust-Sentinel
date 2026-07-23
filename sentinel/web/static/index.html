@@ -12,6 +12,10 @@
     --amber:#f5a623; --amber-bg:#fef6e7;
     /* resubmit: a neutral bounce, deliberately NOT red — it denies nothing */
     --blue:#2673dd; --blue-bg:#eaf1fd;
+    /* Chart identity is the POLICY, not the metric: our routing vs the baseline
+       gate. Within a bar, the lighter step is the residual-loss share. Palette
+       validated (lightness / chroma / CVD / contrast) against the card surface. */
+    --ours:#ee4d2d; --ours-lt:#f9b6a6; --gate:#7d848b; --gate-lt:#cfd3d7;
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
@@ -37,40 +41,75 @@
   .view{display:none} .view.active{display:block}
   h1{font-size:20px;margin:0 0 2px} .sub{color:var(--muted);margin:0 0 20px}
 
+  /* ---- one-screen dashboard -------------------------------------------
+     A dashboard you have to scroll is a report. The whole point is that a
+     reviewer glances once and sees the state of the batch, so the dashboard
+     view is height-locked to the viewport and every panel sizes itself to
+     fit rather than growing the page. Only this view opts in; the case list
+     and queue are genuinely long and keep normal scrolling. */
+  body.fixed{overflow:hidden}
+  body.fixed .wrap{max-width:1500px;height:calc(100vh - 56px);padding:12px 18px;
+    display:flex;flex-direction:column;min-height:0}
+  body.fixed #dashboard.active{display:grid;gap:10px;min-height:0;flex:1;
+    grid-template-rows:auto auto minmax(0,1fr)}
+  body.fixed #dashboard h1{font-size:17px}
+  body.fixed #dashboard .sub{margin:0}
+  .dash-hd{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .dash-hd .sub{font-size:13px}
+  .dash-main{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:10px;min-height:0;
+    grid-template-rows:minmax(0,1.05fr) minmax(0,1fr)}
+  .chart{position:relative;min-height:0;display:flex;flex-direction:column}
+  .chart .cbox{flex:1;min-height:0;overflow:hidden}
+  .chart svg{display:block}
+  .chart .hero{font-size:clamp(18px,1.9vw,25px);font-weight:800;color:var(--shopee-dark);
+    line-height:1.05}
+  .chart .heroSub{font-size:11.5px;color:var(--muted);margin:1px 0 8px}
+  /* charts carry identity in the mark; text always wears text tokens */
+  .ct-lbl{font-size:11px;fill:var(--muted)}
+  .ct-val{font-size:11.5px;font-weight:700;fill:var(--ink)}
+  .ct-axis{stroke:#e6e6e6;stroke-width:1}
+  .clegend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-top:6px}
+  .clegend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;
+    vertical-align:middle}
+
   /* kpi cards */
-  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:18px}
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px}
   .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
   .kpi .label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.03em}
   .kpi .val{font-size:26px;font-weight:700;margin-top:6px}
   .kpi .val small{font-size:14px;color:var(--muted);font-weight:500}
   .kpi.hl{background:var(--shopee-soft);border-color:#ffd9cf}
   .kpi.hl .val{color:var(--shopee-dark)}
+  body.fixed .kpis{margin-bottom:0}
+  body.fixed .kpi{padding:9px 12px}
+  body.fixed .kpi .label{font-size:10px}
+  body.fixed .kpi .val{font-size:clamp(17px,1.75vw,23px);margin-top:1px}
+  body.fixed .kpi .val small{font-size:11px}
 
   .card{background:var(--card);border:1px solid var(--line);border-radius:12px;
     padding:18px;margin-bottom:18px}
   .card h2{font-size:15px;margin:0 0 14px}
   .grid2{display:grid;grid-template-columns:1.3fr 1fr;gap:18px}
+  body.fixed .card{margin-bottom:0;padding:12px 14px;min-height:0;overflow:hidden;
+    display:flex;flex-direction:column}
+  body.fixed .card h2{font-size:12px;margin:0 0 9px;text-transform:uppercase;
+    letter-spacing:.04em;color:var(--muted);flex-shrink:0}
+  body.fixed .card h2 b{color:var(--ink)}
+  body.fixed .card > :last-child{min-height:0;flex:1;overflow:hidden}
   @media(max-width:820px){.kpis{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}}
+  /* below this the panels genuinely cannot fit side by side; give the page back */
+  @media(max-width:1080px),(max-height:600px){
+    body.fixed{overflow:auto}
+    body.fixed .wrap{height:auto;padding:16px 18px 40px}
+    body.fixed #dashboard.active{display:block}
+    body.fixed .kpis,body.fixed .card{margin-bottom:12px}
+    .dash-main{grid-template-columns:1fr}
+    /* fallback: panels stack full-width */
+  }
 
-  /* decision mix bar */
-  .mixbar{display:flex;height:26px;border-radius:7px;overflow:hidden;margin-bottom:10px}
-  .mixbar span{display:block}
-  .seg-approve{background:var(--green)} .seg-escalate{background:var(--amber)}
-  .seg-reject{background:var(--red)} .seg-resubmit{background:var(--blue)}
-  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px}
-  .legend .dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle}
-
-  /* confusion matrix */
-  .cm{display:grid;grid-template-columns:auto 1fr 1fr 1fr 1fr;gap:6px;font-size:13px}
-  .cm .h{color:var(--muted);font-size:11px;text-transform:uppercase;padding:4px;text-align:center;align-self:end}
-  .cm .rh{color:var(--muted);font-size:11px;text-transform:uppercase;align-self:center;padding-right:6px;text-align:right}
-  .cm .cell{border-radius:8px;padding:12px 8px;text-align:center}
-  .cm .cell b{font-size:22px;display:block}
-  .cm .cell small{font-size:10px;opacity:.8}
-  .cm-good{background:var(--green-bg);color:#177a30}
-  .cm-bad{background:var(--red-bg);color:#b31414}
-  .cm-esc{background:var(--amber-bg);color:#8a5a06}
-  .cm-res{background:var(--blue-bg);color:#1b4f9c}
+  .tbl-fit{min-height:0;overflow:hidden}
+  body.fixed .tbl-fit th{padding:5px 7px;font-size:10px}
+  body.fixed .tbl-fit td{padding:5px 7px;font-size:12px}
 
   /* table */
   table{width:100%;border-collapse:collapse}
@@ -157,25 +196,36 @@
 <div class="wrap">
   <!-- DASHBOARD -->
   <section class="view active" id="dashboard">
-    <h1>Refund-proof review dashboard</h1>
-    <p class="sub">AI flags suspicious proof and explains why — a human still makes the final call on escalations.</p>
+    <div class="dash-hd">
+      <h1>Refund-proof review dashboard</h1>
+      <p class="sub">AI flags suspicious proof and explains why — a human still makes the final call.</p>
+    </div>
     <div class="kpis" id="kpis"><div class="loading">Loading…</div></div>
-    <div class="grid2">
+
+    <div class="dash-main">
+      <div class="card" id="cardCost">
+        <h2>Expected cost per batch</h2>
+        <div class="chart" id="chCost"></div>
+      </div>
+      <div class="card" id="cardCover">
+        <h2>Value at risk sent to a human</h2>
+        <div class="chart" id="chCover"></div>
+      </div>
       <div class="card">
         <h2>Decision mix</h2>
-        <div class="mixbar" id="mixbar"></div>
-        <div class="legend" id="mixlegend"></div>
+        <div class="chart" id="chMix"></div>
       </div>
-      <div class="card" id="cmCard">
-        <h2>Confusion matrix <span style="color:var(--muted);font-weight:400">· labeled cases</span></h2>
-        <div id="cm"></div>
+      <div class="card" id="cardHist" style="grid-column:span 2">
+        <h2>Why the gate misses — credibility vs claim value</h2>
+        <div class="chart" id="chHist"></div>
       </div>
-    </div>
-    <div class="card">
-      <h2>Recent cases</h2>
-      <table><thead><tr><th>Case</th><th>Return reason</th><th>Claim</th>
-        <th>Credibility</th><th>Decision</th></tr></thead>
-        <tbody id="recentRows"></tbody></table>
+      <div class="card">
+        <h2>Latest cases</h2>
+        <div class="tbl-fit">
+          <table><thead><tr><th>Case</th><th>Claim</th><th>Cred</th><th>Decision</th></tr></thead>
+            <tbody id="recentRows"></tbody></table>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -234,6 +284,8 @@ async function loadSessions(){
 
 async function render(){
   const view = document.querySelector(".tab.active").dataset.view;
+  // only the dashboard is height-locked; long lists keep their scrollbar
+  document.body.classList.toggle("fixed", view==="dashboard");
   if(view==="dashboard") renderDashboard();
   if(view==="queue") renderQueue();
   if(view==="cases") renderCases(document.querySelector("#caseFilters .chip.active").dataset.f);
@@ -247,56 +299,217 @@ async function renderDashboard(){
     <div class="kpi"><div class="label">Cases processed</div><div class="val">${s.n}</div></div>
     <div class="kpi"><div class="label">Avg time / case</div>
       <div class="val">${(s.avg_runtime_ms/1000).toFixed(1)}<small>s</small></div></div>
+    <div class="kpi"><div class="label">Escalations</div>
+      <div class="val">${s.mix.escalate} <small>· ${peso(s.escalated_value_php)}</small></div></div>
     <div class="kpi hl"><div class="label">Net saved vs manual</div>
       <div class="val">${peso(s.net_saved_php)} <small>/ batch</small></div></div>`;
 
-  const m = s.mix, tot = s.n||1;
-  document.getElementById("mixbar").innerHTML =
-    `<span class="seg-approve" style="width:${m.approve/tot*100}%"></span>
-     <span class="seg-escalate" style="width:${m.escalate/tot*100}%"></span>
-     <span class="seg-reject" style="width:${m.reject/tot*100}%"></span>
-     <span class="seg-resubmit" style="width:${m.resubmit/tot*100}%"></span>`;
-  document.getElementById("mixlegend").innerHTML =
-    `<span><i class="dot" style="background:var(--green)"></i>Auto-approve · ${m.approve}</span>
-     <span><i class="dot" style="background:var(--amber)"></i>Escalate · ${m.escalate}</span>
-     <span><i class="dot" style="background:var(--red)"></i>Auto-reject · ${m.reject}</span>
-     <span><i class="dot" style="background:var(--blue)"></i>Bounced to buyer · ${m.resubmit}</span>`;
-
-  const cm = s.confusion, card = document.getElementById("cmCard");
-  if(!cm){ card.style.display="none"; }
-  else{
-    card.style.display="";
-    document.getElementById("cm").innerHTML = `
-      <div class="cm">
-        <div class="h"></div><div class="h">pred reject</div><div class="h">pred approve</div><div class="h">escalated</div><div class="h">bounced</div>
-        <div class="rh">actual invalid</div>
-          <div class="cell cm-good"><b>${cm.tp}</b><small>caught</small></div>
-          <div class="cell cm-bad"><b>${cm.fn}</b><small>bad approval</small></div>
-          <div class="cell cm-esc"><b>${cm.esc_inv}</b><small>to human</small></div>
-          <div class="cell cm-res"><b>${cm.res_inv}</b><small>unreadable</small></div>
-        <div class="rh">actual valid</div>
-          <div class="cell cm-bad"><b>${cm.fp}</b><small>bad reject</small></div>
-          <div class="cell cm-good"><b>${cm.tn}</b><small>honest ok</small></div>
-          <div class="cell cm-esc"><b>${cm.esc_val}</b><small>to human</small></div>
-          <div class="cell cm-res"><b>${cm.res_val}</b><small>unreadable</small></div>
-      </div>
-      <p style="color:var(--muted);font-size:12px;margin:12px 0 0">
-        FP=${cm.fp}: honest buyers wrongly rejected. Small labeled sample — read error types, not rates.</p>`;
-  }
-
   const rows = await j("/api/cases?session="+SESSION);
-  document.getElementById("recentRows").innerHTML = rows.slice(0,8).map(rowHtml).join("");
+  SUMMARY = s; RECENT = rows;
+  drawAll();
   bindRows();
 }
 
-function rowHtml(r){
+let RECENT = [], SUMMARY = null;
+
+function drawAll(){
+  if(!SUMMARY) return;
+  chartCost(SUMMARY.gate);
+  chartCover(SUMMARY.gate);
+  chartMix(SUMMARY.mix, SUMMARY.n);
+  chartHist(RECENT, SUMMARY.gate);
+  fitRecent();
+}
+
+/* Show exactly as many rows as the panel can hold. A table that overflows its
+   card is the thing that puts a scrollbar back on the page, and a half-clipped
+   row reads as a rendering bug — so we measure and cut. */
+function fitRecent(){
+  const body = document.getElementById("recentRows");
+  if(!RECENT.length){ body.innerHTML = ""; return; }
+  const box = body.closest(".tbl-fit");
+  // must mirror the CSS breakpoint that releases the height lock, or we would
+  // measure a collapsed box and render a one-row table on small screens
+  const locked = document.body.classList.contains("fixed")
+    && matchMedia("(min-width:1081px) and (min-height:601px)").matches;
+  let n = locked ? RECENT.length : 8;
+  if(locked && box){
+    const head = box.querySelector("thead");
+    const avail = box.clientHeight - (head ? head.offsetHeight : 0);
+    body.innerHTML = rowHtml4(RECENT[0]);           // measure one real row
+    const rh = body.firstElementChild ? body.firstElementChild.offsetHeight : 34;
+    n = Math.max(1, Math.floor(avail / (rh || 34)));
+  }
+  body.innerHTML = RECENT.slice(0, Math.min(n, 5)).map(rowHtml4).join("");
+}
+let rzT; addEventListener("resize", ()=>{
+  clearTimeout(rzT);
+  rzT = setTimeout(()=>{ if(RECENT.length){ drawAll(); bindRows(); } }, 120);
+});
+
+function rowHtml4(r){
   return `<tr class="clk" data-id="${r.case_id}">
-    <td class="mono">${r.case_id}</td>
-    <td>${r.return_reason||"—"}</td>
+    <td class="mono" style="font-size:11px">${r.case_id}
+      <div style="color:var(--muted);font-size:10px;font-family:inherit">${r.return_reason||"—"}</div></td>
     <td class="mono">${peso(r.claim_value_php)}</td>
     <td class="cred" style="color:${credColor(r.credibility)}">${r.credibility??"—"}</td>
     <td>${badge(r.decision)}</td></tr>`;
 }
+
+/* ---- tiny SVG chart kit -------------------------------------------------
+   Charts are drawn at the panel's measured pixel size rather than scaled from a
+   viewBox, so labels stay at their true type size instead of stretching with the
+   card. Every chart redraws on resize. */
+const SVGNS="http://www.w3.org/2000/svg";
+function svgBox(el){
+  el.innerHTML="";
+  const w=Math.max(el.clientWidth,120), h=Math.max(el.clientHeight,90);
+  const s=document.createElementNS(SVGNS,"svg");
+  s.setAttribute("width",w); s.setAttribute("height",h);
+  el.appendChild(s);
+  return {s,w,h};
+}
+function nd(s,tag,attrs,text){
+  const e=document.createElementNS(SVGNS,tag);
+  for(const k in attrs) e.setAttribute(k,attrs[k]);
+  if(text!=null) e.textContent=text;
+  s.appendChild(e); return e;
+}
+function tip(e,text){ nd(e,"title",{},text); }
+
+// A rounded data-end anchored to the baseline: only the outer corners round, so
+// stacked segments still read as one bar.
+function barPath(x,y,w,h,r,side){
+  r=Math.min(r,h/2,w/2); if(w<=0) return "";
+  if(side==="right") return `M${x},${y}h${w-r}a${r},${r} 0 0 1 ${r},${r}v${h-2*r}a${r},${r} 0 0 1 ${-r},${r}h${-(w-r)}z`;
+  return `M${x},${y}h${w}v${h}h${-w}z`;
+}
+
+/* Two routing policies over the SAME cases, costed with identical risk inputs.
+   "Gate" = the obvious baseline: anything the model is unsure about (credibility
+   35–75) goes to a human. "Ours" = escalate only when the money at stake justifies
+   the ₱ cost of that review. Every chart below is one read of that comparison. */
+
+// 1. Expected cost — stacked horizontal bars. Color = policy; the lighter step
+//    inside each bar is the share that is residual loss rather than review spend.
+function chartCost(g){
+  const el = document.getElementById("chCost");
+  if(!g){ document.getElementById("cardCost").style.display="none"; return; }
+  const save = g.gate.total_cost_php - g.ours.total_cost_php;
+  el.innerHTML = `<div class="hero">${save>=0?"":"−"}${peso(Math.abs(save))}</div>
+    <div class="heroSub">${save>=0?"cheaper":"costlier"} than an uncertainty gate · ${g.n_pool} routable cases</div>
+    <div class="cbox"></div>
+    <div class="clegend"><span><i style="background:var(--ours)"></i>Review spend</span>
+      <span><i style="background:var(--ours-lt)"></i>Residual expected loss</span></div>`;
+  const {s,w,h} = svgBox(el.querySelector(".cbox"));
+  const mx = Math.max(g.ours.total_cost_php, g.gate.total_cost_php, 1);
+  const plotW = w - 78, rowH = h/2, bh = Math.min(24, rowH-22);
+  [["Value-aware (ours)",g.ours,"var(--ours)","var(--ours-lt)"],
+   ["Uncertainty gate",g.gate,"var(--gate)","var(--gate-lt)"]].forEach(([name,d,c1,c2],i)=>{
+    const y = i*rowH + (rowH-bh)/2 + 6;
+    nd(s,"text",{x:0,y:y-6,class:"ct-lbl"},name);
+    const tw = d.total_cost_php/mx*plotW;
+    const w1 = Math.max(d.review_cost_php/mx*plotW - 2, 0);
+    const w2 = Math.max(tw - w1 - 2, 0);
+    tip(nd(s,"path",{d:barPath(0,y,w1,bh,4,w2<=0?"right":"flat"),fill:c1}),
+        `Review spend ${peso(d.review_cost_php)}`);
+    if(w2>0) tip(nd(s,"path",{d:barPath(w1+2,y,w2,bh,4,"right"),fill:c2}),
+        `Residual expected loss ${peso(d.residual_loss_php)}`);
+    nd(s,"text",{x:tw+8,y:y+bh/2+4,class:"ct-val"},peso(d.total_cost_php));
+  });
+}
+
+// 2. Coverage — what share of the pesos at risk actually reaches a human. The
+//    track is the whole exposure pool, so the unfilled part is what goes unseen.
+function chartCover(g){
+  const el = document.getElementById("chCover");
+  if(!g){ document.getElementById("cardCover").style.display="none"; return; }
+  el.innerHTML = `<div class="hero">${pct(g.ours.exposure_coverage)}</div>
+    <div class="heroSub">of ${peso(g.total_exposure_php)} at risk reviewed · gate sees ${pct(g.gate.exposure_coverage)}</div>
+    <div class="cbox"></div>`;
+  const {s,w,h} = svgBox(el.querySelector(".cbox"));
+  const rowH = h/2, bh = Math.min(24, rowH-24);
+  [["Value-aware (ours)",g.ours,"var(--ours)"],["Uncertainty gate",g.gate,"var(--gate)"]]
+  .forEach(([name,d,c],i)=>{
+    const y = i*rowH + (rowH-bh)/2 + 7;
+    nd(s,"text",{x:0,y:y-7,class:"ct-lbl"},
+       `${name} · ${d.n_reviewed} review${d.n_reviewed===1?"":"s"}`);
+    nd(s,"path",{d:barPath(0,y,w,bh,4,"right"),fill:"#f0f0f0"});
+    const bw = Math.max(d.exposure_coverage*w, 2);
+    tip(nd(s,"path",{d:barPath(0,y,bw,bh,4,"right"),fill:c}),
+        `${peso(d.exposure_reviewed_php)} of ${peso(g.total_exposure_php)}`);
+    const inside = bw > 62;
+    nd(s,"text",{x:inside?bw-6:bw+6,y:y+bh/2+4,class:"ct-val",
+      "text-anchor":inside?"end":"start",fill:inside?"#fff":"var(--ink)"},
+      pct(d.exposure_coverage));
+  });
+}
+
+// 3. Decision mix — a donut, because the question is "how is the batch split",
+//    not "which route is biggest". Status hues; every arc is also direct-labeled
+//    in the legend, so route identity is never carried by color alone.
+function chartMix(m, n){
+  const el = document.getElementById("chMix");
+  const routes = [["Auto-approve",m.approve,"var(--green)"],["Escalate",m.escalate,"var(--amber)"],
+                  ["Auto-reject",m.reject,"var(--red)"],["Bounced",m.resubmit,"var(--blue)"]];
+  el.innerHTML = `<div class="cbox"></div>
+    <div class="clegend">${routes.map(([nm,v,c])=>
+      `<span><i style="background:${c}"></i>${nm} · ${v}</span>`).join("")}</div>`;
+  const {s,w,h} = svgBox(el.querySelector(".cbox"));
+  const tot = n||1, cx = w/2, cy = h/2, R = Math.min(w,h)/2 - 4, r = R*0.62;
+  let a0 = -Math.PI/2;
+  routes.forEach(([nm,v,c])=>{
+    if(!v) return;
+    const a1 = a0 + v/tot*Math.PI*2, gap = 0.018;
+    const s0 = a0+gap, s1 = Math.max(a1-gap, a0+gap+.001);
+    const P=(ang,rad)=>[cx+Math.cos(ang)*rad, cy+Math.sin(ang)*rad];
+    const [x0,y0]=P(s0,R),[x1,y1]=P(s1,R),[x2,y2]=P(s1,r),[x3,y3]=P(s0,r);
+    const big = (s1-s0)>Math.PI?1:0;
+    tip(nd(s,"path",{fill:c,d:`M${x0},${y0}A${R},${R} 0 ${big} 1 ${x1},${y1}L${x2},${y2}A${r},${r} 0 ${big} 0 ${x3},${y3}Z`}),
+        `${nm}: ${v} (${pct(v/tot)})`);
+    a0 = a1;
+  });
+  nd(s,"text",{x:cx,y:cy-3,"text-anchor":"middle","font-size":"19","font-weight":"800",
+    fill:"var(--ink)"},String(n));
+  nd(s,"text",{x:cx,y:cy+14,"text-anchor":"middle",class:"ct-lbl"},"cases");
+}
+
+// 4. The diagnosis. Each dot is a case: how sure the model was (x) against how
+//    much money rides on it (y). The shaded column is the ONLY thing the gate
+//    reviews — so every expensive claim sitting outside it is a claim the gate
+//    waves through unseen. That is the whole argument in one picture.
+function chartHist(rows, g){
+  const el = document.getElementById("chHist");
+  const pts = rows.filter(r=>r.credibility!=null && r.claim_value_php!=null);
+  if(!g || !pts.length){ document.getElementById("cardHist").style.display="none"; return; }
+  el.innerHTML = `<div class="cbox"></div>
+    <div class="clegend"><span><i style="background:var(--ours)"></i>We escalate</span>
+      <span><i style="background:#c9c9c9"></i>Auto-decided</span>
+      <span><i style="background:#e9e9ec"></i>Gate's review band (${g.band[0]}–${g.band[1]})</span></div>`;
+  const {s,w,h} = svgBox(el.querySelector(".cbox"));
+  const L=44, R=10, T=8, B=20, pw=w-L-R, ph=h-T-B;
+  const maxV = Math.max(...pts.map(p=>p.claim_value_php), 1);
+  const X = c => L + c/100*pw, Y = v => T + ph - (v/maxV)*ph;
+
+  // the gate's blind spot, drawn first so dots sit on top of it
+  nd(s,"rect",{x:X(g.band[0]),y:T,width:X(g.band[1])-X(g.band[0]),height:ph,fill:"#eceef0"});
+  [0,.5,1].forEach(f=>{
+    const y = T+ph-f*ph;
+    nd(s,"line",{x1:L,x2:L+pw,y1:y,y2:y,class:"ct-axis"});
+    nd(s,"text",{x:L-6,y:y+3,class:"ct-lbl","text-anchor":"end"},peso(maxV*f));
+  });
+  // axis names live in the panel title, so the scale only carries its ticks
+  [0,50,100].forEach((c,i)=>nd(s,"text",{x:X(c),y:h-6,class:"ct-lbl",
+    "text-anchor":i===0?"start":i===2?"end":"middle"}, c===50?"credibility 50":c));
+
+  pts.forEach(p=>{
+    const esc = p.decision==="escalate";
+    tip(nd(s,"circle",{cx:X(p.credibility),cy:Y(p.claim_value_php),r:esc?5:4,
+      fill:esc?"var(--ours)":"#c9c9c9",stroke:"#fff","stroke-width":2}),
+      `${p.case_id} · ${peso(p.claim_value_php)} · cred ${p.credibility} · ${p.decision}`);
+  });
+}
+
 function rowHtml6(r){
   return `<tr class="clk" data-id="${r.case_id}">
     <td class="mono">${r.case_id}</td>
